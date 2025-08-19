@@ -80,17 +80,192 @@ SellOutEasy/
 ### Script SQL
 
 ```sql
-CREATE DATABASE SellOutEasyTrack_SQL;
+-- ===============================================
+-- SCRIPT COMPLETO DE CONFIGURAÇÃO DO MYSQL
+-- SellOut EasyTrack - Versão 2.0
+-- ===============================================
 
+-- Remove database se já existir (cuidado em produção!)
+DROP DATABASE IF EXISTS SellOutEasyTrack_SQL;
+
+-- Cria o database com configurações otimizadas
+CREATE DATABASE SellOutEasyTrack_SQL 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+-- Usar o database
 USE SellOutEasyTrack_SQL;
+
+-- ===============================================
+-- CRIAÇÃO DA TABELA VENDAS (OTIMIZADA)
+-- ===============================================
 
 CREATE TABLE vendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto VARCHAR(100) NOT NULL,
-    quantidade INT NOT NULL,
-    valor_unitario DECIMAL(10,2) NOT NULL,
-    data_venda DATE NOT NULL
-);
+    quantidade INT NOT NULL CHECK (quantidade > 0),
+    valor_unitario DECIMAL(10,2) NOT NULL CHECK (valor_unitario > 0),
+    data_venda DATE NOT NULL DEFAULT (CURRENT_DATE),
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Índices para melhor performance
+    INDEX idx_produto (produto),
+    INDEX idx_data_venda (data_venda),
+    INDEX idx_produto_data (produto, data_venda)
+) ENGINE=InnoDB 
+  CHARACTER SET utf8mb4 
+  COLLATE utf8mb4_unicode_ci
+  COMMENT=\'Tabela de vendas do sistema SellOut EasyTrack\';
+
+-- ===============================================
+-- CRIAÇÃO DE USUÁRIO ESPECÍFICO (RECOMENDADO)
+-- ===============================================
+
+-- Remove usuário se já existir
+DROP USER IF EXISTS \'sellout_user\'@\'localhost\';
+
+-- Cria usuário específico para a aplicação
+CREATE USER \'sellout_user\'@\'localhost\' IDENTIFIED BY \'SellOut123!\';
+
+-- Concede privilégios específicos
+GRANT SELECT, INSERT, UPDATE, DELETE ON SellOutEasyTrack_SQL.* TO \'sellout_user\'@\'localhost\';
+
+-- Aplica as mudanças
+FLUSH PRIVILEGES;
+
+-- ===============================================
+-- DADOS DE EXEMPLO PARA TESTE
+-- ===============================================
+
+INSERT INTO vendas (produto, quantidade, valor_unitario, data_venda) VALUES
+(\'Notebook Dell\', 2, 2500.00, \'2024-01-15\'),
+(\'Mouse Logitech\', 5, 85.50, \'2024-01-16\'),
+(\'Teclado Mecânico\', 3, 320.00, \'2024-01-17\'),
+(\'Monitor 24"\', 1, 899.99, \'2024-01-18\'),
+(\'Smartphone Samsung\', 4, 1200.00, \'2024-01-19\'),
+(\'Tablet Apple\', 2, 2800.00, \'2024-01-20\'),
+(\'Fone Bluetooth\', 8, 150.00, \'2024-01-21\'),
+(\'Carregador USB-C\', 10, 45.90, \'2024-01-22\'),
+(\'SSD 1TB\', 3, 480.00, \'2024-01-23\'),
+(\'Webcam HD\', 6, 220.00, \'2024-01-24\');
+
+-- ===============================================
+-- VIEWS ÚTEIS PARA RELATÓRIOS
+-- ===============================================
+
+-- View para produtos mais vendidos
+CREATE VIEW vw_produtos_mais_vendidos AS
+SELECT 
+    produto,
+    SUM(quantidade) as total_quantidade,
+    SUM(quantidade * valor_unitario) as total_vendas,
+    AVG(valor_unitario) as preco_medio,
+    COUNT(*) as numero_vendas
+FROM vendas 
+GROUP BY produto 
+ORDER BY total_quantidade DESC;
+
+-- View para vendas mensais
+CREATE VIEW vw_vendas_mensais AS
+SELECT 
+    YEAR(data_venda) as ano,
+    MONTH(data_venda) as mes,
+    MONTHNAME(data_venda) as nome_mes,
+    COUNT(*) as total_vendas,
+    SUM(quantidade) as total_produtos,
+    SUM(quantidade * valor_unitario) as faturamento
+FROM vendas 
+GROUP BY YEAR(data_venda), MONTH(data_venda)
+ORDER BY ano DESC, mes DESC;
+
+-- ===============================================
+-- PROCEDURES ÚTEIS
+-- ===============================================
+
+DELIMITER //
+
+-- Procedure para calcular estatísticas gerais
+CREATE PROCEDURE sp_estatisticas_gerais()
+BEGIN
+    SELECT 
+        COUNT(*) as total_vendas,
+        SUM(quantidade) as total_produtos_vendidos,
+        SUM(quantidade * valor_unitario) as faturamento_total,
+        AVG(quantidade * valor_unitario) as ticket_medio,
+        MIN(data_venda) as primeira_venda,
+        MAX(data_venda) as ultima_venda
+    FROM vendas;
+END //
+
+-- Procedure para limpeza de dados antigos (se necessário)
+CREATE PROCEDURE sp_limpar_vendas_antigas(IN dias_antigos INT)
+BEGIN
+    DELETE FROM vendas 
+    WHERE data_venda < DATE_SUB(CURDATE(), INTERVAL dias_antigos DAY);
+    
+    SELECT ROW_COUNT() as registros_removidos;
+END //
+
+DELIMITER ;
+
+-- ===============================================
+-- VERIFICAÇÕES E TESTES
+-- ===============================================
+
+-- Verificar se a tabela foi criada corretamente
+DESCRIBE vendas;
+
+-- Verificar dados inseridos
+SELECT COUNT(*) as total_registros FROM vendas;
+
+-- Testar view de produtos mais vendidos
+SELECT * FROM vw_produtos_mais_vendidos LIMIT 5;
+
+-- Testar procedure de estatísticas
+CALL sp_estatisticas_gerais();
+
+-- ===============================================
+-- INFORMAÇÕES DE CONEXÃO PARA O JAVA
+-- ===============================================
+
+/*
+CONFIGURAÇÃO PARA DBConnection.java:
+
+private static final String URL = "jdbc:mysql://localhost:3306/SellOutEasyTrack_SQL?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo";
+private static final String USER = "sellout_user";
+private static final String PASSWORD = "SellOut123!";
+
+ALTERNATIVA (usando root):
+private static final String USER = "root";
+private static final String PASSWORD = "sua_senha_root";
+*/
+
+-- ===============================================
+-- COMANDOS DE VERIFICAÇÃO PARA TROUBLESHOOTING
+-- ===============================================
+
+-- Verificar usuários criados
+SELECT User, Host FROM mysql.user WHERE User IN (\'sellout_user\', \'root\');
+
+-- Verificar privilégios do usuário
+SHOW GRANTS FOR \'sellout_user\'@\'localhost\';
+
+-- Verificar status da conexão
+SHOW STATUS LIKE \'Connections\';
+
+-- Verificar configurações do servidor
+SHOW VARIABLES LIKE \'port\';
+SHOW VARIABLES LIKE \'socket\';
+
+-- ===============================================
+-- SCRIPT CONCLUÍDO COM SUCESSO!
+-- ===============================================
+
+SELECT \'DATABASE CONFIGURADO COM SUCESSO!\' as status,
+       \'sellout_user criado\' as usuario,
+       \'Dados de exemplo inseridos\' as dados,
+       \'Views e procedures criadas\' as recursos;
 ```
 
 ---
@@ -106,9 +281,9 @@ src/main/java/util/DBConnection.java
 Edite as credenciais:
 
 ```java
-private static final String URL = "jdbc:mysql://localhost:3306/SellOutEasyTrack_SQL";
-private static final String USER = "seu_usuario";
-private static final String PASSWORD = "sua_senha";
+private static final String URL = "jdbc:mysql://localhost:3306/SellOutEasyTrack_SQL?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo";
+private static final String USER = "sellout_user";
+private static final String PASSWORD = "SellOut123!";
 ```
 
 ---
