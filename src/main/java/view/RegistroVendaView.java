@@ -13,7 +13,6 @@ public class RegistroVendaView extends JDialog {
     private JTextField txtProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
-
     private VendaController vendaController = new VendaController();
 
     public RegistroVendaView(JFrame parent) {

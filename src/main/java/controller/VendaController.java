@@ -11,13 +11,11 @@ public class VendaController {
 
     private VendaDAO vendaDAO = new VendaDAO();
 
-    // CREATE - Salvar nova venda
     public void salvarVenda(Venda venda) throws SQLException {
         if (venda == null) {
             throw new IllegalArgumentException("Venda não pode ser nula");
         }
 
-        // Validações de negócio
         if (venda.getProduto() == null || venda.getProduto().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do produto é obrigatório");
         }
@@ -33,12 +31,10 @@ public class VendaController {
         vendaDAO.inserirVenda(venda);
     }
 
-    // READ - Obter todas as vendas
     public List<Venda> obterTodasVendas() throws SQLException {
         return vendaDAO.listarVendas();
     }
 
-    // READ - Buscar venda por ID
     public Venda buscarVendaPorId(int id) throws SQLException {
         if (id <= 0) {
             throw new IllegalArgumentException("ID deve ser maior que zero");
@@ -46,7 +42,6 @@ public class VendaController {
         return vendaDAO.buscarVendaPorId(id);
     }
 
-    // UPDATE - Atualizar venda existente
     public void atualizarVenda(Venda venda) throws SQLException {
         if (venda == null) {
             throw new IllegalArgumentException("Venda não pode ser nula");
@@ -56,7 +51,6 @@ public class VendaController {
             throw new IllegalArgumentException("ID da venda deve ser maior que zero");
         }
 
-        // Validações de negócio (mesmas do CREATE)
         if (venda.getProduto() == null || venda.getProduto().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do produto é obrigatório");
         }
@@ -69,7 +63,6 @@ public class VendaController {
             throw new IllegalArgumentException("Valor unitário deve ser maior que zero");
         }
 
-        // Verificar se a venda existe antes de atualizar
         Venda vendaExistente = vendaDAO.buscarVendaPorId(venda.getId());
         if (vendaExistente == null) {
             throw new SQLException("Venda com ID " + venda.getId() + " não encontrada");
@@ -78,13 +71,11 @@ public class VendaController {
         vendaDAO.atualizarVenda(venda);
     }
 
-    // DELETE - Deletar venda por ID
     public void deletarVenda(int id) throws SQLException {
         if (id <= 0) {
             throw new IllegalArgumentException("ID deve ser maior que zero");
         }
 
-        // Verificar se a venda existe antes de deletar
         Venda vendaExistente = vendaDAO.buscarVendaPorId(id);
         if (vendaExistente == null) {
             throw new SQLException("Venda com ID " + id + " não encontrada");
@@ -93,7 +84,6 @@ public class VendaController {
         vendaDAO.deletarVenda(id);
     }
 
-    // RELATÓRIOS E ESTATÍSTICAS
     public Map<String, Integer> obterProdutoMaisVendido() throws SQLException {
         return vendaDAO.produtoMaisVendido();
     }
@@ -118,7 +108,6 @@ public class VendaController {
         return calcularValorTotalVendas() / totalVendas;
     }
 
-    // Validação de dados de venda
     public void validarVenda(Venda venda) throws IllegalArgumentException {
         if (venda == null) {
             throw new IllegalArgumentException("Venda não pode ser nula");
@@ -141,7 +130,6 @@ public class VendaController {
         }
     }
 
-    // Método auxiliar para buscar vendas por produto
     public List<Venda> buscarVendasPorProduto(String produto) throws SQLException {
         if (produto == null || produto.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do produto é obrigatório para busca");
