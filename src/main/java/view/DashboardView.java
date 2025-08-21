@@ -46,7 +46,7 @@ public class DashboardView extends JFrame {
 
         // Configurar ícone da aplicação (se houver)
         try {
-            setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
+            setIconImage(Toolkit.getDefaultToolkit().getImage("agent-seller-svgrepo-com"));
         } catch (Exception e) {
             // Ícone não encontrado, ignorar
         }

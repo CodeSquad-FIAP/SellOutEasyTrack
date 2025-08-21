@@ -23,8 +23,8 @@ public class DBConnection {
             "characterEncoding=UTF-8";
 
     // OPÇÃO 1: Usuário específico criado (RECOMENDADO)
-    private static final String USER = "root";
-    private static final String PASSWORD = " ";
+    private static final String USER = "sellout_user";
+    private static final String PASSWORD = "SellOut123!";
 
     // OPÇÃO 2: Se preferir usar root (descomente as linhas abaixo e comente as de cima)
     // private static final String USER = "root";
