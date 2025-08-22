@@ -17,7 +17,7 @@ public class AtualizarVendaView extends JDialog {
     private JTextField txtProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
-    private JButton btnAtualizar; // Referência direta ao botão
+    private JButton btnAtualizar;
     private Venda vendaSelecionada;
 
     public AtualizarVendaView(JFrame parent) {
@@ -31,17 +31,14 @@ public class AtualizarVendaView extends JDialog {
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Título
         JLabel titulo = new JLabel("ATUALIZAR VENDA", JLabel.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
         titulo.setForeground(new Color(230, 126, 34));
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         add(titulo, gbc);
 
-        // Reset gridwidth
         gbc.gridwidth = 1;
 
-        // Seleção de venda
         JLabel lblSelecionar = new JLabel("Selecionar Venda:");
         lblSelecionar.setFont(new Font("Arial", Font.BOLD, 14));
 
@@ -54,17 +51,14 @@ public class AtualizarVendaView extends JDialog {
         gbc.gridx = 1;
         add(comboVendas, gbc);
 
-        // Separador visual
         JSeparator separador = new JSeparator();
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(separador, gbc);
 
-        // Reset para campos de formulário
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Campos do formulário
         JLabel lblProduto = new JLabel("Produto:");
         lblProduto.setFont(new Font("Arial", Font.BOLD, 14));
         txtProduto = new JTextField(20);
@@ -72,7 +66,7 @@ public class AtualizarVendaView extends JDialog {
         txtProduto.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
-        txtProduto.setEnabled(false); // Inicia desabilitado
+        txtProduto.setEnabled(false);
 
         JLabel lblQuantidade = new JLabel("Quantidade:");
         lblQuantidade.setFont(new Font("Arial", Font.BOLD, 14));
@@ -92,7 +86,6 @@ public class AtualizarVendaView extends JDialog {
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
         txtValorUnitario.setEnabled(false);
 
-        // Layout dos campos
         gbc.gridx = 0; gbc.gridy = 3;
         add(lblProduto, gbc);
         gbc.gridx = 1;
@@ -108,14 +101,13 @@ public class AtualizarVendaView extends JDialog {
         gbc.gridx = 1;
         add(txtValorUnitario, gbc);
 
-        // Botões
         btnAtualizar = new JButton("Atualizar Venda");
         btnAtualizar.setBackground(new Color(230, 126, 34));
         btnAtualizar.setForeground(Color.white);
         btnAtualizar.setFocusPainted(false);
         btnAtualizar.setFont(new Font("Arial", Font.BOLD, 16));
         btnAtualizar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
-        btnAtualizar.setEnabled(false); // Inicia desabilitado
+        btnAtualizar.setEnabled(false);
 
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBackground(new Color(149, 165, 166));
@@ -124,11 +116,9 @@ public class AtualizarVendaView extends JDialog {
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
         btnCancelar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
-        // Event listeners
         btnAtualizar.addActionListener(e -> atualizarVenda());
         btnCancelar.addActionListener(e -> dispose());
 
-        // Panel para botões
         JPanel panelBotoes = new JPanel(new FlowLayout());
         panelBotoes.setBackground(new Color(245, 245, 245));
         panelBotoes.add(btnAtualizar);
@@ -137,7 +127,6 @@ public class AtualizarVendaView extends JDialog {
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         add(panelBotoes, gbc);
 
-        // Carregar vendas
         carregarVendas();
 
         setVisible(true);
@@ -176,11 +165,10 @@ public class AtualizarVendaView extends JDialog {
             txtQuantidade.setText(String.valueOf(vendaSelecionada.getQuantidade()));
             txtValorUnitario.setText(String.valueOf(vendaSelecionada.getValorUnitario()));
 
-            // Habilitar campos e botão
             txtProduto.setEnabled(true);
             txtQuantidade.setEnabled(true);
             txtValorUnitario.setEnabled(true);
-            btnAtualizar.setEnabled(true); // Usar referência direta
+            btnAtualizar.setEnabled(true);
 
         } else {
             vendaSelecionada = null;
@@ -189,11 +177,10 @@ public class AtualizarVendaView extends JDialog {
             txtQuantidade.setText("");
             txtValorUnitario.setText("");
 
-            // Desabilitar campos e botão
             txtProduto.setEnabled(false);
             txtQuantidade.setEnabled(false);
             txtValorUnitario.setEnabled(false);
-            btnAtualizar.setEnabled(false); // Usar referência direta
+            btnAtualizar.setEnabled(false);
         }
     }
 
@@ -205,7 +192,6 @@ public class AtualizarVendaView extends JDialog {
         }
 
         try {
-            // Validação dos campos
             String produto = txtProduto.getText().trim();
             if (produto.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Por favor, informe o nome do produto!",
@@ -230,7 +216,6 @@ public class AtualizarVendaView extends JDialog {
                 return;
             }
 
-            // Conversão e validação de tipos
             int quantidade = Integer.parseInt(quantidadeStr);
             if (quantidade <= 0) {
                 JOptionPane.showMessageDialog(this, "A quantidade deve ser um número positivo!",
@@ -245,7 +230,6 @@ public class AtualizarVendaView extends JDialog {
                 return;
             }
 
-            // Confirmação da atualização
             int resposta = JOptionPane.showConfirmDialog(this,
                     "Confirma a atualização desta venda?\n\n" +
                             "Dados atuais:\n" +
@@ -259,20 +243,18 @@ public class AtualizarVendaView extends JDialog {
 
             if (resposta == JOptionPane.YES_OPTION) {
                 try {
-                    // Cria nova instância da venda com dados atualizados
                     Venda vendaAtualizada = new Venda(
                             vendaSelecionada.getId(),
                             produto,
                             quantidade,
                             valor,
-                            vendaSelecionada.getData() // Mantém a data original
+                            vendaSelecionada.getData()
                     );
 
-                    // Chama o controller para atualizar
                     vendaController.atualizarVenda(vendaAtualizada);
 
                     JOptionPane.showMessageDialog(this,
-                            "✅ Venda atualizada com sucesso!\n\n" +
+                            "Venda atualizada com sucesso!\n\n" +
                                     "Dados atualizados:\n" +
                                     "• ID: " + vendaSelecionada.getId() + "\n" +
                                     "• Produto: " + produto + "\n" +
@@ -314,7 +296,6 @@ public class AtualizarVendaView extends JDialog {
         }
     }
 
-    // Classe auxiliar para o ComboBox
     private static class VendaComboItem {
         private Venda venda;
         private String texto;

@@ -7,21 +7,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Motor de Analytics Inteligente para SellOut EasyTrack
- * Gera insights automáticos baseado nos dados de vendas
- */
 public class AnalyticsEngine {
 
-    // Constantes para classificação de insights
-    private static final double CRESCIMENTO_ALTO = 0.15; // 15%
-    private static final double QUEDA_PREOCUPANTE = -0.10; // -10%
+    private static final double CRESCIMENTO_ALTO = 0.15;
+    private static final double QUEDA_PREOCUPANTE = -0.10;
     private static final int DIAS_ANALISE_TREND = 30;
     private static final double DESVIO_PADRAO_LIMITE = 2.0;
 
-    /**
-     * Gera insights automáticos baseado na lista de vendas
-     */
     public List<Insight> gerarInsightsAutomaticos(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
@@ -35,7 +27,6 @@ public class AnalyticsEngine {
             return insights;
         }
 
-        // Análises principais
         insights.addAll(analisarTendenciaVendas(vendas));
         insights.addAll(analisarProdutosMaisVendidos(vendas));
         insights.addAll(analisarPerformanceTempoReal(vendas));
@@ -43,19 +34,14 @@ public class AnalyticsEngine {
         insights.addAll(analisarSazonalidade(vendas));
         insights.addAll(analisarOportunidades(vendas));
 
-        // Ordenar por prioridade (crítico > alerta > info)
         insights.sort((a, b) -> a.getTipo().getPrioridade() - b.getTipo().getPrioridade());
 
         return insights;
     }
 
-    /**
-     * Analisa tendências de vendas (crescimento/queda)
-     */
     private List<Insight> analisarTendenciaVendas(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
-        // Separar vendas dos últimos 30 dias vs 30 dias anteriores
         LocalDate hoje = LocalDate.now();
         LocalDate inicio30Dias = hoje.minusDays(30);
         LocalDate inicio60Dias = hoje.minusDays(60);
@@ -88,14 +74,14 @@ public class AnalyticsEngine {
             if (crescimento > CRESCIMENTO_ALTO) {
                 insights.add(new Insight(
                         TipoInsight.SUCESSO,
-                        "Crescimento Acelerado Detectado! 🚀",
+                        "Crescimento Acelerado Detectado!",
                         String.format("Suas vendas cresceram %.1f%% nos últimos 30 dias!", crescimento * 100),
                         "Mantenha essa estratégia! Considere aumentar o estoque dos produtos em alta."
                 ));
             } else if (crescimento < QUEDA_PREOCUPANTE) {
                 insights.add(new Insight(
                         TipoInsight.CRITICO,
-                        "Queda nas Vendas Detectada ⚠️",
+                        "Queda nas Vendas Detectada",
                         String.format("Suas vendas caíram %.1f%% nos últimos 30 dias.", Math.abs(crescimento * 100)),
                         "Analise os produtos com baixa performance e revise sua estratégia de vendas."
                 ));
@@ -112,9 +98,6 @@ public class AnalyticsEngine {
         return insights;
     }
 
-    /**
-     * Analisa performance dos produtos mais vendidos
-     */
     private List<Insight> analisarProdutosMaisVendidos(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
@@ -130,13 +113,11 @@ public class AnalyticsEngine {
                         Collectors.summingDouble(v -> v.getQuantidade() * v.getValorUnitario())
                 ));
 
-        // Top 3 produtos por quantidade
         List<Map.Entry<String, Integer>> topQuantidade = produtosPorQuantidade.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(3)
                 .collect(Collectors.toList());
 
-        // Top 3 produtos por faturamento
         List<Map.Entry<String, Double>> topFaturamento = produtosPorFaturamento.entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
                 .limit(3)
@@ -148,7 +129,7 @@ public class AnalyticsEngine {
 
             insights.add(new Insight(
                     TipoInsight.SUCESSO,
-                    "Produto Campeão de Vendas! 🏆",
+                    "Produto Campeão de Vendas!",
                     String.format("%s é seu produto mais vendido com %d unidades!", produtoMaisVendido, quantidade),
                     "Considere aumentar o estoque deste produto e criar promoções relacionadas."
             ));
@@ -161,7 +142,7 @@ public class AnalyticsEngine {
             if (!produtoMaiorFaturamento.equals(topQuantidade.get(0).getKey())) {
                 insights.add(new Insight(
                         TipoInsight.INFO,
-                        "Produto de Alto Valor Identificado 💰",
+                        "Produto de Alto Valor Identificado",
                         String.format("%s gera mais faturamento (R$ %.2f) apesar de não ser o mais vendido.",
                                 produtoMaiorFaturamento, faturamento),
                         "Foque em vender mais deste produto de alta margem."
@@ -172,9 +153,6 @@ public class AnalyticsEngine {
         return insights;
     }
 
-    /**
-     * Analisa performance em tempo real (últimos 7 dias)
-     */
     private List<Insight> analisarPerformanceTempoReal(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
@@ -206,7 +184,6 @@ public class AnalyticsEngine {
                 "Continue monitorando este desempenho diariamente."
         ));
 
-        // Verificar se teve vendas hoje
         boolean vendasHoje = vendasRecentes.stream()
                 .anyMatch(v -> v.getData().toLocalDate().equals(hoje));
 
@@ -222,17 +199,13 @@ public class AnalyticsEngine {
         return insights;
     }
 
-    /**
-     * Detecta anomalias nos dados (vendas muito altas ou baixas)
-     */
     private List<Insight> analisarAnomalias(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
         if (vendas.size() < 10) {
-            return insights; // Dados insuficientes para análise estatística
+            return insights;
         }
 
-        // Calcular faturamento diário
         Map<LocalDate, Double> faturamentoPorDia = vendas.stream()
                 .collect(Collectors.groupingBy(
                         v -> v.getData().toLocalDate(),
@@ -243,7 +216,6 @@ public class AnalyticsEngine {
         double media = faturamentosDiarios.stream().mapToDouble(Double::doubleValue).average().orElse(0);
         double desvioPadrao = calcularDesvioPadrao(faturamentosDiarios, media);
 
-        // Detectar dias com performance anômala
         for (Map.Entry<LocalDate, Double> entry : faturamentoPorDia.entrySet()) {
             double faturamento = entry.getValue();
             double zScore = Math.abs(faturamento - media) / desvioPadrao;
@@ -252,7 +224,7 @@ public class AnalyticsEngine {
                 if (faturamento > media) {
                     insights.add(new Insight(
                             TipoInsight.SUCESSO,
-                            "Dia Excepcional de Vendas! ⭐",
+                            "Dia Excepcional de Vendas!",
                             String.format("No dia %s você faturou R$ %.2f (%.1fx acima da média)!",
                                     entry.getKey(), faturamento, faturamento / media),
                             "Analise o que funcionou nesse dia para replicar o sucesso."
@@ -272,14 +244,11 @@ public class AnalyticsEngine {
         return insights;
     }
 
-    /**
-     * Analisa padrões sazonais (dias da semana, fins de semana)
-     */
     private List<Insight> analisarSazonalidade(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
         if (vendas.size() < 14) {
-            return insights; // Dados insuficientes
+            return insights;
         }
 
         Map<String, Double> faturamentoPorDiaSemana = vendas.stream()
@@ -311,13 +280,9 @@ public class AnalyticsEngine {
         return insights;
     }
 
-    /**
-     * Identifica oportunidades de crescimento
-     */
     private List<Insight> analisarOportunidades(List<Venda> vendas) {
         List<Insight> insights = new ArrayList<>();
 
-        // Produtos com baixa frequência mas alto valor
         Map<String, Long> frequenciaPorProduto = vendas.stream()
                 .collect(Collectors.groupingBy(
                         Venda::getProduto,
@@ -334,7 +299,7 @@ public class AnalyticsEngine {
             long frequencia = frequenciaPorProduto.get(produto);
             double valorMedio = valorMedioPorProduto.get(produto);
 
-            if (frequencia <= 2 && valorMedio > 500) { // Produto caro mas pouco vendido
+            if (frequencia <= 2 && valorMedio > 500) {
                 insights.add(new Insight(
                         TipoInsight.OPORTUNIDADE,
                         "Oportunidade de Produto Premium",
@@ -345,7 +310,6 @@ public class AnalyticsEngine {
             }
         }
 
-        // Sugestão de diversificação se há poucos produtos
         long produtosUnicos = vendas.stream()
                 .map(Venda::getProduto)
                 .distinct()
@@ -363,7 +327,6 @@ public class AnalyticsEngine {
         return insights;
     }
 
-    // Métodos auxiliares
     private double calcularFaturamento(List<Venda> vendas) {
         return vendas.stream()
                 .mapToDouble(v -> v.getQuantidade() * v.getValorUnitario())
@@ -390,31 +353,24 @@ public class AnalyticsEngine {
         return traducao.getOrDefault(diaIngles, diaIngles);
     }
 
-    /**
-     * Enum para tipos de insight
-     */
     public enum TipoInsight {
-        CRITICO(1, "🔴"),
-        ALERTA(2, "🟡"),
-        INFO(3, "🔵"),
-        SUCESSO(4, "🟢"),
-        OPORTUNIDADE(5, "💡");
+        CRITICO(1),
+        ALERTA(2),
+        INFO(3),
+        SUCESSO(4),
+        OPORTUNIDADE(5);
 
         private final int prioridade;
-        private final String emoji;
 
-        TipoInsight(int prioridade, String emoji) {
+        TipoInsight(int prioridade) {
             this.prioridade = prioridade;
-            this.emoji = emoji;
         }
 
-        public int getPrioridade() { return prioridade; }
-        public String getEmoji() { return emoji; }
+        public int getPrioridade() {
+            return prioridade;
+        }
     }
 
-    /**
-     * Classe para representar um insight
-     */
     public static class Insight {
         private final TipoInsight tipo;
         private final String titulo;
@@ -430,7 +386,6 @@ public class AnalyticsEngine {
             this.dataGeracao = LocalDate.now();
         }
 
-        // Getters
         public TipoInsight getTipo() { return tipo; }
         public String getTitulo() { return titulo; }
         public String getDescricao() { return descricao; }
@@ -439,8 +394,8 @@ public class AnalyticsEngine {
 
         @Override
         public String toString() {
-            return String.format("%s %s\n%s\n💡 %s\n",
-                    tipo.getEmoji(), titulo, descricao, recomendacao);
+            return String.format("%s\n%s\nRecomendação: %s\n",
+                    titulo, descricao, recomendacao);
         }
     }
 }

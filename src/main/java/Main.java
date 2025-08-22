@@ -5,39 +5,29 @@ import util.DBConnection;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Classe principal SIMPLIFICADA do SellOut EasyTrack
- * Foco nas sprints: BI Inteligente + Múltiplas Fontes + Escalabilidade
- * SEM complexidade de licenciamento
- */
 public class Main {
 
     private static final String SYSTEM_NAME = "SellOut EasyTrack";
     private static final String VERSION = "v2.0 - Sistema Completo";
 
     public static void main(String[] args) {
-        System.out.println("🚀 INICIANDO " + SYSTEM_NAME + " " + VERSION);
-        System.out.println("🎯 FOCO: BI Inteligente + Múltiplas Fontes + Analytics");
-        System.out.println("✅ TODAS as funcionalidades SEMPRE ativas!");
+        System.out.println("INICIANDO " + SYSTEM_NAME + " " + VERSION);
+        System.out.println("FOCO: BI Inteligente + Múltiplas Fontes + Analytics");
+        System.out.println("TODAS as funcionalidades SEMPRE ativas!");
         System.out.println("===============================================\n");
 
-        // Configurar interface moderna
         configurarLookAndFeel();
-
-        // Configurar renderização
         configurarPropriedadesRenderizacao();
 
-        // Verificar dependências críticas
         if (!verificarDependencias()) {
             System.exit(1);
         }
 
-        // Iniciar aplicação
         SwingUtilities.invokeLater(() -> {
             try {
                 new SimplifiedDashboardView();
-                System.out.println("✅ Aplicação iniciada com sucesso!");
-                System.out.println("🎉 Todas as funcionalidades estão disponíveis!");
+                System.out.println("Aplicação iniciada com sucesso!");
+                System.out.println("Todas as funcionalidades estão disponíveis!");
             } catch (Exception e) {
                 mostrarErroInicializacao(e);
             }
@@ -48,13 +38,11 @@ public class Main {
         try {
             FlatLightLaf.setup();
 
-            // Configurações visuais modernas
             UIManager.put("Button.arc", 8);
             UIManager.put("Component.arc", 8);
             UIManager.put("ProgressBar.arc", 8);
             UIManager.put("TextComponent.arc", 8);
 
-            // Cores do tema
             Color primaryColor = new Color(41, 128, 185);
             Color accentColor = new Color(46, 204, 113);
 
@@ -63,18 +51,17 @@ public class Main {
             UIManager.put("Component.focusColor", primaryColor);
             UIManager.put("ProgressBar.foreground", accentColor);
 
-            // Configurar fonte
             configurarFontes();
 
-            System.out.println("✅ Interface moderna configurada");
+            System.out.println("Interface moderna configurada");
 
         } catch (Exception e) {
-            System.err.println("⚠️ Erro ao configurar interface: " + e.getMessage());
+            System.err.println("Erro ao configurar interface: " + e.getMessage());
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                System.out.println("⚠️ Usando interface padrão do sistema");
+                System.out.println("Usando interface padrão do sistema");
             } catch (Exception ex) {
-                System.err.println("❌ Erro crítico na interface: " + ex.getMessage());
+                System.err.println("Erro crítico na interface: " + ex.getMessage());
             }
         }
     }
@@ -102,10 +89,10 @@ public class Main {
             UIManager.put("Button.font", new Font(baseFont.getName(), Font.BOLD, 12));
             UIManager.put("TextField.font", baseFont);
 
-            System.out.println("✅ Fonte configurada: " + baseFont.getName());
+            System.out.println("Fonte configurada: " + baseFont.getName());
 
         } catch (Exception e) {
-            System.err.println("⚠️ Erro ao configurar fontes: " + e.getMessage());
+            System.err.println("Erro ao configurar fontes: " + e.getMessage());
         }
     }
 
@@ -126,93 +113,88 @@ public class Main {
             System.setProperty("sun.java2d.opengl", "true");
             System.setProperty("sun.java2d.d3d", "false");
 
-            System.out.println("✅ Renderização otimizada");
+            System.out.println("Renderização otimizada");
 
         } catch (Exception e) {
-            System.err.println("⚠️ Algumas otimizações podem não estar disponíveis");
+            System.err.println("Algumas otimizações podem não estar disponíveis");
         }
     }
 
     private static boolean verificarDependencias() {
-        System.out.println("🔍 Verificando dependências...");
+        System.out.println("Verificando dependências...");
 
         boolean todasOk = true;
 
-        // 1. Verificar Java
         try {
             String javaVersion = System.getProperty("java.version");
-            System.out.println("☕ Java: " + javaVersion);
+            System.out.println("Java: " + javaVersion);
 
             String[] versionParts = javaVersion.split("\\.");
             int majorVersion = Integer.parseInt(versionParts[0]);
             if (majorVersion < 11) {
-                System.err.println("❌ Java 11+ necessário. Atual: " + javaVersion);
+                System.err.println("Java 11+ necessário. Atual: " + javaVersion);
                 todasOk = false;
             } else {
-                System.out.println("✅ Java compatível");
+                System.out.println("Java compatível");
             }
         } catch (Exception e) {
-            System.err.println("❌ Erro ao verificar Java: " + e.getMessage());
+            System.err.println("Erro ao verificar Java: " + e.getMessage());
             todasOk = false;
         }
 
-        // 2. Verificar MySQL
         try {
             if (DBConnection.testarConexao()) {
-                System.out.println("✅ MySQL conectado");
+                System.out.println("MySQL conectado");
             } else {
-                System.err.println("❌ Falha na conexão MySQL");
+                System.err.println("Falha na conexão MySQL");
                 todasOk = false;
             }
         } catch (Exception e) {
-            System.err.println("❌ Erro MySQL: " + e.getMessage());
+            System.err.println("Erro MySQL: " + e.getMessage());
             todasOk = false;
         }
 
-        // 3. Verificar R (opcional)
         try {
             if (util.RGraphUtil.isRDisponivel()) {
-                System.out.println("✅ R disponível para gráficos avançados");
+                System.out.println("R disponível para gráficos avançados");
             } else {
-                System.out.println("⚠️ R não disponível - gráficos básicos serão usados");
+                System.out.println("R não disponível - gráficos básicos serão usados");
             }
         } catch (Exception e) {
-            System.out.println("⚠️ R não verificado: " + e.getMessage());
+            System.out.println("R não verificado: " + e.getMessage());
         }
 
-        // 4. Verificar espaço
         try {
             long espacoMB = new java.io.File(".").getFreeSpace() / (1024 * 1024);
-            System.out.println("💾 Espaço livre: " + espacoMB + " MB");
+            System.out.println("Espaço livre: " + espacoMB + " MB");
 
             if (espacoMB < 50) {
-                System.err.println("⚠️ Pouco espaço em disco");
+                System.err.println("Pouco espaço em disco");
             } else {
-                System.out.println("✅ Espaço suficiente");
+                System.out.println("Espaço suficiente");
             }
         } catch (Exception e) {
-            System.out.println("⚠️ Não foi possível verificar espaço");
+            System.out.println("Não foi possível verificar espaço");
         }
 
-        // 5. Verificar permissões
         try {
             java.io.File testFile = new java.io.File("test_permission.tmp");
             if (testFile.createNewFile()) {
                 testFile.delete();
-                System.out.println("✅ Permissões OK");
+                System.out.println("Permissões OK");
             } else {
-                System.err.println("❌ Sem permissões de escrita");
+                System.err.println("Sem permissões de escrita");
                 todasOk = false;
             }
         } catch (Exception e) {
-            System.err.println("❌ Erro nas permissões: " + e.getMessage());
+            System.err.println("Erro nas permissões: " + e.getMessage());
             todasOk = false;
         }
 
         if (todasOk) {
-            System.out.println("✅ Todas as dependências verificadas!");
+            System.out.println("Todas as dependências verificadas!");
         } else {
-            System.err.println("❌ Algumas dependências falharam");
+            System.err.println("Algumas dependências falharam");
 
             int resposta = JOptionPane.showConfirmDialog(
                     null,
@@ -231,16 +213,16 @@ public class Main {
     }
 
     private static void mostrarErroInicializacao(Exception e) {
-        System.err.println("❌ ERRO CRÍTICO NA INICIALIZAÇÃO");
+        System.err.println("ERRO CRÍTICO NA INICIALIZAÇÃO");
         System.err.println("==========================================");
 
         String mensagemErro = "Erro ao inicializar o " + SYSTEM_NAME + ":\n\n" +
                 e.getClass().getSimpleName() + ": " + e.getMessage() + "\n\n" +
                 "Verificações:\n" +
-                "✓ MySQL está executando?\n" +
-                "✓ Credenciais do banco corretas?\n" +
-                "✓ Java 11+ instalado?\n" +
-                "✓ Permissões de escrita?\n\n" +
+                "MySQL está executando?\n" +
+                "Credenciais do banco corretas?\n" +
+                "Java 11+ instalado?\n" +
+                "Permissões de escrita?\n\n" +
                 "Para suporte, envie os logs do console.";
 
         try {

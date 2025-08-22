@@ -1,17 +1,13 @@
-# Script R simplificado para gerar gráfico de vendas
 cat('Iniciando script R...\n')
 
 library(ggplot2)
 
-# Ler dados
 dados <- read.csv('temp_vendas_data.csv', stringsAsFactors = FALSE)
 cat(paste('Dados lidos:', nrow(dados), 'linhas\n'))
 
-# Ordenar dados
 dados <- dados[order(-dados$Quantidade), ]
 if(nrow(dados) > 10) dados <- dados[1:10, ]
 
-# Criar gráfico vertical em 1080p
 cat('Criando gráfico 1080p...\n')
 grafico <- ggplot(dados, aes(x = reorder(Produto, Quantidade), y = Quantidade)) +
   geom_col(fill = '#3498db', color = '#2980b9', linewidth = 1.0) +
@@ -41,20 +37,19 @@ grafico <- ggplot(dados, aes(x = reorder(Produto, Quantidade), y = Quantidade)) 
     plot.margin = margin(20, 20, 20, 20)
   )
 
-# Salvar gráfico em 1080p Full HD
 cat('Salvando gráfico em 1080p...\n')
 ggsave(
   filename = 'vendas_grafico.png',
   plot = grafico,
-  width = 12,
-  height = 9,
-  dpi = 400,
+  width = 16,
+  height = 12,
+  dpi = 600,
   units = 'in',
   device = 'png',
-  type = 'cairo-png'
+  type = 'cairo-png',
+  bg = 'white'
 )
 
-# Verificar resultado
 if(file.exists('vendas_grafico.png')) {
   cat('Grafico salvo com sucesso!\n')
 } else {

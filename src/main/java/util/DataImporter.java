@@ -13,21 +13,15 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-/**
- * Sistema de Importação de Múltiplas Fontes de Dados
- * Suporta CSV, TXT, e futuramente Excel e APIs
- */
 public class DataImporter {
 
     private final VendaController vendaController;
     private final List<ImportError> errors;
     private final List<ImportWarning> warnings;
 
-    // Padrões de validação
     private static final Pattern DECIMAL_PATTERN = Pattern.compile("^\\d+([.,]\\d{1,2})?$");
     private static final Pattern INTEGER_PATTERN = Pattern.compile("^\\d+$");
 
-    // Formatadores de data aceitos
     private static final List<DateTimeFormatter> DATE_FORMATTERS = Arrays.asList(
             DateTimeFormatter.ofPattern("dd/MM/yyyy"),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"),
@@ -42,9 +36,6 @@ public class DataImporter {
         this.warnings = new ArrayList<>();
     }
 
-    /**
-     * Importa vendas de arquivo CSV
-     */
     public ImportResult importFromCSV(File csvFile) {
         clearErrorsAndWarnings();
 
@@ -100,9 +91,6 @@ public class DataImporter {
         return new ImportResult(true, successCount, errorCount, errors, warnings);
     }
 
-    /**
-     * Importa vendas de arquivo de texto (formato livre)
-     */
     public ImportResult importFromTextFile(File textFile) {
         clearErrorsAndWarnings();
 
@@ -123,7 +111,7 @@ public class DataImporter {
                 line = line.trim();
 
                 if (line.isEmpty() || line.startsWith("#") || line.startsWith("//")) {
-                    continue; // Pular comentários e linhas vazias
+                    continue;
                 }
 
                 try {
@@ -150,9 +138,6 @@ public class DataImporter {
         return new ImportResult(true, successCount, errorCount, errors, warnings);
     }
 
-    /**
-     * Importa vendas de dados WhatsApp (formato específico)
-     */
     public ImportResult importFromWhatsApp(String whatsappText) {
         clearErrorsAndWarnings();
 
@@ -192,9 +177,6 @@ public class DataImporter {
         return new ImportResult(true, successCount, errorCount, errors, warnings);
     }
 
-    /**
-     * Gera template CSV para download
-     */
     public File generateCSVTemplate() throws IOException {
         File template = new File("template_vendas.csv");
 
@@ -206,8 +188,6 @@ public class DataImporter {
 
         return template;
     }
-
-    // Métodos privados de parsing
 
     private Venda parseVendaFromCSV(String[] values, int lineNumber) {
         if (values.length < 4) {
@@ -245,13 +225,7 @@ public class DataImporter {
     }
 
     private Venda parseVendaFromText(String line, int lineNumber) {
-        // Formatos aceitos:
-        // "Produto - 5 unidades - R$ 25,50 - 2024-01-15"
-        // "Produto: 5 x R$ 25,50 em 15/01/2024"
-        // "5x Produto por R$ 25,50 hoje"
-
         try {
-            // Padrão 1: Produto - quantidade - valor - data
             if (line.contains(" - ")) {
                 String[] parts = line.split(" - ");
                 if (parts.length >= 3) {
@@ -270,23 +244,19 @@ public class DataImporter {
                 }
             }
 
-            // Padrão 2: Produto: quantidade x valor em data
             if (line.contains(":") && line.contains("x")) {
                 String[] mainParts = line.split(":");
                 if (mainParts.length >= 2) {
                     String produto = cleanText(mainParts[0]);
                     String resto = mainParts[1];
 
-                    // Extrair quantidade
                     String quantidadeStr = resto.split("x")[0].replaceAll("[^0-9]", "");
-
-                    // Extrair valor
                     String valorStr = resto.replaceAll("[^0-9.,]", "").replace(",", ".");
 
                     if (!quantidadeStr.isEmpty() && !valorStr.isEmpty()) {
                         int quantidade = Integer.parseInt(quantidadeStr);
                         double valor = Double.parseDouble(valorStr);
-                        Date data = Date.valueOf(LocalDate.now()); // Default hoje
+                        Date data = Date.valueOf(LocalDate.now());
 
                         return new Venda(produto, quantidade, valor, data);
                     }
@@ -303,33 +273,25 @@ public class DataImporter {
     }
 
     private Venda parseVendaFromWhatsApp(String line, int lineNumber) {
-        // Formato WhatsApp: "João: Comprei 5 Notebooks por R$ 2500 cada"
-        // "Cliente: Produto - quantidade - valor"
-
         try {
-            // Remover timestamp do WhatsApp se presente
             line = line.replaceFirst("\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2} - ", "");
 
-            // Se tem nome do cliente
             if (line.contains(":")) {
                 String[] parts = line.split(":", 2);
                 if (parts.length >= 2) {
-                    line = parts[1].trim(); // Pegar só a mensagem
+                    line = parts[1].trim();
                 }
             }
 
-            // Extrair informações usando regex ou padrões
             String produto = "Produto WhatsApp";
             int quantidade = 1;
             double valor = 0.0;
 
-            // Procurar por padrões de quantidade
             if (line.matches(".*\\d+.*")) {
                 String[] words = line.split("\\s+");
                 for (int i = 0; i < words.length; i++) {
                     String word = words[i];
 
-                    // Procurar quantidade
                     if (word.matches("\\d+") && i + 1 < words.length) {
                         quantidade = Integer.parseInt(word);
                         if (i + 1 < words.length) {
@@ -337,7 +299,6 @@ public class DataImporter {
                         }
                     }
 
-                    // Procurar valor (R$ 150, 150.50, etc)
                     if (word.matches("R\\$?\\d+([.,]\\d{2})?") || word.matches("\\d+([.,]\\d{2})?")) {
                         String valorStr = word.replaceAll("[^0-9.,]", "").replace(",", ".");
                         if (!valorStr.isEmpty()) {
@@ -360,8 +321,6 @@ public class DataImporter {
             return null;
         }
     }
-
-    // Métodos auxiliares
 
     private String[] parseCSVLine(String line) {
         List<String> values = new ArrayList<>();
@@ -413,7 +372,7 @@ public class DataImporter {
             return false;
         }
 
-        if (file.length() > 10 * 1024 * 1024) { // 10MB limit
+        if (file.length() > 10 * 1024 * 1024) {
             addError(0, "Arquivo muito grande (máximo 10MB)");
             return false;
         }
@@ -423,7 +382,7 @@ public class DataImporter {
 
     private String cleanText(String text) {
         if (text == null) return "";
-        return text.trim().replaceAll("^\"|\"$", ""); // Remove aspas
+        return text.trim().replaceAll("^\"|\"$", "");
     }
 
     private int parseInteger(String value, int lineNumber, String fieldName) {
@@ -459,7 +418,6 @@ public class DataImporter {
 
         String cleaned = cleanText(dateStr);
 
-        // Tentar hoje/ontem
         if (cleaned.equalsIgnoreCase("hoje") || cleaned.equalsIgnoreCase("today")) {
             return Date.valueOf(LocalDate.now());
         }
@@ -467,13 +425,11 @@ public class DataImporter {
             return Date.valueOf(LocalDate.now().minusDays(1));
         }
 
-        // Tentar formatadores de data
         for (DateTimeFormatter formatter : DATE_FORMATTERS) {
             try {
                 LocalDate date = LocalDate.parse(cleaned, formatter);
                 return Date.valueOf(date);
             } catch (DateTimeParseException ignored) {
-                // Continuar tentando
             }
         }
 
@@ -494,8 +450,6 @@ public class DataImporter {
         warnings.clear();
     }
 
-    // Classes auxiliares
-
     public static class ImportResult {
         private final boolean success;
         private final int successCount;
@@ -512,7 +466,6 @@ public class DataImporter {
             this.warnings = new ArrayList<>(warnings);
         }
 
-        // Getters
         public boolean isSuccess() { return success; }
         public int getSuccessCount() { return successCount; }
         public int getErrorCount() { return errorCount; }

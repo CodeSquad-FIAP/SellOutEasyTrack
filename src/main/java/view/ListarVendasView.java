@@ -27,7 +27,6 @@ public class ListarVendasView extends JDialog {
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
 
-        // Painel do título
         JPanel painelTitulo = new JPanel();
         painelTitulo.setBackground(new Color(52, 152, 219));
         painelTitulo.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
@@ -37,12 +36,11 @@ public class ListarVendasView extends JDialog {
         titulo.setForeground(Color.WHITE);
         painelTitulo.add(titulo);
 
-        // Configurar tabela
         String[] colunas = {"ID", "Produto", "Quantidade", "Valor Unit. (R$)", "Total (R$)", "Data"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Tabela apenas para leitura
+                return false;
             }
         };
 
@@ -52,24 +50,21 @@ public class ListarVendasView extends JDialog {
         tabelaVendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabelaVendas.setGridColor(new Color(230, 230, 230));
 
-        // Configurar header da tabela
         JTableHeader header = tabelaVendas.getTableHeader();
         header.setBackground(new Color(240, 240, 240));
         header.setFont(new Font("Arial", Font.BOLD, 12));
         header.setBorder(BorderFactory.createRaisedBevelBorder());
 
-        // Configurar larguras das colunas
-        tabelaVendas.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
-        tabelaVendas.getColumnModel().getColumn(1).setPreferredWidth(200); // Produto
-        tabelaVendas.getColumnModel().getColumn(2).setPreferredWidth(80);  // Quantidade
-        tabelaVendas.getColumnModel().getColumn(3).setPreferredWidth(100); // Valor Unit.
-        tabelaVendas.getColumnModel().getColumn(4).setPreferredWidth(100); // Total
-        tabelaVendas.getColumnModel().getColumn(5).setPreferredWidth(120); // Data
+        tabelaVendas.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tabelaVendas.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tabelaVendas.getColumnModel().getColumn(2).setPreferredWidth(80);
+        tabelaVendas.getColumnModel().getColumn(3).setPreferredWidth(100);
+        tabelaVendas.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tabelaVendas.getColumnModel().getColumn(5).setPreferredWidth(120);
 
         JScrollPane scrollPane = new JScrollPane(tabelaVendas);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
-        // Painel de estatísticas
         JPanel painelEstatisticas = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
         painelEstatisticas.setBackground(new Color(245, 245, 245));
         painelEstatisticas.setBorder(BorderFactory.createTitledBorder(
@@ -86,10 +81,9 @@ public class ListarVendasView extends JDialog {
         lblValorTotal.setForeground(new Color(46, 204, 113));
 
         painelEstatisticas.add(lblTotalVendas);
-        painelEstatisticas.add(new JLabel("|")); // Separador visual
+        painelEstatisticas.add(new JLabel("|"));
         painelEstatisticas.add(lblValorTotal);
 
-        // Painel de botões
         JPanel painelBotoes = new JPanel(new FlowLayout());
         painelBotoes.setBackground(Color.WHITE);
 
@@ -113,7 +107,6 @@ public class ListarVendasView extends JDialog {
         painelBotoes.add(btnAtualizar);
         painelBotoes.add(btnFechar);
 
-        // Adicionar componentes ao dialog
         add(painelTitulo, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -122,7 +115,6 @@ public class ListarVendasView extends JDialog {
         painelSul.add(painelBotoes, BorderLayout.SOUTH);
         add(painelSul, BorderLayout.SOUTH);
 
-        // Carregar dados iniciais
         carregarVendas();
 
         setVisible(true);
@@ -130,10 +122,8 @@ public class ListarVendasView extends JDialog {
 
     private void carregarVendas() {
         try {
-            // Limpar tabela
             modeloTabela.setRowCount(0);
 
-            // Buscar vendas
             List<Venda> vendas = vendaController.obterTodasVendas();
 
             if (vendas.isEmpty()) {
@@ -141,11 +131,9 @@ public class ListarVendasView extends JDialog {
                 lblSemDados.setFont(new Font("Arial", Font.ITALIC, 16));
                 lblSemDados.setForeground(Color.GRAY);
 
-                // Criar painel temporário para mostrar mensagem
                 JPanel painelVazio = new JPanel(new BorderLayout());
                 painelVazio.add(lblSemDados, BorderLayout.CENTER);
 
-                // Remover tabela e adicionar mensagem
                 Component[] components = getContentPane().getComponents();
                 for (Component comp : components) {
                     if (comp instanceof JScrollPane) {
@@ -166,7 +154,6 @@ public class ListarVendasView extends JDialog {
             NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
             double valorTotalGeral = 0;
 
-            // Preencher tabela
             for (Venda venda : vendas) {
                 double valorTotal = venda.getQuantidade() * venda.getValorUnitario();
                 valorTotalGeral += valorTotal;
@@ -183,7 +170,6 @@ public class ListarVendasView extends JDialog {
                 modeloTabela.addRow(linha);
             }
 
-            // Atualizar estatísticas
             lblTotalVendas.setText("Total de Vendas: " + vendas.size());
             lblValorTotal.setText("Valor Total: " + formatoMoeda.format(valorTotalGeral));
 
