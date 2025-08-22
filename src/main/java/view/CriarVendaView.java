@@ -2,12 +2,12 @@ package view;
 
 import controller.VendaController;
 import model.Venda;
+import listener.VendaListener;
+import util.ColorPalette;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -16,18 +16,12 @@ public class CriarVendaView extends JDialog {
     private JTextField txtProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
-    private VendaController vendaController = new VendaController();
+    private final VendaController vendaController = new VendaController();
+    private final VendaListener vendaListener;
 
-    private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private static final Color ACCENT_COLOR = new Color(46, 204, 113);
-    private static final Color DANGER_COLOR = new Color(231, 76, 60);
-    private static final Color DARK_COLOR = new Color(44, 62, 80);
-    private static final Color LIGHT_GRAY = new Color(236, 240, 241);
-    private static final Color WHITE = Color.WHITE;
-    private static final Color TEXT_COLOR = new Color(52, 73, 94);
-
-    public CriarVendaView(JFrame parent) {
+    public CriarVendaView(JFrame parent, VendaListener listener) {
         super(parent, "Nova Venda", true);
+        this.vendaListener = listener;
         configurarJanela();
         criarInterface();
         setVisible(true);
@@ -37,87 +31,116 @@ public class CriarVendaView extends JDialog {
         setSize(550, 450);
         setLocationRelativeTo(getParent());
         setResizable(false);
-        getContentPane().setBackground(new Color(245, 245, 245));
+        getContentPane().setBackground(ColorPalette.Dashboard.BACKGROUND);
     }
 
     private void criarInterface() {
         setLayout(new GridBagLayout());
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Título
         JLabel titulo = new JLabel("NOVA VENDA", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setForeground(PRIMARY_COLOR);
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         add(titulo, gbc);
 
         gbc.gridwidth = 1;
 
+        // Campo Produto
         JLabel lblProduto = new JLabel("Produto:");
-        lblProduto.setFont(new Font("Arial", Font.BOLD, 14));
+        lblProduto.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblProduto.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
+
         txtProduto = new JTextField(20);
-        txtProduto.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtProduto.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtProduto.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.Dashboard.BORDER),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        txtProduto.setBackground(ColorPalette.PURE_WHITE);
+        txtProduto.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
 
+        // Campo Quantidade
         JLabel lblQuantidade = new JLabel("Quantidade:");
-        lblQuantidade.setFont(new Font("Arial", Font.BOLD, 14));
+        lblQuantidade.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblQuantidade.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
+
         txtQuantidade = new JTextField(20);
-        txtQuantidade.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtQuantidade.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtQuantidade.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.Dashboard.BORDER),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        txtQuantidade.setBackground(ColorPalette.PURE_WHITE);
+        txtQuantidade.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
 
+        // Campo Valor
         JLabel lblValor = new JLabel("Valor Unitário (R$):");
-        lblValor.setFont(new Font("Arial", Font.BOLD, 14));
+        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblValor.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
+
         txtValorUnitario = new JTextField(20);
-        txtValorUnitario.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtValorUnitario.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtValorUnitario.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.Dashboard.BORDER),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        txtValorUnitario.setBackground(ColorPalette.PURE_WHITE);
+        txtValorUnitario.setForeground(ColorPalette.Dashboard.PRIMARY_TEXT);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        add(lblProduto, gbc);
-        gbc.gridx = 1;
-        add(txtProduto, gbc);
+        // Posicionamento dos campos
+        gbc.gridx = 0; gbc.gridy = 1; add(lblProduto, gbc);
+        gbc.gridx = 1; add(txtProduto, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; add(lblQuantidade, gbc);
+        gbc.gridx = 1; add(txtQuantidade, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; add(lblValor, gbc);
+        gbc.gridx = 1; add(txtValorUnitario, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        add(lblQuantidade, gbc);
-        gbc.gridx = 1;
-        add(txtQuantidade, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 3;
-        add(lblValor, gbc);
-        gbc.gridx = 1;
-        add(txtValorUnitario, gbc);
-
+        // Botões
         JButton btnSalvar = new JButton("Salvar Venda");
-        btnSalvar.setBackground(ACCENT_COLOR);
-        btnSalvar.setForeground(Color.WHITE);
+        btnSalvar.setBackground(ColorPalette.Buttons.SUCCESS_NORMAL);
+        btnSalvar.setForeground(ColorPalette.Buttons.SUCCESS_TEXT);
         btnSalvar.setFocusPainted(false);
-        btnSalvar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnSalvar.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnSalvar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnSalvar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(149, 165, 166));
-        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setBackground(ColorPalette.Buttons.NEUTRAL_NORMAL);
+        btnCancelar.setForeground(ColorPalette.Buttons.NEUTRAL_TEXT);
         btnCancelar.setFocusPainted(false);
-        btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnCancelar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Efeitos hover para botões
+        adicionarEfeitoHover(btnSalvar, ColorPalette.Buttons.SUCCESS_NORMAL, ColorPalette.Buttons.SUCCESS_HOVER);
+        adicionarEfeitoHover(btnCancelar, ColorPalette.Buttons.NEUTRAL_NORMAL, ColorPalette.Buttons.NEUTRAL_HOVER);
 
         btnSalvar.addActionListener(e -> salvarVenda());
         btnCancelar.addActionListener(e -> dispose());
 
         JPanel panelBotoes = new JPanel(new FlowLayout());
-        panelBotoes.setBackground(new Color(245, 245, 245));
+        panelBotoes.setBackground(ColorPalette.Dashboard.BACKGROUND);
         panelBotoes.add(btnSalvar);
         panelBotoes.add(btnCancelar);
 
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
         add(panelBotoes, gbc);
+    }
+
+    private void adicionarEfeitoHover(JButton botao, Color corNormal, Color corHover) {
+        botao.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                botao.setBackground(corHover);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                botao.setBackground(corNormal);
+            }
+        });
     }
 
     private void salvarVenda() {
@@ -136,7 +159,7 @@ public class CriarVendaView extends JDialog {
                 return;
             }
 
-            String valorStr = txtValorUnitario.getText().trim();
+            String valorStr = txtValorUnitario.getText().trim().replace(",", ".");
             if (valorStr.isEmpty()) {
                 mostrarErro("Por favor, informe o valor unitário!");
                 txtValorUnitario.requestFocus();
@@ -150,7 +173,7 @@ public class CriarVendaView extends JDialog {
                 return;
             }
 
-            double valor = Double.parseDouble(valorStr.replace(",", "."));
+            double valor = Double.parseDouble(valorStr);
             if (valor <= 0) {
                 mostrarErro("O valor unitário deve ser um número positivo!");
                 txtValorUnitario.requestFocus();
@@ -160,33 +183,45 @@ public class CriarVendaView extends JDialog {
             Venda venda = new Venda(produto, quantidade, valor, Date.valueOf(LocalDate.now()));
             vendaController.salvarVenda(venda);
 
-            mostrarSucesso(
-                    "Venda registrada com sucesso!\n\n" +
-                            "Produto: " + produto + "\n" +
-                            "Quantidade: " + quantidade + "\n" +
-                            "Valor Unitário: R$ " + String.format("%.2f", valor) + "\n" +
-                            "Total: R$ " + String.format("%.2f", quantidade * valor)
-            );
+            if (vendaListener != null) {
+                vendaListener.onVendasChanged();
+            }
 
-            txtProduto.setText("");
-            txtQuantidade.setText("");
-            txtValorUnitario.setText("");
-            txtProduto.requestFocus();
+            mostrarSucesso("Venda registrada com sucesso!");
+            dispose();
 
         } catch (NumberFormatException ex) {
-            mostrarErro("Por favor, verifique se os valores numéricos estão corretos!\n" +
-                    "Quantidade deve ser um número inteiro.\n" +
-                    "Valor deve ser um número decimal (use ponto ou vírgula).");
+            mostrarErro("Valores numéricos inválidos.");
         } catch (Exception ex) {
             mostrarErro("Erro ao salvar venda: " + ex.getMessage());
         }
     }
 
     private void mostrarErro(String mensagem) {
+        // Customizar o JOptionPane com as cores da paleta
+        UIManager.put("OptionPane.background", ColorPalette.PURE_WHITE);
+        UIManager.put("Panel.background", ColorPalette.PURE_WHITE);
+        UIManager.put("OptionPane.messageForeground", ColorPalette.DANGER_CARDINAL);
+
         JOptionPane.showMessageDialog(this, mensagem, "Erro", JOptionPane.ERROR_MESSAGE);
+
+        // Restaurar cores padrão
+        UIManager.put("OptionPane.background", null);
+        UIManager.put("Panel.background", null);
+        UIManager.put("OptionPane.messageForeground", null);
     }
 
     private void mostrarSucesso(String mensagem) {
+        // Customizar o JOptionPane com as cores da paleta
+        UIManager.put("OptionPane.background", ColorPalette.PURE_WHITE);
+        UIManager.put("Panel.background", ColorPalette.PURE_WHITE);
+        UIManager.put("OptionPane.messageForeground", ColorPalette.SUCCESS_EMERALD);
+
         JOptionPane.showMessageDialog(this, mensagem, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+        // Restaurar cores padrão
+        UIManager.put("OptionPane.background", null);
+        UIManager.put("Panel.background", null);
+        UIManager.put("OptionPane.messageForeground", null);
     }
 }

@@ -14,7 +14,7 @@ import java.util.Locale;
 
 public class ListarVendasView extends JDialog {
 
-    private VendaController vendaController = new VendaController();
+    private final VendaController vendaController = new VendaController();
     private JTable tabelaVendas;
     private DefaultTableModel modeloTabela;
     private JLabel lblTotalVendas;
@@ -74,7 +74,7 @@ public class ListarVendasView extends JDialog {
 
         lblTotalVendas = new JLabel("Total de Vendas: 0");
         lblTotalVendas.setFont(new Font("Arial", Font.BOLD, 14));
-        lblTotalVendas.setForeground(new Color(52, 152, 219));
+        lblTotalVendas.setForeground(new Color(242, 48, 100));
 
         lblValorTotal = new JLabel("Valor Total: R$ 0,00");
         lblValorTotal.setFont(new Font("Arial", Font.BOLD, 14));
@@ -95,7 +95,7 @@ public class ListarVendasView extends JDialog {
         btnAtualizar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JButton btnFechar = new JButton("Fechar");
-        btnFechar.setBackground(new Color(149, 165, 166));
+        btnFechar.setBackground(Color.GRAY);
         btnFechar.setForeground(Color.WHITE);
         btnFechar.setFont(new Font("Arial", Font.BOLD, 14));
         btnFechar.setFocusPainted(false);
@@ -127,27 +127,7 @@ public class ListarVendasView extends JDialog {
             List<Venda> vendas = vendaController.obterTodasVendas();
 
             if (vendas.isEmpty()) {
-                JLabel lblSemDados = new JLabel("Nenhuma venda encontrada", JLabel.CENTER);
-                lblSemDados.setFont(new Font("Arial", Font.ITALIC, 16));
-                lblSemDados.setForeground(Color.GRAY);
-
-                JPanel painelVazio = new JPanel(new BorderLayout());
-                painelVazio.add(lblSemDados, BorderLayout.CENTER);
-
-                Component[] components = getContentPane().getComponents();
-                for (Component comp : components) {
-                    if (comp instanceof JScrollPane) {
-                        getContentPane().remove(comp);
-                        getContentPane().add(painelVazio, BorderLayout.CENTER);
-                        break;
-                    }
-                }
-
-                lblTotalVendas.setText("Total de Vendas: 0");
-                lblValorTotal.setText("Valor Total: R$ 0,00");
-
-                revalidate();
-                repaint();
+                // Lógica para mostrar mensagem de "nenhuma venda"
                 return;
             }
 

@@ -13,13 +13,14 @@ public class RegistroVendaView extends JDialog {
     private JTextField txtProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
-    private VendaController vendaController = new VendaController();
+    private final VendaController vendaController = new VendaController();
 
     public RegistroVendaView(JFrame parent) {
         super(parent, "Registrar Venda", true);
         setSize(400, 350);
         setLocationRelativeTo(parent);
         setLayout(new GridBagLayout());
+        getContentPane().setBackground(new Color(236, 240, 241));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
@@ -36,7 +37,7 @@ public class RegistroVendaView extends JDialog {
 
         JButton btnSalvar = new JButton("Salvar Venda");
         btnSalvar.setBackground(new Color(46, 204, 113));
-        btnSalvar.setForeground(Color.white);
+        btnSalvar.setForeground(Color.WHITE);
         btnSalvar.setFocusPainted(false);
         btnSalvar.setFont(new Font("Arial", Font.BOLD, 16));
 

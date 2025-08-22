@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class RelatorioView extends JDialog {
 
-    private VendaController vendaController = new VendaController();
+    private final VendaController vendaController = new VendaController();
     private JTextArea txtRelatorio;
 
     public RelatorioView(JFrame parent) {
@@ -26,7 +26,7 @@ public class RelatorioView extends JDialog {
 
         JButton btnGerar = new JButton("Gerar Relatório");
         btnGerar.setBackground(new Color(52, 152, 219));
-        btnGerar.setForeground(Color.white);
+        btnGerar.setForeground(Color.WHITE);
         btnGerar.setFocusPainted(false);
         btnGerar.setFont(new Font("Arial", Font.BOLD, 16));
 
