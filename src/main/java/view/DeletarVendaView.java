@@ -19,6 +19,11 @@ public class DeletarVendaView extends JDialog {
     private DefaultTableModel modeloTabela;
     private JButton btnDeletar;
 
+    // Cores padronizadas
+    private static final Color DANGER_COLOR = new Color(231, 76, 60);
+    private static final Color PRIMARY_COLOR = new Color(52, 152, 219);
+    private static final Color SECONDARY_COLOR = new Color(149, 165, 166);
+
     public DeletarVendaView(JFrame parent) {
         super(parent, "Deletar Venda", true);
         setSize(850, 600);
@@ -26,15 +31,23 @@ public class DeletarVendaView extends JDialog {
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
 
+        criarInterface();
+        carregarVendas();
+        setVisible(true);
+    }
+
+    private void criarInterface() {
+        // Painel do título
         JPanel painelTitulo = new JPanel();
-        painelTitulo.setBackground(new Color(231, 76, 60));
+        painelTitulo.setBackground(DANGER_COLOR);
         painelTitulo.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 
         JLabel titulo = new JLabel("DELETAR VENDA", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titulo.setForeground(Color.WHITE);
         painelTitulo.add(titulo);
 
+        // Painel de instruções
         JPanel painelInstrucoes = new JPanel();
         painelInstrucoes.setBackground(new Color(255, 248, 220));
         painelInstrucoes.setBorder(BorderFactory.createCompoundBorder(
@@ -42,11 +55,12 @@ public class DeletarVendaView extends JDialog {
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
         JLabel lblInstrucoes = new JLabel(
-                "<html><b>ATENÇÃO:</b> Selecione uma venda na tabela abaixo e clique em 'Deletar Selecionada' para remover permanentemente.</html>");
-        lblInstrucoes.setFont(new Font("Arial", Font.PLAIN, 12));
+                "<html><b>⚠️ ATENÇÃO:</b> Selecione uma venda na tabela abaixo e clique em 'Deletar Selecionada' para remover permanentemente.</html>");
+        lblInstrucoes.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblInstrucoes.setForeground(new Color(133, 100, 4));
         painelInstrucoes.add(lblInstrucoes);
 
+        // Configurar tabela
         String[] colunas = {"ID", "Produto", "Quantidade", "Valor Unit. (R$)", "Total (R$)", "Data"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
@@ -57,15 +71,18 @@ public class DeletarVendaView extends JDialog {
 
         tabelaVendas = new JTable(modeloTabela);
         tabelaVendas.setRowHeight(30);
-        tabelaVendas.setFont(new Font("Arial", Font.PLAIN, 12));
+        tabelaVendas.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tabelaVendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabelaVendas.setGridColor(new Color(230, 230, 230));
+        tabelaVendas.setSelectionBackground(new Color(255, 235, 235));
+        tabelaVendas.setSelectionForeground(Color.BLACK);
 
         JTableHeader header = tabelaVendas.getTableHeader();
         header.setBackground(new Color(240, 240, 240));
-        header.setFont(new Font("Arial", Font.BOLD, 12));
+        header.setFont(new Font("Segoe UI", Font.BOLD, 12));
         header.setBorder(BorderFactory.createRaisedBevelBorder());
 
+        // Ajustar larguras das colunas
         tabelaVendas.getColumnModel().getColumn(0).setPreferredWidth(50);
         tabelaVendas.getColumnModel().getColumn(1).setPreferredWidth(200);
         tabelaVendas.getColumnModel().getColumn(2).setPreferredWidth(80);
@@ -82,31 +99,47 @@ public class DeletarVendaView extends JDialog {
         JScrollPane scrollPane = new JScrollPane(tabelaVendas);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
-        JPanel painelBotoes = new JPanel(new FlowLayout());
+        // CORRIGIDO: Painel de botões padronizados
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 15));
         painelBotoes.setBackground(Color.WHITE);
 
+        // Botão Deletar - Destaque vermelho
         btnDeletar = new JButton("Deletar Selecionada");
-        btnDeletar.setBackground(new Color(231, 76, 60));
+        btnDeletar.setBackground(DANGER_COLOR);
         btnDeletar.setForeground(Color.WHITE);
-        btnDeletar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnDeletar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnDeletar.setFocusPainted(false);
         btnDeletar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnDeletar.setPreferredSize(new Dimension(160, 45));
         btnDeletar.setEnabled(false);
+        btnDeletar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        // Botão Atualizar - Azul
         JButton btnAtualizar = new JButton("Atualizar Lista");
-        btnAtualizar.setBackground(new Color(52, 152, 219));
+        btnAtualizar.setBackground(PRIMARY_COLOR);
         btnAtualizar.setForeground(Color.WHITE);
-        btnAtualizar.setFont(new Font("Arial", Font.BOLD, 14));
+        btnAtualizar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnAtualizar.setFocusPainted(false);
-        btnAtualizar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnAtualizar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnAtualizar.setPreferredSize(new Dimension(160, 45));
+        btnAtualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        // Botão Fechar - Cinza
         JButton btnFechar = new JButton("Fechar");
-        btnFechar.setBackground(new Color(149, 165, 166));
+        btnFechar.setBackground(SECONDARY_COLOR);
         btnFechar.setForeground(Color.WHITE);
-        btnFechar.setFont(new Font("Arial", Font.BOLD, 14));
+        btnFechar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnFechar.setFocusPainted(false);
-        btnFechar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnFechar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnFechar.setPreferredSize(new Dimension(160, 45));
+        btnFechar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        // Adicionar efeitos hover aos botões
+        adicionarEfeitoHover(btnDeletar, DANGER_COLOR);
+        adicionarEfeitoHover(btnAtualizar, PRIMARY_COLOR);
+        adicionarEfeitoHover(btnFechar, SECONDARY_COLOR);
+
+        // Ações dos botões
         btnDeletar.addActionListener(e -> deletarVendaSelecionada());
         btnAtualizar.addActionListener(e -> carregarVendas());
         btnFechar.addActionListener(e -> dispose());
@@ -115,6 +148,7 @@ public class DeletarVendaView extends JDialog {
         painelBotoes.add(btnAtualizar);
         painelBotoes.add(btnFechar);
 
+        // Montar layout
         JPanel painelCentral = new JPanel(new BorderLayout());
         painelCentral.add(painelInstrucoes, BorderLayout.NORTH);
         painelCentral.add(scrollPane, BorderLayout.CENTER);
@@ -122,9 +156,24 @@ public class DeletarVendaView extends JDialog {
         add(painelTitulo, BorderLayout.NORTH);
         add(painelCentral, BorderLayout.CENTER);
         add(painelBotoes, BorderLayout.SOUTH);
+    }
 
-        carregarVendas();
-        setVisible(true);
+    private void adicionarEfeitoHover(JButton botao, Color corOriginal) {
+        botao.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (botao.isEnabled()) {
+                    botao.setBackground(corOriginal.darker());
+                }
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                if (botao.isEnabled()) {
+                    botao.setBackground(corOriginal);
+                }
+            }
+        });
     }
 
     private void carregarVendas() {
@@ -160,12 +209,12 @@ public class DeletarVendaView extends JDialog {
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                    "Erro ao carregar vendas: " + e.getMessage(),
+                    "❌ Erro ao carregar vendas:\n\n" + e.getMessage(),
                     "Erro de Banco de Dados",
                     JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "Erro inesperado: " + e.getMessage(),
+                    "❌ Erro inesperado:\n\n" + e.getMessage(),
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -176,7 +225,7 @@ public class DeletarVendaView extends JDialog {
 
         if (linhaSelecionada == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Por favor, selecione uma venda para deletar!",
+                    "⚠️ Por favor, selecione uma venda para deletar!",
                     "Nenhuma Seleção",
                     JOptionPane.WARNING_MESSAGE);
             return;
@@ -185,7 +234,7 @@ public class DeletarVendaView extends JDialog {
         Object idObj = modeloTabela.getValueAt(linhaSelecionada, 0);
         if (idObj.equals("—")) {
             JOptionPane.showMessageDialog(this,
-                    "Não é possível deletar: nenhuma venda válida selecionada!",
+                    "⚠️ Não é possível deletar: nenhuma venda válida selecionada!",
                     "Seleção Inválida",
                     JOptionPane.WARNING_MESSAGE);
             return;
@@ -198,39 +247,68 @@ public class DeletarVendaView extends JDialog {
         String totalStr = (String) modeloTabela.getValueAt(linhaSelecionada, 4);
         String data = (String) modeloTabela.getValueAt(linhaSelecionada, 5);
 
-        int resposta = JOptionPane.showConfirmDialog(this,
-                "ATENÇÃO: Esta ação não pode ser desfeita!\n\n" +
-                        "Confirma a exclusão permanente desta venda?\n\n" +
-                        "Detalhes da venda:\n" +
-                        "• ID: " + id + "\n" +
-                        "• Produto: " + produto + "\n" +
-                        "• Quantidade: " + quantidade + "\n" +
-                        "• Valor Unitário: " + valorStr + "\n" +
-                        "• Total: " + totalStr + "\n" +
-                        "• Data: " + data,
+        // Dialog de confirmação melhorado
+        JPanel confirmPanel = new JPanel(new BorderLayout());
+        confirmPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel iconLabel = new JLabel("⚠️", JLabel.CENTER);
+        iconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 48));
+        iconLabel.setForeground(DANGER_COLOR);
+
+        JLabel mensagemLabel = new JLabel("<html><center><b>ATENÇÃO: Esta ação não pode ser desfeita!</b><br><br>" +
+                "Confirma a exclusão permanente desta venda?</center></html>");
+        mensagemLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        mensagemLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        JPanel detalhesPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+        detalhesPanel.setBorder(BorderFactory.createTitledBorder("Detalhes da venda:"));
+        detalhesPanel.setBackground(new Color(248, 249, 250));
+
+        detalhesPanel.add(new JLabel("ID:"));
+        detalhesPanel.add(new JLabel(String.valueOf(id)));
+        detalhesPanel.add(new JLabel("Produto:"));
+        detalhesPanel.add(new JLabel(produto));
+        detalhesPanel.add(new JLabel("Quantidade:"));
+        detalhesPanel.add(new JLabel(String.valueOf(quantidade)));
+        detalhesPanel.add(new JLabel("Valor Unitário:"));
+        detalhesPanel.add(new JLabel(valorStr));
+        detalhesPanel.add(new JLabel("Total:"));
+        detalhesPanel.add(new JLabel(totalStr));
+
+        confirmPanel.add(iconLabel, BorderLayout.NORTH);
+        confirmPanel.add(mensagemLabel, BorderLayout.CENTER);
+        confirmPanel.add(detalhesPanel, BorderLayout.SOUTH);
+
+        String[] opcoes = {"🗑️ Deletar", "❌ Cancelar"};
+        int resposta = JOptionPane.showOptionDialog(this,
+                confirmPanel,
                 "Confirmar Exclusão Permanente",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                opcoes,
+                opcoes[1]);
 
-        if (resposta == JOptionPane.YES_OPTION) {
+        if (resposta == 0) { // Deletar
             try {
                 vendaController.deletarVenda(id);
 
                 JOptionPane.showMessageDialog(this,
-                        "Venda deletada com sucesso!\n\n" +
+                        "✅ Venda deletada com sucesso!\n\n" +
                                 "Venda removida:\n" +
                                 "• ID: " + id + "\n" +
                                 "• Produto: " + produto + "\n" +
-                                "• Quantidade: " + quantidade,
+                                "• Quantidade: " + quantidade + "\n" +
+                                "• Total: " + totalStr,
                         "Exclusão Realizada",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 carregarVendas();
 
             } catch (SQLException ex) {
-                String mensagemErro = "Erro ao deletar venda do banco de dados:\n" + ex.getMessage();
+                String mensagemErro = "❌ Erro ao deletar venda do banco de dados:\n\n" + ex.getMessage();
                 if (ex.getMessage().contains("não encontrada")) {
-                    mensagemErro = "A venda selecionada não existe mais no banco de dados.\n" +
+                    mensagemErro = "⚠️ A venda selecionada não existe mais no banco de dados.\n" +
                             "A lista será atualizada automaticamente.";
                     carregarVendas();
                 }
@@ -241,7 +319,7 @@ public class DeletarVendaView extends JDialog {
                         JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
-                        "Erro inesperado ao deletar venda:\n" + ex.getMessage(),
+                        "❌ Erro inesperado ao deletar venda:\n\n" + ex.getMessage(),
                         "Erro",
                         JOptionPane.ERROR_MESSAGE);
             }

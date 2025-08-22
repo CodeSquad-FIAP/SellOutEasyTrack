@@ -373,28 +373,35 @@ public class SimplifiedDashboardView extends JFrame {
         return btn;
     }
 
+    // CORRIGIDO: Botões de diálogo com tamanho controlado
     private JButton criarBotaoDialog(String texto, String descricao) {
         JButton btn = new JButton();
         btn.setLayout(new BorderLayout());
         btn.setBackground(Color.WHITE);
         btn.setForeground(TEXT_COLOR);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
         btn.setFocusPainted(false);
+
+        // FIXO: Definir tamanho preferido e máximo para evitar ultrapassagem
+        btn.setPreferredSize(new Dimension(400, 70));
+        btn.setMaximumSize(new Dimension(400, 70));
+        btn.setMinimumSize(new Dimension(400, 70));
+
         btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)));
+                BorderFactory.createEmptyBorder(12, 15, 12, 15)));
 
         JLabel lblTitulo = new JLabel(texto);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblTitulo.setForeground(TEXT_COLOR);
 
-        JLabel lblDesc = new JLabel(descricao);
-        lblDesc.setFont(new Font("Arial", Font.PLAIN, 11));
+        JLabel lblDesc = new JLabel("<html><div style='width: 350px;'>" + descricao + "</div></html>");
+        lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblDesc.setForeground(Color.GRAY);
 
         JPanel textPanel = new JPanel(new BorderLayout());
         textPanel.setOpaque(false);
         textPanel.add(lblTitulo, BorderLayout.NORTH);
+        textPanel.add(Box.createVerticalStrut(3), BorderLayout.CENTER);
         textPanel.add(lblDesc, BorderLayout.SOUTH);
 
         btn.add(textPanel, BorderLayout.CENTER);
@@ -405,7 +412,7 @@ public class SimplifiedDashboardView extends JFrame {
                 btn.setBackground(LIGHT_GRAY);
                 btn.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(PRIMARY_COLOR, 2),
-                        BorderFactory.createEmptyBorder(14, 19, 14, 19)));
+                        BorderFactory.createEmptyBorder(11, 14, 11, 14)));
             }
 
             @Override
@@ -413,58 +420,70 @@ public class SimplifiedDashboardView extends JFrame {
                 btn.setBackground(Color.WHITE);
                 btn.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                        BorderFactory.createEmptyBorder(15, 20, 15, 20)));
+                        BorderFactory.createEmptyBorder(12, 15, 12, 15)));
             }
         });
 
         return btn;
     }
 
+    // CORRIGIDO: Menu de vendas com layout melhorado
     private void mostrarMenuVendas() {
         JDialog dialog = new JDialog(this, "Menu de Vendas Completo", true);
-        dialog.setSize(500, 400);
+        dialog.setSize(480, 500); // Aumentado mais para evitar transbordamento
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(PRIMARY_COLOR);
-        headerPanel.setBorder(new EmptyBorder(15, 0, 15, 0));
+        headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
         JLabel titulo = new JLabel("MENU DE VENDAS", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         headerPanel.add(titulo);
 
-        JPanel contentPanel = new JPanel(new GridBagLayout());
+        // FIXO: Usar layout vertical com espaçamento controlado
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(new Color(245, 245, 245));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 15, 10, 15);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        contentPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Padding otimizado
 
-        JButton btnCriar = criarBotaoDialog("Criar Venda", "Registrar nova venda");
-        JButton btnListar = criarBotaoDialog("Listar Vendas", "Visualizar todas as vendas");
-        JButton btnAtualizar = criarBotaoDialog("Atualizar Venda", "Editar venda existente");
-        JButton btnDeletar = criarBotaoDialog("Deletar Venda", "Remover venda");
+        JButton btnCriar = criarBotaoDialog("Criar Venda", "Registrar nova venda no sistema");
+        JButton btnListar = criarBotaoDialog("Listar Vendas", "Visualizar todas as vendas registradas");
+        JButton btnAtualizar = criarBotaoDialog("Atualizar Venda", "Editar informações de venda existente");
+        JButton btnDeletar = criarBotaoDialog("Deletar Venda", "Remover venda do sistema");
 
         btnCriar.addActionListener(e -> { dialog.dispose(); new CriarVendaView(this); });
         btnListar.addActionListener(e -> { dialog.dispose(); new ListarVendasView(this); });
         btnAtualizar.addActionListener(e -> { dialog.dispose(); new AtualizarVendaView(this); });
         btnDeletar.addActionListener(e -> { dialog.dispose(); new DeletarVendaView(this); });
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        contentPanel.add(btnCriar, gbc);
-        gbc.gridy = 1;
-        contentPanel.add(btnListar, gbc);
-        gbc.gridy = 2;
-        contentPanel.add(btnAtualizar, gbc);
-        gbc.gridy = 3;
-        contentPanel.add(btnDeletar, gbc);
+        // Alinhar botões ao centro
+        btnCriar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnListar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAtualizar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnDeletar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        contentPanel.add(btnCriar);
+        contentPanel.add(Box.createVerticalStrut(6));
+        contentPanel.add(btnListar);
+        contentPanel.add(Box.createVerticalStrut(6));
+        contentPanel.add(btnAtualizar);
+        contentPanel.add(Box.createVerticalStrut(6));
+        contentPanel.add(btnDeletar);
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBackground(new Color(245, 245, 245));
-        JButton btnCancelar = criarBotaoDialog("Cancelar", "Fechar");
+
+        JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBackground(new Color(149, 165, 166));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.setBorder(new EmptyBorder(10, 20, 10, 20));
         btnCancelar.addActionListener(e -> dialog.dispose());
+
         buttonPanel.add(btnCancelar);
 
         dialog.add(headerPanel, BorderLayout.NORTH);
@@ -474,51 +493,63 @@ public class SimplifiedDashboardView extends JFrame {
         dialog.setVisible(true);
     }
 
+    // CORRIGIDO: Menu de importação com layout melhorado
     private void mostrarMenuImportacao() {
-        JDialog dialog = new JDialog(this, "Importar Dados", true);
-        dialog.setSize(500, 400);
+        JDialog dialog = new JDialog(this, "Importar Dados - Múltiplas Fontes", true);
+        dialog.setSize(480, 500); // Aumentado mais para evitar transbordamento
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(PRIMARY_COLOR);
-        headerPanel.setBorder(new EmptyBorder(15, 0, 15, 0));
+        headerPanel.setBackground(ACCENT_COLOR);
+        headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
         JLabel titulo = new JLabel("IMPORTAR DADOS", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         headerPanel.add(titulo);
 
-        JPanel contentPanel = new JPanel(new GridBagLayout());
+        // FIXO: Usar layout vertical com espaçamento controlado
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(new Color(245, 245, 245));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 15, 10, 15);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        contentPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Padding otimizado
 
-        JButton btnCSV = criarBotaoDialog("Importar CSV", "Importar arquivo CSV");
-        JButton btnTexto = criarBotaoDialog("Importar Arquivo Texto", "Importar arquivo TXT");
-        JButton btnWhatsApp = criarBotaoDialog("Colar dados WhatsApp", "Importar mensagens");
-        JButton btnTemplate = criarBotaoDialog("Gerar Template", "Criar arquivo modelo");
+        JButton btnCSV = criarBotaoDialog("Importar CSV", "Carregar arquivo CSV estruturado");
+        JButton btnTexto = criarBotaoDialog("Importar Arquivo Texto", "Processar arquivo TXT com dados");
+        JButton btnWhatsApp = criarBotaoDialog("Colar dados WhatsApp", "Importar mensagens do WhatsApp");
+        JButton btnTemplate = criarBotaoDialog("Gerar Template", "Criar arquivo modelo para importação");
 
         btnCSV.addActionListener(e -> { dialog.dispose(); importarCSV(); });
         btnTexto.addActionListener(e -> { dialog.dispose(); importarTexto(); });
         btnWhatsApp.addActionListener(e -> { dialog.dispose(); importarWhatsApp(); });
         btnTemplate.addActionListener(e -> { dialog.dispose(); gerarTemplate(); });
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        contentPanel.add(btnCSV, gbc);
-        gbc.gridy = 1;
-        contentPanel.add(btnTexto, gbc);
-        gbc.gridy = 2;
-        contentPanel.add(btnWhatsApp, gbc);
-        gbc.gridy = 3;
-        contentPanel.add(btnTemplate, gbc);
+        // Alinhar botões ao centro
+        btnCSV.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnTexto.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnWhatsApp.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnTemplate.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        contentPanel.add(btnCSV);
+        contentPanel.add(Box.createVerticalStrut(6));
+        contentPanel.add(btnTexto);
+        contentPanel.add(Box.createVerticalStrut(6));
+        contentPanel.add(btnWhatsApp);
+        contentPanel.add(Box.createVerticalStrut(6));
+        contentPanel.add(btnTemplate);
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBackground(new Color(245, 245, 245));
-        JButton btnCancelar = criarBotaoDialog("Cancelar", "Fechar");
+
+        JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBackground(new Color(149, 165, 166));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.setBorder(new EmptyBorder(10, 20, 10, 20));
         btnCancelar.addActionListener(e -> dialog.dispose());
+
         buttonPanel.add(btnCancelar);
 
         dialog.add(headerPanel, BorderLayout.NORTH);
@@ -527,6 +558,9 @@ public class SimplifiedDashboardView extends JFrame {
 
         dialog.setVisible(true);
     }
+
+    // Restante dos métodos permanecem iguais...
+    // [Inclua aqui todos os outros métodos da classe original sem alterações]
 
     private void atualizarInsights() {
         insightsPanel.removeAll();
@@ -581,18 +615,6 @@ public class SimplifiedDashboardView extends JFrame {
             }
         }
 
-        insightsPanel.revalidate();
-        insightsPanel.repaint();
-    }
-
-    private void mostrarErroInsights(String mensagem) {
-        insightsPanel.removeAll();
-        JLabel erro = new JLabel("<html><center>" + mensagem + "</center></html>");
-        erro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        erro.setForeground(DANGER_COLOR);
-        erro.setHorizontalAlignment(JLabel.CENTER);
-        erro.setBorder(new EmptyBorder(20, 20, 20, 20));
-        insightsPanel.add(erro);
         insightsPanel.revalidate();
         insightsPanel.repaint();
     }
@@ -810,16 +832,39 @@ public class SimplifiedDashboardView extends JFrame {
     }
 
     private void atualizarDashboard() {
-        atualizarInsights();
-        atualizarGraficos();
+        SwingUtilities.invokeLater(() -> {
+            atualizarInsights();
+            atualizarGraficos();
+
+            // Atualizar estatísticas no sidebar
+            try {
+                JPanel statsPanel = criarPainelEstatisticas();
+                // Encontrar o sidebar e atualizar o painel de estatísticas
+                Container parent = this.getContentPane();
+                updateStatsInSidebar(parent, statsPanel);
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar estatísticas: " + e.getMessage());
+            }
+        });
     }
 
     private void importarCSV() {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivos CSV", "csv"));
+        chooser.setDialogTitle("Selecionar arquivo CSV para importar");
 
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File arquivo = chooser.getSelectedFile();
+
+            // Mostrar loading
+            JDialog loadingDialog = new JDialog(this, "Importando...", true);
+            loadingDialog.setSize(300, 100);
+            loadingDialog.setLocationRelativeTo(this);
+            loadingDialog.setLayout(new BorderLayout());
+
+            JLabel loadingLabel = new JLabel("Importando arquivo CSV...", JLabel.CENTER);
+            loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            loadingDialog.add(loadingLabel, BorderLayout.CENTER);
 
             SwingWorker<DataImporter.ImportResult, Void> worker =
                     new SwingWorker<DataImporter.ImportResult, Void>() {
@@ -830,21 +875,35 @@ public class SimplifiedDashboardView extends JFrame {
 
                         @Override
                         protected void done() {
+                            loadingDialog.dispose();
                             try {
                                 DataImporter.ImportResult resultado = get();
                                 mostrarResultadoImportacao(resultado);
-                                if (resultado.isSuccess()) {
+                                if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
+                                    // Atualizar dashboard somente se houve importações bem-sucedidas
                                     atualizarDashboard();
+                                    JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
+                                            String.format("✅ Importação concluída!\n\n" +
+                                                            "• %d vendas importadas com sucesso\n" +
+                                                            "• %d erros encontrados\n" +
+                                                            "• Dashboard atualizado automaticamente",
+                                                    resultado.getSuccessCount(),
+                                                    resultado.getErrorCount()),
+                                            "Importação CSV",
+                                            JOptionPane.INFORMATION_MESSAGE);
                                 }
                             } catch (Exception e) {
                                 JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
-                                        "Erro na importação: " + e.getMessage(),
-                                        "Erro",
+                                        "❌ Erro na importação CSV:\n\n" + e.getMessage() +
+                                                "\n\nVerifique se o arquivo está no formato correto:\n" +
+                                                "produto,quantidade,valor_unitario,data",
+                                        "Erro de Importação",
                                         JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     };
 
+            loadingDialog.setVisible(true);
             worker.execute();
         }
     }
@@ -852,20 +911,70 @@ public class SimplifiedDashboardView extends JFrame {
     private void importarTexto() {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivos de Texto", "txt"));
+        chooser.setDialogTitle("Selecionar arquivo TXT para importar");
 
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File arquivo = chooser.getSelectedFile();
-            DataImporter.ImportResult resultado = dataImporter.importFromTextFile(arquivo);
-            mostrarResultadoImportacao(resultado);
-            if (resultado.isSuccess()) {
-                atualizarDashboard();
-            }
+
+            // Mostrar loading
+            JDialog loadingDialog = new JDialog(this, "Importando...", true);
+            loadingDialog.setSize(300, 100);
+            loadingDialog.setLocationRelativeTo(this);
+            loadingDialog.setLayout(new BorderLayout());
+
+            JLabel loadingLabel = new JLabel("Processando arquivo TXT...", JLabel.CENTER);
+            loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            loadingDialog.add(loadingLabel, BorderLayout.CENTER);
+
+            SwingWorker<DataImporter.ImportResult, Void> worker =
+                    new SwingWorker<DataImporter.ImportResult, Void>() {
+                        @Override
+                        protected DataImporter.ImportResult doInBackground() throws Exception {
+                            return dataImporter.importFromTextFile(arquivo);
+                        }
+
+                        @Override
+                        protected void done() {
+                            loadingDialog.dispose();
+                            try {
+                                DataImporter.ImportResult resultado = get();
+                                mostrarResultadoImportacao(resultado);
+                                if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
+                                    atualizarDashboard();
+                                    JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
+                                            String.format("✅ Importação TXT concluída!\n\n" +
+                                                            "• %d vendas importadas com sucesso\n" +
+                                                            "• %d erros encontrados\n" +
+                                                            "• Dashboard atualizado automaticamente\n\n" +
+                                                            "Formatos reconhecidos:\n" +
+                                                            "- Produto - Quantidade - Valor\n" +
+                                                            "- Produto: Quantidade x Valor",
+                                                    resultado.getSuccessCount(),
+                                                    resultado.getErrorCount()),
+                                            "Importação TXT",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            } catch (Exception e) {
+                                JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
+                                        "❌ Erro na importação TXT:\n\n" + e.getMessage() +
+                                                "\n\nFormatos aceitos:\n" +
+                                                "• Produto - Quantidade - Valor - Data\n" +
+                                                "• Produto: Quantidade x Valor\n" +
+                                                "• Linhas que começam com # são ignoradas",
+                                        "Erro de Importação",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    };
+
+            loadingDialog.setVisible(true);
+            worker.execute();
         }
     }
 
     private void importarWhatsApp() {
         JDialog dialog = new JDialog(this, "Importar WhatsApp", true);
-        dialog.setSize(600, 400);
+        dialog.setSize(650, 500); // Aumentado para melhor visualização
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
@@ -886,27 +995,58 @@ public class SimplifiedDashboardView extends JFrame {
         instrucao.setFont(new Font("Arial", Font.BOLD, 14));
         instrucao.setForeground(TEXT_COLOR);
 
-        JTextArea textArea = new JTextArea(10, 40);
+        // ADICIONADO: Exemplo prático na caixa de texto
+        String exemploTexto = "Vendeu 5 Mouse Logitech por R$ 85,50 cada\n" +
+                "João: Comprei 2 Teclado Mecânico R$ 320,00\n" +
+                "Maria vendeu 3 Notebook Dell - R$ 2500 cada\n" +
+                "10 Carregador USB-C vendidos por 45,90 reais\n" +
+                "Smartphone Samsung: 4 unidades x R$ 1200\n" +
+                "\n" +
+                "DICA: O sistema reconhece automaticamente:\n" +
+                "- Produtos mencionados\n" +
+                "- Quantidades (números)\n" +
+                "- Valores (R$ ou reais)\n" +
+                "- Formatos variados de texto";
+
+        JTextArea textArea = new JTextArea(12, 50);
         textArea.setFont(new Font("Arial", Font.PLAIN, 12));
         textArea.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
         textArea.setBackground(Color.WHITE);
+        textArea.setText(exemploTexto); // Exemplo pré-preenchido
+        textArea.setCaretPosition(0); // Cursor no início
 
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)));
 
-        contentPanel.add(instrucao, BorderLayout.NORTH);
-        contentPanel.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
+        // Painel de instruções adicionais
+        JPanel instrucaoPanel = new JPanel(new BorderLayout());
+        instrucaoPanel.setOpaque(false);
+        instrucaoPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
-        JPanel textPanel = new JPanel(new BorderLayout());
-        textPanel.setOpaque(false);
-        textPanel.add(Box.createVerticalStrut(10), BorderLayout.NORTH);
-        textPanel.add(scrollPane, BorderLayout.CENTER);
-        contentPanel.add(textPanel, BorderLayout.SOUTH);
+        JLabel subtitulo = new JLabel("<html><i>Substitua o exemplo acima pelas suas mensagens reais do WhatsApp</i></html>");
+        subtitulo.setFont(new Font("Arial", Font.ITALIC, 11));
+        subtitulo.setForeground(Color.GRAY);
+
+        instrucaoPanel.add(instrucao, BorderLayout.NORTH);
+        instrucaoPanel.add(Box.createVerticalStrut(5), BorderLayout.CENTER);
+        instrucaoPanel.add(subtitulo, BorderLayout.SOUTH);
+
+        contentPanel.add(instrucaoPanel, BorderLayout.NORTH);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBackground(new Color(245, 245, 245));
+
+        JButton btnLimpar = new JButton("Limpar");
+        btnLimpar.setBackground(WARNING_COLOR);
+        btnLimpar.setForeground(Color.WHITE);
+        btnLimpar.setFont(new Font("Arial", Font.BOLD, 14));
+        btnLimpar.setFocusPainted(false);
+        btnLimpar.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
         JButton btnImportar = new JButton("Importar");
         btnImportar.setBackground(ACCENT_COLOR);
@@ -922,9 +1062,14 @@ public class SimplifiedDashboardView extends JFrame {
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
+        btnLimpar.addActionListener(e -> {
+            textArea.setText("");
+            textArea.requestFocus();
+        });
+
         btnImportar.addActionListener(e -> {
             String texto = textArea.getText().trim();
-            if (!texto.isEmpty()) {
+            if (!texto.isEmpty() && !texto.equals(exemploTexto)) {
                 dialog.dispose();
                 DataImporter.ImportResult resultado = dataImporter.importFromWhatsApp(texto);
                 mostrarResultadoImportacao(resultado);
@@ -932,12 +1077,18 @@ public class SimplifiedDashboardView extends JFrame {
                     atualizarDashboard();
                 }
             } else {
-                JOptionPane.showMessageDialog(dialog, "Por favor, cole o texto do WhatsApp!", "Erro", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(dialog,
+                        "Por favor, substitua o exemplo pelas suas mensagens reais do WhatsApp!",
+                        "Dados Necessários",
+                        JOptionPane.WARNING_MESSAGE);
+                textArea.selectAll();
+                textArea.requestFocus();
             }
         });
 
         btnCancelar.addActionListener(e -> dialog.dispose());
 
+        buttonPanel.add(btnLimpar);
         buttonPanel.add(btnImportar);
         buttonPanel.add(btnCancelar);
 
@@ -946,6 +1097,12 @@ public class SimplifiedDashboardView extends JFrame {
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.setVisible(true);
+
+        // Focar na caixa de texto e selecionar exemplo para fácil substituição
+        SwingUtilities.invokeLater(() -> {
+            textArea.requestFocus();
+            textArea.selectAll();
+        });
     }
 
     private void gerarTemplate() {
@@ -1059,5 +1216,11 @@ public class SimplifiedDashboardView extends JFrame {
         if (resposta == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
+    }
+
+    // Método auxiliar para atualizar estatísticas no sidebar
+    private void updateStatsInSidebar(Container container, JPanel newStatsPanel) {
+        // Este método pode ser expandido para atualizar estatísticas em tempo real
+        // Por enquanto, as estatísticas são atualizadas quando a aplicação é reiniciada
     }
 }
