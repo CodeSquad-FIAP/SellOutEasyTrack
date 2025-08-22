@@ -3,6 +3,7 @@ package view;
 import controller.VendaController;
 import model.Venda;
 import util.RGraphUtil;
+import listener.VendaListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,21 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DashboardView extends JFrame {
+public class DashboardView extends JFrame implements VendaListener {
 
     private VendaController vendaController = new VendaController();
     private JPanel chartPanel;
     private JPopupMenu crudMenu;
-
-    // Cores do tema moderno
-    private static final Color PRIMARY_COLOR = new Color(41, 128, 185);      // Azul principal
-    private static final Color SECONDARY_COLOR = new Color(52, 152, 219);    // Azul claro
-    private static final Color ACCENT_COLOR = new Color(46, 204, 113);       // Verde
-    private static final Color DANGER_COLOR = new Color(231, 76, 60);        // Vermelho
-    private static final Color DARK_COLOR = new Color(44, 62, 80);           // Azul escuro
-    private static final Color LIGHT_GRAY = new Color(236, 240, 241);        // Cinza claro
-    private static final Color WHITE = Color.WHITE;
-    private static final Color TEXT_COLOR = new Color(52, 73, 94);           // Texto escuro
 
     public DashboardView() {
         super("SellOut EasyTrack - Dashboard Executivo");
@@ -38,13 +29,17 @@ public class DashboardView extends JFrame {
         setVisible(true);
     }
 
+    @Override
+    public void onVendasChanged() {
+        atualizarGrafico();
+    }
+
     private void configurarJanela() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1400, 800);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Configurar ícone da aplicação (se houver)
         try {
             setIconImage(Toolkit.getDefaultToolkit().getImage("agent-seller-svgrepo-com"));
         } catch (Exception e) {
@@ -53,20 +48,12 @@ public class DashboardView extends JFrame {
     }
 
     private void criarInterface() {
-        // Painel principal com gradiente
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(LIGHT_GRAY);
+        mainPanel.setBackground(new Color(236, 240, 241));
 
-        // Header com título e informações
         JPanel headerPanel = criarHeader();
-
-        // Sidebar com menu
         JPanel sidebarPanel = criarSidebar();
-
-        // Área central com conteúdo
         JPanel contentPanel = criarAreaConteudo();
-
-        // Footer com informações
         JPanel footerPanel = criarFooter();
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
@@ -79,14 +66,13 @@ public class DashboardView extends JFrame {
 
     private JPanel criarHeader() {
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(DARK_COLOR);
+        header.setBackground(new Color(44, 62, 80));
         header.setBorder(new EmptyBorder(15, 25, 15, 25));
         header.setPreferredSize(new Dimension(0, 80));
 
-        // Título principal
         JLabel titulo = new JLabel("SellOut EasyTrack");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        titulo.setForeground(WHITE);
+        titulo.setForeground(Color.WHITE);
 
         JLabel subtitulo = new JLabel("Sistema de Gestão de Vendas");
         subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -97,7 +83,6 @@ public class DashboardView extends JFrame {
         tituloPanel.add(titulo, BorderLayout.CENTER);
         tituloPanel.add(subtitulo, BorderLayout.SOUTH);
 
-        // Informações do usuário
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         userPanel.setOpaque(false);
 
@@ -120,7 +105,6 @@ public class DashboardView extends JFrame {
         sidebar.setPreferredSize(new Dimension(280, 0));
         sidebar.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        // Título do menu - CENTRALIZADO
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titlePanel.setOpaque(false);
         titlePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
@@ -133,7 +117,6 @@ public class DashboardView extends JFrame {
         sidebar.add(titlePanel);
         sidebar.add(Box.createVerticalStrut(10));
 
-        // Botões do menu
         sidebar.add(criarBotaoMenu("VENDAS", "Gerenciar vendas", this::mostrarMenuVendas));
         sidebar.add(Box.createVerticalStrut(5));
         sidebar.add(criarBotaoMenu("RELATÓRIOS", "Visualizar relatórios", this::abrirRelatorios));
@@ -144,7 +127,6 @@ public class DashboardView extends JFrame {
 
         sidebar.add(Box.createVerticalGlue());
 
-        // Botão sair
         sidebar.add(criarBotaoMenu("SAIR", "Fechar aplicação", this::sairAplicacao));
         sidebar.add(Box.createVerticalStrut(20));
 
@@ -160,7 +142,7 @@ public class DashboardView extends JFrame {
 
         JLabel tituloLabel = new JLabel(titulo);
         tituloLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        tituloLabel.setForeground(WHITE);
+        tituloLabel.setForeground(Color.WHITE);
 
         JLabel descLabel = new JLabel(descricao);
         descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
@@ -173,12 +155,11 @@ public class DashboardView extends JFrame {
 
         buttonPanel.add(textPanel, BorderLayout.CENTER);
 
-        // Efeitos hover e clique
         buttonPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 buttonPanel.setOpaque(true);
-                buttonPanel.setBackground(PRIMARY_COLOR);
+                buttonPanel.setBackground(new Color(191, 59, 94));
                 buttonPanel.repaint();
             }
 
@@ -190,11 +171,9 @@ public class DashboardView extends JFrame {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Adicionar feedback visual do clique
-                buttonPanel.setBackground(PRIMARY_COLOR.darker());
+                buttonPanel.setBackground(new Color(242, 48, 100).darker());
                 buttonPanel.repaint();
 
-                // Executar ação após breve delay para feedback visual
                 Timer timer = new Timer(100, evt -> {
                     try {
                         acao.run();
@@ -209,14 +188,14 @@ public class DashboardView extends JFrame {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                buttonPanel.setBackground(PRIMARY_COLOR.darker());
+                buttonPanel.setBackground(new Color(191, 59, 94).darker());
                 buttonPanel.repaint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (buttonPanel.contains(e.getPoint())) {
-                    buttonPanel.setBackground(PRIMARY_COLOR);
+                    buttonPanel.setBackground(new Color(191, 59, 94));
                 } else {
                     buttonPanel.setOpaque(false);
                 }
@@ -229,10 +208,9 @@ public class DashboardView extends JFrame {
 
     private JPanel criarAreaConteudo() {
         JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(LIGHT_GRAY);
+        content.setBackground(new Color(236, 240, 241));
         content.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Card do gráfico
         JPanel cardGrafico = criarCardGrafico();
         content.add(cardGrafico, BorderLayout.CENTER);
 
@@ -241,47 +219,43 @@ public class DashboardView extends JFrame {
 
     private JPanel criarCardGrafico() {
         JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(WHITE);
+        card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
                 new EmptyBorder(25, 25, 25, 25)
         ));
 
-        // Header do card
         JPanel cardHeader = new JPanel(new BorderLayout());
         cardHeader.setOpaque(false);
         cardHeader.setBorder(new EmptyBorder(0, 0, 20, 0));
 
         JLabel cardTitle = new JLabel("Análise de Vendas");
         cardTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        cardTitle.setForeground(DARK_COLOR);
+        cardTitle.setForeground(new Color(44, 62, 80));
 
         JLabel cardSubtitle = new JLabel("Produtos com melhor desempenho");
         cardSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        cardSubtitle.setForeground(TEXT_COLOR);
+        cardSubtitle.setForeground(new Color(38, 38, 38));
 
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setOpaque(false);
         titlePanel.add(cardTitle, BorderLayout.NORTH);
         titlePanel.add(cardSubtitle, BorderLayout.SOUTH);
 
-        // Botão de atualização
-        JButton btnRefresh = criarBotaoModerno("ATUALIZAR", SECONDARY_COLOR);
+        JButton btnRefresh = criarBotaoModerno("ATUALIZAR", new Color(52, 152, 219));
         btnRefresh.addActionListener(e -> atualizarGrafico());
 
         cardHeader.add(titlePanel, BorderLayout.WEST);
         cardHeader.add(btnRefresh, BorderLayout.EAST);
 
-        // Área do gráfico
         chartPanel = new JPanel(new BorderLayout());
-        chartPanel.setBackground(WHITE);
+        chartPanel.setBackground(Color.WHITE);
         chartPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(LIGHT_GRAY, 1),
+                BorderFactory.createLineBorder(new Color(236, 240, 241), 1),
                 new EmptyBorder(20, 20, 20, 20)
         ));
         chartPanel.setPreferredSize(new Dimension(0, 400));
 
-        // Carregar gráfico inicial
         gerarGraficoR();
 
         card.add(cardHeader, BorderLayout.NORTH);
@@ -293,13 +267,12 @@ public class DashboardView extends JFrame {
     private JButton criarBotaoModerno(String texto, Color cor) {
         JButton btn = new JButton(texto);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setForeground(WHITE);
+        btn.setForeground(Color.WHITE);
         btn.setBackground(cor);
         btn.setBorder(new EmptyBorder(10, 20, 10, 20));
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Efeito hover
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -318,18 +291,23 @@ public class DashboardView extends JFrame {
     private JPanel criarFooter() {
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(new Color(127, 140, 141));
-        footer.setBorder(new EmptyBorder(10, 25, 10, 25));
-        footer.setPreferredSize(new Dimension(0, 40));
+        footer.setBorder(new EmptyBorder(12, 25, 12, 25));
+        footer.setPreferredSize(new Dimension(0, 45));
+
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftPanel.setOpaque(false);
 
         JLabel footerText = new JLabel("SellOut EasyTrack - Sistema de Gestão de Vendas");
         footerText.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        footerText.setForeground(WHITE);
+        footerText.setForeground(Color.WHITE);
+
+        leftPanel.add(footerText);
 
         JLabel status = new JLabel("Sistema Online");
         status.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         status.setForeground(new Color(189, 195, 199));
 
-        footer.add(footerText, BorderLayout.WEST);
+        footer.add(leftPanel, BorderLayout.WEST);
         footer.add(status, BorderLayout.EAST);
 
         return footer;
@@ -341,7 +319,7 @@ public class DashboardView extends JFrame {
                 BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
                 BorderFactory.createEmptyBorder(5, 0, 5, 0)
         ));
-        crudMenu.setBackground(WHITE);
+        crudMenu.setBackground(Color.WHITE);
 
         JMenuItem criarItem = criarMenuItem("CRIAR VENDA", "Registrar nova venda no sistema");
         JMenuItem lerItem = criarMenuItem("LISTAR VENDAS", "Visualizar todas as vendas registradas");
@@ -350,7 +328,7 @@ public class DashboardView extends JFrame {
 
         criarItem.addActionListener(e -> {
             crudMenu.setVisible(false);
-            new CriarVendaView(this);
+            new CriarVendaView(this, this);
         });
 
         lerItem.addActionListener(e -> {
@@ -360,12 +338,12 @@ public class DashboardView extends JFrame {
 
         atualizarItem.addActionListener(e -> {
             crudMenu.setVisible(false);
-            new AtualizarVendaView(this);
+            new AtualizarVendaView(this, this);
         });
 
         deletarItem.addActionListener(e -> {
             crudMenu.setVisible(false);
-            new DeletarVendaView(this);
+            new DeletarVendaView(this, this);
         });
 
         crudMenu.add(criarItem);
@@ -381,16 +359,16 @@ public class DashboardView extends JFrame {
         JMenuItem item = new JMenuItem();
         item.setLayout(new BorderLayout());
         item.setBorder(new EmptyBorder(12, 20, 12, 20));
-        item.setBackground(WHITE);
+        item.setBackground(Color.WHITE);
         item.setPreferredSize(new Dimension(250, 50));
 
         JLabel tituloLabel = new JLabel(titulo);
         tituloLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tituloLabel.setForeground(DARK_COLOR);
+        tituloLabel.setForeground(new Color(44, 62, 80));
 
         JLabel descLabel = new JLabel(descricao);
         descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        descLabel.setForeground(TEXT_COLOR);
+        descLabel.setForeground(new Color(38, 38, 38));
 
         JPanel textPanel = new JPanel(new BorderLayout());
         textPanel.setOpaque(false);
@@ -399,17 +377,16 @@ public class DashboardView extends JFrame {
 
         item.add(textPanel, BorderLayout.CENTER);
 
-        // Efeito hover no menu item
-        item.addMouseListener(new java.awt.event.MouseAdapter() {
+        item.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                item.setBackground(LIGHT_GRAY);
+            public void mouseEntered(MouseEvent e) {
+                item.setBackground(new Color(236, 240, 241));
                 item.repaint();
             }
 
             @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                item.setBackground(WHITE);
+            public void mouseExited(MouseEvent e) {
+                item.setBackground(Color.WHITE);
                 item.repaint();
             }
         });
@@ -417,37 +394,27 @@ public class DashboardView extends JFrame {
         return item;
     }
 
-    // Métodos de ação
     private void mostrarMenuVendas() {
         System.out.println("🔍 [DEBUG] Botão VENDAS clicado");
-
         try {
             if (crudMenu == null) {
                 System.out.println("🔍 [DEBUG] Configurando menu CRUD...");
                 configurarMenuCrud();
             }
-
-            // Encontrar posição ideal para mostrar o menu
             Point frameLocation = this.getLocationOnScreen();
-            int menuX = 280; // Largura do sidebar
-            int menuY = 180; // Posição aproximada do botão VENDAS
-
+            int menuX = 280;
+            int menuY = 180;
             System.out.println("🔍 [DEBUG] Mostrando menu na posição: " + menuX + ", " + menuY);
-
             crudMenu.show(this, menuX, menuY);
-
         } catch (Exception e) {
             System.err.println("❌ [ERROR] Erro ao mostrar menu VENDAS: " + e.getMessage());
             e.printStackTrace();
-
-            // Fallback: mostrar menu simples
             mostrarMenuVendasSimples();
         }
     }
 
     private void mostrarMenuVendasSimples() {
         String[] opcoes = {"Criar Venda", "Listar Vendas", "Atualizar Venda", "Deletar Venda", "Cancelar"};
-
         int escolha = JOptionPane.showOptionDialog(
                 this,
                 "Selecione uma opção:",
@@ -458,32 +425,19 @@ public class DashboardView extends JFrame {
                 opcoes,
                 opcoes[0]
         );
-
         switch (escolha) {
-            case 0:
-                new CriarVendaView(this);
-                break;
-            case 1:
-                new ListarVendasView(this);
-                break;
-            case 2:
-                new AtualizarVendaView(this);
-                break;
-            case 3:
-                new DeletarVendaView(this);
-                break;
-            default:
-                // Cancelar ou fechar
-                break;
+            case 0: new CriarVendaView(this, this); break;
+            case 1: new ListarVendasView(this); break;
+            case 2: new AtualizarVendaView(this, this); break;
+            case 3: new DeletarVendaView(this, this); break;
+            default: break;
         }
     }
 
     private void abrirRelatorios() {
         try {
             System.out.println("🔍 [DEBUG] Gerando relatório automático...");
-
             List<Venda> vendas = vendaController.obterTodasVendas();
-
             if (vendas.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                         "Nenhuma venda encontrada para gerar relatório.",
@@ -491,40 +445,30 @@ public class DashboardView extends JFrame {
                         JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-
-            // Calcular estatísticas
             int totalVendas = vendas.size();
             double somaTotal = vendas.stream().mapToDouble(v -> v.getQuantidade() * v.getValorUnitario()).sum();
             double ticketMedio = somaTotal / totalVendas;
-
-            // Encontrar produto mais vendido
             Map<String, Integer> produtosMaisVendidos = vendas.stream()
                     .collect(Collectors.groupingBy(
                             Venda::getProduto,
                             Collectors.summingInt(Venda::getQuantidade)
                     ));
-
             String produtoMaisVendido = produtosMaisVendidos.entrySet().stream()
                     .max(Map.Entry.comparingByValue())
                     .map(Map.Entry::getKey)
                     .orElse("Nenhum");
-
             int quantidadeMaisVendido = produtosMaisVendidos.getOrDefault(produtoMaisVendido, 0);
-
-            // Criar relatório
             StringBuilder relatorio = new StringBuilder();
             relatorio.append("====== RELATÓRIO DE VENDAS ======\n");
             relatorio.append("SellOut EasyTrack\n");
             relatorio.append("Gerado em: ").append(java.time.LocalDateTime.now().format(
                     java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))).append("\n\n");
-
             relatorio.append("RESUMO EXECUTIVO:\n");
             relatorio.append("• Total de vendas registradas: ").append(totalVendas).append("\n");
             relatorio.append("• Faturamento total: R$ ").append(String.format("%.2f", somaTotal)).append("\n");
             relatorio.append("• Ticket médio: R$ ").append(String.format("%.2f", ticketMedio)).append("\n");
             relatorio.append("• Produto mais vendido: ").append(produtoMaisVendido)
                     .append(" (").append(quantidadeMaisVendido).append(" unidades)\n\n");
-
             relatorio.append("DETALHAMENTO POR PRODUTO:\n");
             produtosMaisVendidos.entrySet().stream()
                     .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
@@ -537,32 +481,23 @@ public class DashboardView extends JFrame {
                                 .append(": ").append(entry.getValue()).append(" unidades")
                                 .append(" - R$ ").append(String.format("%.2f", valorTotalProduto)).append("\n");
                     });
-
-            // Exibir relatório em janela
             JTextArea areaRelatorio = new JTextArea(relatorio.toString());
             areaRelatorio.setFont(new Font("Courier New", Font.PLAIN, 12));
             areaRelatorio.setEditable(false);
-            areaRelatorio.setBackground(WHITE);
+            areaRelatorio.setBackground(Color.WHITE);
             areaRelatorio.setBorder(new EmptyBorder(20, 20, 20, 20));
-
             JScrollPane scrollPane = new JScrollPane(areaRelatorio);
             scrollPane.setPreferredSize(new Dimension(600, 400));
-
             JPanel painelRelatorio = new JPanel(new BorderLayout());
             painelRelatorio.add(scrollPane, BorderLayout.CENTER);
-
-            // Botão para salvar relatório
             JPanel painelBotoes = new JPanel(new FlowLayout());
-            JButton btnSalvar = criarBotaoModerno("SALVAR RELATÓRIO", SECONDARY_COLOR);
+            JButton btnSalvar = criarBotaoModerno("SALVAR RELATÓRIO", new Color(52, 152, 219));
             btnSalvar.addActionListener(e -> salvarRelatorio(relatorio.toString()));
             painelBotoes.add(btnSalvar);
-
             painelRelatorio.add(painelBotoes, BorderLayout.SOUTH);
-
             JOptionPane.showMessageDialog(this, painelRelatorio,
                     "Relatório de Vendas - SellOut EasyTrack",
                     JOptionPane.INFORMATION_MESSAGE);
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
                     "Erro ao acessar banco de dados: " + e.getMessage(),
@@ -582,7 +517,6 @@ public class DashboardView extends JFrame {
             chooser.setDialogTitle("Salvar Relatório");
             chooser.setSelectedFile(new java.io.File("Relatorio_Vendas_" +
                     java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyy")) + ".txt"));
-
             if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try (java.io.FileWriter writer = new java.io.FileWriter(chooser.getSelectedFile())) {
                     writer.write(conteudo);
@@ -612,7 +546,6 @@ public class DashboardView extends JFrame {
             if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 String path = chooser.getSelectedFile().getAbsolutePath() + ".csv";
                 util.ReportUtil.exportarCSV(vendas, path);
-
                 JOptionPane.showMessageDialog(this,
                         "Dados exportados com sucesso!\n\nArquivo: " + path,
                         "Exportação Concluída",
@@ -632,7 +565,6 @@ public class DashboardView extends JFrame {
                 "Confirmar Saída",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
-
         if (resposta == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
@@ -642,12 +574,8 @@ public class DashboardView extends JFrame {
         try {
             List<Venda> vendas = vendaController.obterTodasVendas();
             System.out.println("Gerando gráfico 1080p com " + vendas.size() + " vendas");
-
-            // Mostrar loading
             mostrarLoading();
-
-            // Gera o gráfico usando R
-            SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+            SwingWorker<String, Void> worker = new SwingWorker<>() {
                 @Override
                 protected String doInBackground() throws Exception {
                     return RGraphUtil.gerarGraficoVendas(vendas);
@@ -667,9 +595,7 @@ public class DashboardView extends JFrame {
                     }
                 }
             };
-
             worker.execute();
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar dados: " + e.getMessage());
             mostrarErroGrafico("Erro de banco de dados");
@@ -680,7 +606,7 @@ public class DashboardView extends JFrame {
         chartPanel.removeAll();
         JLabel loading = new JLabel("Gerando gráfico...", JLabel.CENTER);
         loading.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        loading.setForeground(TEXT_COLOR);
+        loading.setForeground(new Color(38, 38, 38));
         chartPanel.add(loading);
         chartPanel.revalidate();
         chartPanel.repaint();
@@ -690,58 +616,43 @@ public class DashboardView extends JFrame {
         File imageFile = new File(imagePath);
         if (imageFile.exists()) {
             ImageIcon grafico = new ImageIcon(imagePath);
-
-            // Calcular dimensões otimizadas
             int originalWidth = grafico.getIconWidth();
             int originalHeight = grafico.getIconHeight();
-
             int panelWidth = chartPanel.getWidth() - 40;
             int panelHeight = chartPanel.getHeight() - 40;
-
             if (panelWidth <= 0) panelWidth = 800;
             if (panelHeight <= 0) panelHeight = 400;
-
             double scaleX = (double) panelWidth / originalWidth;
             double scaleY = (double) panelHeight / originalHeight;
             double scale = Math.min(scaleX, scaleY);
-
             int scaledWidth = (int) (originalWidth * scale);
             int scaledHeight = (int) (originalHeight * scale);
-
             Image img = grafico.getImage();
             Image scaledImg = img.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
             ImageIcon finalIcon = new ImageIcon(scaledImg);
-
             JLabel lblGrafico = new JLabel(finalIcon);
             lblGrafico.setHorizontalAlignment(JLabel.CENTER);
             lblGrafico.setVerticalAlignment(JLabel.CENTER);
-
             chartPanel.removeAll();
             chartPanel.add(lblGrafico, BorderLayout.CENTER);
             chartPanel.revalidate();
             chartPanel.repaint();
-
             System.out.println("Gráfico 1080p exibido com sucesso!");
         }
     }
 
     private void mostrarErroGrafico(String mensagem) {
         chartPanel.removeAll();
-
         JPanel errorPanel = new JPanel(new BorderLayout());
         errorPanel.setOpaque(false);
-
         JLabel iconError = new JLabel("⚠", JLabel.CENTER);
         iconError.setFont(new Font("Segoe UI", Font.PLAIN, 48));
-        iconError.setForeground(DANGER_COLOR);
-
+        iconError.setForeground(new Color(231, 76, 60));
         JLabel textError = new JLabel(mensagem, JLabel.CENTER);
         textError.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        textError.setForeground(TEXT_COLOR);
-
+        textError.setForeground(new Color(38, 38, 38));
         errorPanel.add(iconError, BorderLayout.CENTER);
         errorPanel.add(textError, BorderLayout.SOUTH);
-
         chartPanel.add(errorPanel, BorderLayout.CENTER);
         chartPanel.revalidate();
         chartPanel.repaint();

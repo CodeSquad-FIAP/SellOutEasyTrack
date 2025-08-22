@@ -2,12 +2,11 @@ package view;
 
 import controller.VendaController;
 import model.Venda;
+import listener.VendaListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -16,18 +15,12 @@ public class CriarVendaView extends JDialog {
     private JTextField txtProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
-    private VendaController vendaController = new VendaController();
+    private final VendaController vendaController = new VendaController();
+    private final VendaListener vendaListener;
 
-    private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private static final Color ACCENT_COLOR = new Color(46, 204, 113);
-    private static final Color DANGER_COLOR = new Color(231, 76, 60);
-    private static final Color DARK_COLOR = new Color(44, 62, 80);
-    private static final Color LIGHT_GRAY = new Color(236, 240, 241);
-    private static final Color WHITE = Color.WHITE;
-    private static final Color TEXT_COLOR = new Color(52, 73, 94);
-
-    public CriarVendaView(JFrame parent) {
+    public CriarVendaView(JFrame parent, VendaListener listener) {
         super(parent, "Nova Venda", true);
+        this.vendaListener = listener;
         configurarJanela();
         criarInterface();
         setVisible(true);
@@ -42,14 +35,13 @@ public class CriarVendaView extends JDialog {
 
     private void criarInterface() {
         setLayout(new GridBagLayout());
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("NOVA VENDA", JLabel.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setForeground(PRIMARY_COLOR);
+        titulo.setForeground(Color.BLACK);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         add(titulo, gbc);
 
@@ -79,30 +71,22 @@ public class CriarVendaView extends JDialog {
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        add(lblProduto, gbc);
-        gbc.gridx = 1;
-        add(txtProduto, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 2;
-        add(lblQuantidade, gbc);
-        gbc.gridx = 1;
-        add(txtQuantidade, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 3;
-        add(lblValor, gbc);
-        gbc.gridx = 1;
-        add(txtValorUnitario, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; add(lblProduto, gbc);
+        gbc.gridx = 1; add(txtProduto, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; add(lblQuantidade, gbc);
+        gbc.gridx = 1; add(txtQuantidade, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; add(lblValor, gbc);
+        gbc.gridx = 1; add(txtValorUnitario, gbc);
 
         JButton btnSalvar = new JButton("Salvar Venda");
-        btnSalvar.setBackground(ACCENT_COLOR);
+        btnSalvar.setBackground(new Color(46, 204, 113));
         btnSalvar.setForeground(Color.WHITE);
         btnSalvar.setFocusPainted(false);
         btnSalvar.setFont(new Font("Arial", Font.BOLD, 16));
         btnSalvar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(149, 165, 166));
+        btnCancelar.setBackground(Color.GRAY);
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
@@ -136,7 +120,7 @@ public class CriarVendaView extends JDialog {
                 return;
             }
 
-            String valorStr = txtValorUnitario.getText().trim();
+            String valorStr = txtValorUnitario.getText().trim().replace(",", ".");
             if (valorStr.isEmpty()) {
                 mostrarErro("Por favor, informe o valor unitário!");
                 txtValorUnitario.requestFocus();
@@ -150,7 +134,7 @@ public class CriarVendaView extends JDialog {
                 return;
             }
 
-            double valor = Double.parseDouble(valorStr.replace(",", "."));
+            double valor = Double.parseDouble(valorStr);
             if (valor <= 0) {
                 mostrarErro("O valor unitário deve ser um número positivo!");
                 txtValorUnitario.requestFocus();
@@ -160,23 +144,15 @@ public class CriarVendaView extends JDialog {
             Venda venda = new Venda(produto, quantidade, valor, Date.valueOf(LocalDate.now()));
             vendaController.salvarVenda(venda);
 
-            mostrarSucesso(
-                    "Venda registrada com sucesso!\n\n" +
-                            "Produto: " + produto + "\n" +
-                            "Quantidade: " + quantidade + "\n" +
-                            "Valor Unitário: R$ " + String.format("%.2f", valor) + "\n" +
-                            "Total: R$ " + String.format("%.2f", quantidade * valor)
-            );
+            if (vendaListener != null) {
+                vendaListener.onVendasChanged();
+            }
 
-            txtProduto.setText("");
-            txtQuantidade.setText("");
-            txtValorUnitario.setText("");
-            txtProduto.requestFocus();
+            mostrarSucesso("Venda registrada com sucesso!");
+            dispose();
 
         } catch (NumberFormatException ex) {
-            mostrarErro("Por favor, verifique se os valores numéricos estão corretos!\n" +
-                    "Quantidade deve ser um número inteiro.\n" +
-                    "Valor deve ser um número decimal (use ponto ou vírgula).");
+            mostrarErro("Valores numéricos inválidos.");
         } catch (Exception ex) {
             mostrarErro("Erro ao salvar venda: " + ex.getMessage());
         }

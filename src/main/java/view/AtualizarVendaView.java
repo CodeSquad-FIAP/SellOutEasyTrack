@@ -2,38 +2,45 @@ package view;
 
 import controller.VendaController;
 import model.Venda;
+import listener.VendaListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 public class AtualizarVendaView extends JDialog {
 
-    private VendaController vendaController = new VendaController();
+    private final VendaController vendaController = new VendaController();
     private JComboBox<VendaComboItem> comboVendas;
     private JTextField txtProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
     private JButton btnAtualizar;
     private Venda vendaSelecionada;
+    private final VendaListener vendaListener;
 
-    public AtualizarVendaView(JFrame parent) {
+    public AtualizarVendaView(JFrame parent, VendaListener listener) {
         super(parent, "Atualizar Venda", true);
+        this.vendaListener = listener;
         setSize(550, 500);
         setLocationRelativeTo(parent);
         setLayout(new GridBagLayout());
         getContentPane().setBackground(new Color(245, 245, 245));
 
+        criarInterface();
+        carregarVendas();
+        setVisible(true);
+    }
+
+    private void criarInterface() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("ATUALIZAR VENDA", JLabel.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setForeground(new Color(230, 126, 34));
+        titulo.setForeground(Color.BLACK);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         add(titulo, gbc);
 
@@ -46,10 +53,8 @@ public class AtualizarVendaView extends JDialog {
         comboVendas.setFont(new Font("Arial", Font.PLAIN, 12));
         comboVendas.addActionListener(e -> carregarDadosVenda());
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        add(lblSelecionar, gbc);
-        gbc.gridx = 1;
-        add(comboVendas, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; add(lblSelecionar, gbc);
+        gbc.gridx = 1; add(comboVendas, gbc);
 
         JSeparator separador = new JSeparator();
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
@@ -86,32 +91,24 @@ public class AtualizarVendaView extends JDialog {
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
         txtValorUnitario.setEnabled(false);
 
-        gbc.gridx = 0; gbc.gridy = 3;
-        add(lblProduto, gbc);
-        gbc.gridx = 1;
-        add(txtProduto, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 4;
-        add(lblQuantidade, gbc);
-        gbc.gridx = 1;
-        add(txtQuantidade, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 5;
-        add(lblValor, gbc);
-        gbc.gridx = 1;
-        add(txtValorUnitario, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; add(lblProduto, gbc);
+        gbc.gridx = 1; add(txtProduto, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; add(lblQuantidade, gbc);
+        gbc.gridx = 1; add(txtQuantidade, gbc);
+        gbc.gridx = 0; gbc.gridy = 5; add(lblValor, gbc);
+        gbc.gridx = 1; add(txtValorUnitario, gbc);
 
         btnAtualizar = new JButton("Atualizar Venda");
-        btnAtualizar.setBackground(new Color(230, 126, 34));
-        btnAtualizar.setForeground(Color.white);
+        btnAtualizar.setBackground(new Color(220, 20, 60));
+        btnAtualizar.setForeground(Color.WHITE);
         btnAtualizar.setFocusPainted(false);
         btnAtualizar.setFont(new Font("Arial", Font.BOLD, 16));
         btnAtualizar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         btnAtualizar.setEnabled(false);
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(149, 165, 166));
-        btnCancelar.setForeground(Color.white);
+        btnCancelar.setBackground(Color.GRAY);
+        btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
         btnCancelar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
@@ -126,57 +123,38 @@ public class AtualizarVendaView extends JDialog {
 
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         add(panelBotoes, gbc);
-
-        carregarVendas();
-
-        setVisible(true);
     }
 
     private void carregarVendas() {
         try {
             List<Venda> vendas = vendaController.obterTodasVendas();
-
             comboVendas.removeAllItems();
             comboVendas.addItem(new VendaComboItem(null, "-- Selecione uma venda --"));
-
             for (Venda venda : vendas) {
                 comboVendas.addItem(new VendaComboItem(venda,
-                        String.format("ID: %d - %s (Qtd: %d) - %s",
-                                venda.getId(),
-                                venda.getProduto(),
-                                venda.getQuantidade(),
-                                venda.getData())));
+                        String.format("ID: %d - %s (Qtd: %d)", venda.getId(), venda.getProduto(), venda.getQuantidade())));
             }
-
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                    "Erro ao carregar vendas: " + e.getMessage(),
-                    "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erro ao carregar vendas: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void carregarDadosVenda() {
         VendaComboItem item = (VendaComboItem) comboVendas.getSelectedItem();
-
         if (item != null && item.getVenda() != null) {
             vendaSelecionada = item.getVenda();
-
             txtProduto.setText(vendaSelecionada.getProduto());
             txtQuantidade.setText(String.valueOf(vendaSelecionada.getQuantidade()));
             txtValorUnitario.setText(String.valueOf(vendaSelecionada.getValorUnitario()));
-
             txtProduto.setEnabled(true);
             txtQuantidade.setEnabled(true);
             txtValorUnitario.setEnabled(true);
             btnAtualizar.setEnabled(true);
-
         } else {
             vendaSelecionada = null;
-
             txtProduto.setText("");
             txtQuantidade.setText("");
             txtValorUnitario.setText("");
-
             txtProduto.setEnabled(false);
             txtQuantidade.setEnabled(false);
             txtValorUnitario.setEnabled(false);
@@ -186,119 +164,58 @@ public class AtualizarVendaView extends JDialog {
 
     private void atualizarVenda() {
         if (vendaSelecionada == null) {
-            JOptionPane.showMessageDialog(this, "Por favor, selecione uma venda para atualizar!",
-                    "Nenhuma Venda Selecionada", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor, selecione uma venda para atualizar!", "Nenhuma Venda Selecionada", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
             String produto = txtProduto.getText().trim();
             if (produto.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, informe o nome do produto!",
-                        "Campo Obrigatório", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Por favor, informe o nome do produto!", "Campo Obrigatório", JOptionPane.WARNING_MESSAGE);
                 txtProduto.requestFocus();
                 return;
             }
 
             String quantidadeStr = txtQuantidade.getText().trim();
             if (quantidadeStr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, informe a quantidade!",
-                        "Campo Obrigatório", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Por favor, informe a quantidade!", "Campo Obrigatório", JOptionPane.WARNING_MESSAGE);
                 txtQuantidade.requestFocus();
                 return;
             }
 
-            String valorStr = txtValorUnitario.getText().trim();
+            String valorStr = txtValorUnitario.getText().trim().replace(",", ".");
             if (valorStr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, informe o valor unitário!",
-                        "Campo Obrigatório", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Por favor, informe o valor unitário!", "Campo Obrigatório", JOptionPane.WARNING_MESSAGE);
                 txtValorUnitario.requestFocus();
                 return;
             }
 
             int quantidade = Integer.parseInt(quantidadeStr);
-            if (quantidade <= 0) {
-                JOptionPane.showMessageDialog(this, "A quantidade deve ser um número positivo!",
-                        "Valor Inválido", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             double valor = Double.parseDouble(valorStr);
-            if (valor <= 0) {
-                JOptionPane.showMessageDialog(this, "O valor unitário deve ser um número positivo!",
-                        "Valor Inválido", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
 
-            int resposta = JOptionPane.showConfirmDialog(this,
-                    "Confirma a atualização desta venda?\n\n" +
-                            "Dados atuais:\n" +
-                            "Produto: " + vendaSelecionada.getProduto() + " → " + produto + "\n" +
-                            "Quantidade: " + vendaSelecionada.getQuantidade() + " → " + quantidade + "\n" +
-                            "Valor Unit.: R$ " + String.format("%.2f", vendaSelecionada.getValorUnitario()) +
-                            " → R$ " + String.format("%.2f", valor),
-                    "Confirmar Atualização",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+            int resposta = JOptionPane.showConfirmDialog(this, "Confirma a atualização desta venda?", "Confirmar Atualização", JOptionPane.YES_NO_OPTION);
 
             if (resposta == JOptionPane.YES_OPTION) {
-                try {
-                    Venda vendaAtualizada = new Venda(
-                            vendaSelecionada.getId(),
-                            produto,
-                            quantidade,
-                            valor,
-                            vendaSelecionada.getData()
-                    );
+                Venda vendaAtualizada = new Venda(vendaSelecionada.getId(), produto, quantidade, valor, vendaSelecionada.getData());
+                vendaController.atualizarVenda(vendaAtualizada);
 
-                    vendaController.atualizarVenda(vendaAtualizada);
-
-                    JOptionPane.showMessageDialog(this,
-                            "Venda atualizada com sucesso!\n\n" +
-                                    "Dados atualizados:\n" +
-                                    "• ID: " + vendaSelecionada.getId() + "\n" +
-                                    "• Produto: " + produto + "\n" +
-                                    "• Quantidade: " + quantidade + "\n" +
-                                    "• Valor Unit.: R$ " + String.format("%.2f", valor) + "\n" +
-                                    "• Total: R$ " + String.format("%.2f", quantidade * valor),
-                            "Atualização Realizada", JOptionPane.INFORMATION_MESSAGE);
-
-                    dispose();
-
-                } catch (SQLException ex) {
-                    String mensagemErro = "Erro ao atualizar venda no banco de dados:\n" + ex.getMessage();
-                    if (ex.getMessage().contains("não encontrada")) {
-                        mensagemErro = "A venda selecionada não existe mais no banco de dados.";
-                    }
-
-                    JOptionPane.showMessageDialog(this,
-                            mensagemErro,
-                            "Erro de Banco de Dados",
-                            JOptionPane.ERROR_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this,
-                            "Erro inesperado ao atualizar venda:\n" + ex.getMessage(),
-                            "Erro",
-                            JOptionPane.ERROR_MESSAGE);
+                if (vendaListener != null) {
+                    vendaListener.onVendasChanged();
                 }
-            }
 
+                JOptionPane.showMessageDialog(this, "Venda atualizada com sucesso!", "Atualização Realizada", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, verifique se os valores numéricos estão corretos!\n" +
-                            "Quantidade deve ser um número inteiro.\n" +
-                            "Valor deve ser um número decimal.",
-                    "Formato Inválido", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Valores de quantidade e/ou valor unitário são inválidos.", "Formato Inválido", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Erro ao atualizar venda: " + ex.getMessage(),
-                    "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erro ao atualizar venda: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private static class VendaComboItem {
-        private Venda venda;
-        private String texto;
+        private final Venda venda;
+        private final String texto;
 
         public VendaComboItem(Venda venda, String texto) {
             this.venda = venda;

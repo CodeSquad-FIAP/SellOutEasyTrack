@@ -4,6 +4,7 @@ import controller.VendaController;
 import model.Venda;
 import util.AnalyticsEngine;
 import util.DataImporter;
+import listener.VendaListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,27 +12,23 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class SimplifiedDashboardView extends JFrame {
+public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
-    private VendaController vendaController = new VendaController();
-    private AnalyticsEngine analyticsEngine = new AnalyticsEngine();
-    private DataImporter dataImporter = new DataImporter();
+    private final VendaController vendaController = new VendaController();
+    private final AnalyticsEngine analyticsEngine = new AnalyticsEngine();
+    private final DataImporter dataImporter = new DataImporter();
 
     private JPanel chartPanel;
     private JPanel insightsPanel;
-
-    private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
-    private static final Color ACCENT_COLOR = new Color(46, 204, 113);
-    private static final Color DANGER_COLOR = new Color(231, 76, 60);
-    private static final Color WARNING_COLOR = new Color(243, 156, 18);
-    private static final Color DARK_COLOR = new Color(44, 62, 80);
-    private static final Color LIGHT_GRAY = new Color(236, 240, 241);
-    private static final Color WHITE = Color.WHITE;
-    private static final Color TEXT_COLOR = new Color(52, 73, 94);
+    private JPanel statsPanel;
 
     public SimplifiedDashboardView() {
         super("SellOut EasyTrack - Dashboard Inteligente");
@@ -39,6 +36,11 @@ public class SimplifiedDashboardView extends JFrame {
         criarInterface();
         atualizarDashboard();
         setVisible(true);
+    }
+
+    @Override
+    public void onVendasChanged() {
+        atualizarDashboard();
     }
 
     private void configurarJanela() {
@@ -50,7 +52,7 @@ public class SimplifiedDashboardView extends JFrame {
 
     private void criarInterface() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(LIGHT_GRAY);
+        mainPanel.setBackground(new Color(236, 240, 241));
 
         JPanel headerPanel = criarHeader();
         JPanel sidebarPanel = criarSidebar();
@@ -67,13 +69,13 @@ public class SimplifiedDashboardView extends JFrame {
 
     private JPanel criarHeader() {
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(DARK_COLOR);
+        header.setBackground(new Color(44, 62, 80));
         header.setBorder(new EmptyBorder(15, 25, 15, 25));
         header.setPreferredSize(new Dimension(0, 80));
 
         JLabel titulo = new JLabel("SellOut EasyTrack - Sistema Completo");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        titulo.setForeground(WHITE);
+        titulo.setForeground(Color.WHITE);
 
         JLabel subtitulo = new JLabel("BI Inteligente - Múltiplas Fontes - Analytics Avançado");
         subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -91,8 +93,9 @@ public class SimplifiedDashboardView extends JFrame {
 
     private JPanel criarSidebar() {
         JPanel sidebar = new JPanel();
+        sidebar.setName("sidebar");
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(52, 73, 94));
+        sidebar.setBackground(new Color(44, 62, 80));
         sidebar.setPreferredSize(new Dimension(300, 0));
         sidebar.setBorder(new EmptyBorder(20, 0, 20, 0));
 
@@ -120,7 +123,8 @@ public class SimplifiedDashboardView extends JFrame {
 
         sidebar.add(Box.createVerticalGlue());
 
-        JPanel statsPanel = criarPainelEstatisticas();
+        statsPanel = criarPainelEstatisticas();
+        statsPanel.setName("statsPanel");
         sidebar.add(statsPanel);
 
         sidebar.add(Box.createVerticalStrut(20));
@@ -131,12 +135,12 @@ public class SimplifiedDashboardView extends JFrame {
 
     private JPanel criarAreaConteudo() {
         JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(LIGHT_GRAY);
+        content.setBackground(new Color(236, 240, 241));
         content.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(500);
-        splitPane.setBackground(LIGHT_GRAY);
+        splitPane.setBackground(new Color(236, 240, 241));
         splitPane.setBorder(null);
         splitPane.setDividerSize(5);
 
@@ -153,7 +157,7 @@ public class SimplifiedDashboardView extends JFrame {
 
     private JPanel criarPainelInsights() {
         JPanel container = new JPanel(new BorderLayout());
-        container.setBackground(WHITE);
+        container.setBackground(Color.WHITE);
         container.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
                 new EmptyBorder(20, 20, 20, 20)
@@ -161,9 +165,9 @@ public class SimplifiedDashboardView extends JFrame {
 
         JLabel headerLabel = new JLabel("Insights Inteligentes Automáticos");
         headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        headerLabel.setForeground(DARK_COLOR);
+        headerLabel.setForeground(new Color(44, 62, 80));
 
-        JButton btnRefreshInsights = criarBotaoModerno("ATUALIZAR", SECONDARY_COLOR);
+        JButton btnRefreshInsights = criarBotaoModerno("ATUALIZAR", new Color(52, 152, 219));
         btnRefreshInsights.addActionListener(e -> atualizarInsights());
 
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -174,7 +178,7 @@ public class SimplifiedDashboardView extends JFrame {
 
         insightsPanel = new JPanel();
         insightsPanel.setLayout(new BoxLayout(insightsPanel, BoxLayout.Y_AXIS));
-        insightsPanel.setBackground(WHITE);
+        insightsPanel.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(insightsPanel);
         scrollPane.setBorder(null);
@@ -189,7 +193,7 @@ public class SimplifiedDashboardView extends JFrame {
 
     private JPanel criarPainelGraficos() {
         JPanel container = new JPanel(new BorderLayout());
-        container.setBackground(WHITE);
+        container.setBackground(Color.WHITE);
         container.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
                 new EmptyBorder(20, 20, 20, 20)
@@ -197,9 +201,9 @@ public class SimplifiedDashboardView extends JFrame {
 
         JLabel headerLabel = new JLabel("Analytics Visuais Avançados");
         headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        headerLabel.setForeground(DARK_COLOR);
+        headerLabel.setForeground(new Color(44, 62, 80));
 
-        JButton btnRefreshChart = criarBotaoModerno("GERAR GRÁFICOS", SECONDARY_COLOR);
+        JButton btnRefreshChart = criarBotaoModerno("GERAR GRÁFICOS", new Color(52, 152, 219));
         btnRefreshChart.addActionListener(e -> atualizarGraficos());
 
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -209,8 +213,8 @@ public class SimplifiedDashboardView extends JFrame {
         headerPanel.add(btnRefreshChart, BorderLayout.EAST);
 
         chartPanel = new JPanel(new BorderLayout());
-        chartPanel.setBackground(WHITE);
-        chartPanel.setBorder(BorderFactory.createLineBorder(LIGHT_GRAY, 1));
+        chartPanel.setBackground(Color.WHITE);
+        chartPanel.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241), 1));
         chartPanel.setMinimumSize(new Dimension(600, 400));
 
         container.add(headerPanel, BorderLayout.NORTH);
@@ -227,7 +231,7 @@ public class SimplifiedDashboardView extends JFrame {
 
         JLabel titleLabel = new JLabel("ESTATÍSTICAS LIVE");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        titleLabel.setForeground(ACCENT_COLOR);
+        titleLabel.setForeground(new Color(46, 204, 113));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         try {
@@ -238,12 +242,12 @@ public class SimplifiedDashboardView extends JFrame {
 
             JLabel vendasLabel = new JLabel(String.format("Vendas: %d", vendas.size()));
             vendasLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            vendasLabel.setForeground(WHITE);
+            vendasLabel.setForeground(Color.WHITE);
             vendasLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel faturamentoLabel = new JLabel(String.format("R$ %.0f", faturamento));
             faturamentoLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            faturamentoLabel.setForeground(ACCENT_COLOR);
+            faturamentoLabel.setForeground(new Color(46, 204, 113));
             faturamentoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             panel.add(titleLabel);
@@ -254,7 +258,7 @@ public class SimplifiedDashboardView extends JFrame {
         } catch (SQLException e) {
             JLabel errorLabel = new JLabel("Erro ao carregar");
             errorLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-            errorLabel.setForeground(DANGER_COLOR);
+            errorLabel.setForeground(new Color(231, 76, 60));
             errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             panel.add(errorLabel);
         }
@@ -265,23 +269,18 @@ public class SimplifiedDashboardView extends JFrame {
     private JPanel criarFooter() {
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(new Color(127, 140, 141));
-        footer.setBorder(new EmptyBorder(10, 25, 10, 25));
+        footer.setBorder(new EmptyBorder(0, 25, 0, 25));
         footer.setPreferredSize(new Dimension(0, 50));
-
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        leftPanel.setOpaque(false);
 
         JLabel footerText = new JLabel("SellOut EasyTrack");
         footerText.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        footerText.setForeground(WHITE);
-
-        leftPanel.add(footerText);
+        footerText.setForeground(Color.WHITE);
 
         JLabel versionInfo = new JLabel("v2.0 - Sistema Completo");
         versionInfo.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        versionInfo.setForeground(ACCENT_COLOR);
+        versionInfo.setForeground(Color.WHITE);
 
-        footer.add(leftPanel, BorderLayout.WEST);
+        footer.add(footerText, BorderLayout.WEST);
         footer.add(versionInfo, BorderLayout.EAST);
 
         return footer;
@@ -296,7 +295,7 @@ public class SimplifiedDashboardView extends JFrame {
 
         JLabel tituloLabel = new JLabel(titulo);
         tituloLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        tituloLabel.setForeground(WHITE);
+        tituloLabel.setForeground(Color.WHITE);
 
         JLabel descLabel = new JLabel(descricao);
         descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
@@ -313,7 +312,7 @@ public class SimplifiedDashboardView extends JFrame {
             @Override
             public void mouseEntered(MouseEvent e) {
                 buttonPanel.setOpaque(true);
-                buttonPanel.setBackground(PRIMARY_COLOR);
+                buttonPanel.setBackground(new Color(191, 59, 94));
                 buttonPanel.repaint();
             }
 
@@ -325,7 +324,7 @@ public class SimplifiedDashboardView extends JFrame {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                buttonPanel.setBackground(PRIMARY_COLOR.darker());
+                buttonPanel.setBackground(new Color(242, 48, 100).darker());
                 buttonPanel.repaint();
 
                 Timer timer = new Timer(100, evt -> {
@@ -352,7 +351,7 @@ public class SimplifiedDashboardView extends JFrame {
     private JButton criarBotaoModerno(String texto, Color cor) {
         JButton btn = new JButton(texto);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btn.setForeground(WHITE);
+        btn.setForeground(Color.WHITE);
         btn.setBackground(cor);
         btn.setBorder(new EmptyBorder(8, 15, 8, 15));
         btn.setFocusPainted(false);
@@ -373,15 +372,13 @@ public class SimplifiedDashboardView extends JFrame {
         return btn;
     }
 
-    // CORRIGIDO: Botões de diálogo com tamanho controlado
     private JButton criarBotaoDialog(String texto, String descricao) {
         JButton btn = new JButton();
         btn.setLayout(new BorderLayout());
         btn.setBackground(Color.WHITE);
-        btn.setForeground(TEXT_COLOR);
+        btn.setForeground(new Color(38, 38, 38));
         btn.setFocusPainted(false);
 
-        // FIXO: Definir tamanho preferido e máximo para evitar ultrapassagem
         btn.setPreferredSize(new Dimension(400, 70));
         btn.setMaximumSize(new Dimension(400, 70));
         btn.setMinimumSize(new Dimension(400, 70));
@@ -392,7 +389,7 @@ public class SimplifiedDashboardView extends JFrame {
 
         JLabel lblTitulo = new JLabel(texto);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblTitulo.setForeground(TEXT_COLOR);
+        lblTitulo.setForeground(new Color(38, 38, 38));
 
         JLabel lblDesc = new JLabel("<html><div style='width: 350px;'>" + descricao + "</div></html>");
         lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
@@ -409,9 +406,9 @@ public class SimplifiedDashboardView extends JFrame {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                btn.setBackground(LIGHT_GRAY);
+                btn.setBackground(new Color(236, 240, 241));
                 btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(PRIMARY_COLOR, 2),
+                        BorderFactory.createLineBorder(new Color(242, 48, 100), 2),
                         BorderFactory.createEmptyBorder(11, 14, 11, 14)));
             }
 
@@ -427,93 +424,96 @@ public class SimplifiedDashboardView extends JFrame {
         return btn;
     }
 
-    // CORRIGIDO: Menu de vendas com layout melhorado
     private void mostrarMenuVendas() {
         JDialog dialog = new JDialog(this, "Menu de Vendas Completo", true);
-        dialog.setSize(480, 500); // Aumentado mais para evitar transbordamento
+        dialog.setSize(480, 520);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(PRIMARY_COLOR);
+        headerPanel.setBackground(new Color(242, 48, 100));
         headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-
         JLabel titulo = new JLabel("MENU DE VENDAS", JLabel.CENTER);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         headerPanel.add(titulo);
 
-        // FIXO: Usar layout vertical com espaçamento controlado
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(new Color(245, 245, 245));
-        contentPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Padding otimizado
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(245, 245, 245));
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setOpaque(false);
+        optionsPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
         JButton btnCriar = criarBotaoDialog("Criar Venda", "Registrar nova venda no sistema");
         JButton btnListar = criarBotaoDialog("Listar Vendas", "Visualizar todas as vendas registradas");
         JButton btnAtualizar = criarBotaoDialog("Atualizar Venda", "Editar informações de venda existente");
         JButton btnDeletar = criarBotaoDialog("Deletar Venda", "Remover venda do sistema");
 
-        btnCriar.addActionListener(e -> { dialog.dispose(); new CriarVendaView(this); });
+        btnCriar.addActionListener(e -> { dialog.dispose(); new CriarVendaView(this, this); });
         btnListar.addActionListener(e -> { dialog.dispose(); new ListarVendasView(this); });
-        btnAtualizar.addActionListener(e -> { dialog.dispose(); new AtualizarVendaView(this); });
-        btnDeletar.addActionListener(e -> { dialog.dispose(); new DeletarVendaView(this); });
+        btnAtualizar.addActionListener(e -> { dialog.dispose(); new AtualizarVendaView(this, this); });
+        btnDeletar.addActionListener(e -> { dialog.dispose(); new DeletarVendaView(this, this); });
 
-        // Alinhar botões ao centro
         btnCriar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnListar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAtualizar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnDeletar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        contentPanel.add(btnCriar);
-        contentPanel.add(Box.createVerticalStrut(6));
-        contentPanel.add(btnListar);
-        contentPanel.add(Box.createVerticalStrut(6));
-        contentPanel.add(btnAtualizar);
-        contentPanel.add(Box.createVerticalStrut(6));
-        contentPanel.add(btnDeletar);
+        optionsPanel.add(Box.createVerticalGlue());
+        optionsPanel.add(btnCriar);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(btnListar);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(btnAtualizar);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(btnDeletar);
+        optionsPanel.add(Box.createVerticalGlue());
 
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(149, 165, 166));
+        btnCancelar.setBackground(Color.GRAY);
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorder(new EmptyBorder(10, 20, 10, 20));
         btnCancelar.addActionListener(e -> dialog.dispose());
-
         buttonPanel.add(btnCancelar);
 
+        mainPanel.add(optionsPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
         dialog.add(headerPanel, BorderLayout.NORTH);
-        dialog.add(contentPanel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(mainPanel, BorderLayout.CENTER);
 
         dialog.setVisible(true);
     }
 
-    // CORRIGIDO: Menu de importação com layout melhorado
     private void mostrarMenuImportacao() {
         JDialog dialog = new JDialog(this, "Importar Dados - Múltiplas Fontes", true);
-        dialog.setSize(480, 500); // Aumentado mais para evitar transbordamento
+        dialog.setSize(480, 520);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(ACCENT_COLOR);
+        headerPanel.setBackground(new Color(46, 204, 113));
         headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-
         JLabel titulo = new JLabel("IMPORTAR DADOS", JLabel.CENTER);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         headerPanel.add(titulo);
 
-        // FIXO: Usar layout vertical com espaçamento controlado
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(new Color(245, 245, 245));
-        contentPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Padding otimizado
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(245, 245, 245));
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setOpaque(false);
+        optionsPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
         JButton btnCSV = criarBotaoDialog("Importar CSV", "Carregar arquivo CSV estruturado");
         JButton btnTexto = criarBotaoDialog("Importar Arquivo Texto", "Processar arquivo TXT com dados");
@@ -525,22 +525,24 @@ public class SimplifiedDashboardView extends JFrame {
         btnWhatsApp.addActionListener(e -> { dialog.dispose(); importarWhatsApp(); });
         btnTemplate.addActionListener(e -> { dialog.dispose(); gerarTemplate(); });
 
-        // Alinhar botões ao centro
         btnCSV.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnTexto.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnWhatsApp.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnTemplate.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        contentPanel.add(btnCSV);
-        contentPanel.add(Box.createVerticalStrut(6));
-        contentPanel.add(btnTexto);
-        contentPanel.add(Box.createVerticalStrut(6));
-        contentPanel.add(btnWhatsApp);
-        contentPanel.add(Box.createVerticalStrut(6));
-        contentPanel.add(btnTemplate);
+        optionsPanel.add(Box.createVerticalGlue());
+        optionsPanel.add(btnCSV);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(btnTexto);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(btnWhatsApp);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(btnTemplate);
+        optionsPanel.add(Box.createVerticalGlue());
 
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBackground(new Color(149, 165, 166));
@@ -549,20 +551,20 @@ public class SimplifiedDashboardView extends JFrame {
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorder(new EmptyBorder(10, 20, 10, 20));
         btnCancelar.addActionListener(e -> dialog.dispose());
-
         buttonPanel.add(btnCancelar);
 
+        mainPanel.add(optionsPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
         dialog.add(headerPanel, BorderLayout.NORTH);
-        dialog.add(contentPanel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(mainPanel, BorderLayout.CENTER);
 
         dialog.setVisible(true);
     }
 
-    // Restante dos métodos permanecem iguais...
-    // [Inclua aqui todos os outros métodos da classe original sem alterações]
-
     private void atualizarInsights() {
+        System.out.println("🧠 Atualizando insights...");
+
         insightsPanel.removeAll();
 
         JLabel loading = new JLabel("Gerando insights inteligentes...", JLabel.CENTER);
@@ -573,10 +575,11 @@ public class SimplifiedDashboardView extends JFrame {
         insightsPanel.repaint();
 
         SwingWorker<List<AnalyticsEngine.Insight>, Void> worker =
-                new SwingWorker<List<AnalyticsEngine.Insight>, Void>() {
+                new SwingWorker<>() {
                     @Override
                     protected List<AnalyticsEngine.Insight> doInBackground() throws Exception {
                         List<Venda> vendas = vendaController.obterTodasVendas();
+                        System.out.println("📊 Carregando " + vendas.size() + " vendas para insights");
                         return analyticsEngine.gerarInsightsAutomaticos(vendas);
                     }
 
@@ -584,12 +587,11 @@ public class SimplifiedDashboardView extends JFrame {
                     protected void done() {
                         try {
                             List<AnalyticsEngine.Insight> insights = get();
+                            System.out.println("💡 " + insights.size() + " insights gerados");
                             exibirInsights(insights);
                         } catch (Exception e) {
-                            JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
-                                    "Erro ao gerar insights: " + e.getMessage(),
-                                    "Erro",
-                                    JOptionPane.ERROR_MESSAGE);
+                            System.err.println("❌ Erro ao gerar insights: " + e.getMessage());
+                            mostrarErroInsights("Erro ao gerar insights: " + e.getMessage());
                         }
                     }
                 };
@@ -625,7 +627,7 @@ public class SimplifiedDashboardView extends JFrame {
                 BorderFactory.createLineBorder(getCorPorTipo(insight.getTipo()), 2),
                 new EmptyBorder(12, 12, 12, 12)
         ));
-        card.setBackground(WHITE);
+        card.setBackground(Color.WHITE);
         card.setPreferredSize(new Dimension(450, 100));
         card.setMaximumSize(new Dimension(450, 100));
         card.setMinimumSize(new Dimension(450, 100));
@@ -636,7 +638,7 @@ public class SimplifiedDashboardView extends JFrame {
 
         JLabel descricao = new JLabel("<html><div style='width: 400px;'>" + insight.getDescricao() + "</div></html>");
         descricao.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        descricao.setForeground(TEXT_COLOR);
+        descricao.setForeground(new Color(38, 38, 38));
 
         JLabel recomendacao = new JLabel("<html><div style='width: 400px;'>Recomendação: " + insight.getRecomendacao() + "</div></html>");
         recomendacao.setFont(new Font("Segoe UI", Font.ITALIC, 10));
@@ -658,17 +660,20 @@ public class SimplifiedDashboardView extends JFrame {
 
     private Color getCorPorTipo(AnalyticsEngine.TipoInsight tipo) {
         switch (tipo) {
-            case CRITICO: return DANGER_COLOR;
-            case ALERTA: return WARNING_COLOR;
-            case SUCESSO: return ACCENT_COLOR;
-            case OPORTUNIDADE: return new Color(155, 89, 182);
-            default: return PRIMARY_COLOR;
+            case CRITICO: return new Color(231, 76, 60);
+            case ALERTA: return new Color(243, 156, 18);
+            case SUCESSO: return new Color(46, 204, 113);
+            case OPORTUNIDADE: return new Color(142, 68, 173);
+            default: return new Color(242, 48, 100);
         }
     }
 
     private void atualizarGraficos() {
+        System.out.println("📈 Atualizando gráficos...");
+
         try {
             List<Venda> vendas = vendaController.obterTodasVendas();
+            System.out.println("📊 Carregando " + vendas.size() + " vendas para gráficos");
 
             if (vendas.isEmpty()) {
                 mostrarMensagemGrafico("Nenhuma venda registrada para gerar gráficos.");
@@ -683,7 +688,7 @@ public class SimplifiedDashboardView extends JFrame {
             chartPanel.revalidate();
             chartPanel.repaint();
 
-            SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+            SwingWorker<String, Void> worker = new SwingWorker<>() {
                 @Override
                 protected String doInBackground() throws Exception {
                     return util.RGraphUtil.gerarGraficoVendas(vendas);
@@ -694,11 +699,14 @@ public class SimplifiedDashboardView extends JFrame {
                     try {
                         String imagePath = get();
                         if (imagePath != null && new File(imagePath).exists()) {
+                            System.out.println("✅ Gráfico gerado: " + imagePath);
                             exibirGrafico(imagePath);
                         } else {
+                            System.err.println("❌ Gráfico não foi gerado");
                             mostrarErroGrafico();
                         }
                     } catch (Exception e) {
+                        System.err.println("❌ Erro ao gerar gráfico: " + e.getMessage());
                         mostrarErroGrafico();
                     }
                 }
@@ -706,9 +714,10 @@ public class SimplifiedDashboardView extends JFrame {
 
             worker.execute();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao atualizar gráficos: " + e.getMessage());
             JOptionPane.showMessageDialog(this,
-                    "Erro ao carregar dados: " + e.getMessage(),
+                    "Erro ao carregar dados para gráficos: " + e.getMessage(),
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -761,7 +770,7 @@ public class SimplifiedDashboardView extends JFrame {
         chartPanel.removeAll();
         JLabel erro = new JLabel("<html><center>Erro ao gerar gráfico.<br>Verifique se o R está instalado.</center></html>");
         erro.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        erro.setForeground(DANGER_COLOR);
+        erro.setForeground(new Color(231, 76, 60));
         erro.setHorizontalAlignment(JLabel.CENTER);
         chartPanel.add(erro, BorderLayout.CENTER);
         chartPanel.revalidate();
@@ -803,9 +812,9 @@ public class SimplifiedDashboardView extends JFrame {
 
             analytics.append("PRODUTOS MAIS VENDIDOS:\n");
             vendas.stream()
-                    .collect(java.util.stream.Collectors.groupingBy(
+                    .collect(Collectors.groupingBy(
                             Venda::getProduto,
-                            java.util.stream.Collectors.summingInt(Venda::getQuantidade)
+                            Collectors.summingInt(Venda::getQuantidade)
                     ))
                     .entrySet().stream()
                     .sorted(java.util.Map.Entry.<String, Integer>comparingByValue().reversed())
@@ -815,7 +824,7 @@ public class SimplifiedDashboardView extends JFrame {
             JTextArea areaAnalytics = new JTextArea(analytics.toString());
             areaAnalytics.setFont(new Font("Courier New", Font.PLAIN, 12));
             areaAnalytics.setEditable(false);
-            areaAnalytics.setBackground(WHITE);
+            areaAnalytics.setBackground(Color.WHITE);
             areaAnalytics.setBorder(new EmptyBorder(20, 20, 20, 20));
 
             JScrollPane scrollPane = new JScrollPane(areaAnalytics);
@@ -835,16 +844,7 @@ public class SimplifiedDashboardView extends JFrame {
         SwingUtilities.invokeLater(() -> {
             atualizarInsights();
             atualizarGraficos();
-
-            // Atualizar estatísticas no sidebar
-            try {
-                JPanel statsPanel = criarPainelEstatisticas();
-                // Encontrar o sidebar e atualizar o painel de estatísticas
-                Container parent = this.getContentPane();
-                updateStatsInSidebar(parent, statsPanel);
-            } catch (Exception e) {
-                System.err.println("Erro ao atualizar estatísticas: " + e.getMessage());
-            }
+            updateStatsInSidebar();
         });
     }
 
@@ -852,59 +852,35 @@ public class SimplifiedDashboardView extends JFrame {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivos CSV", "csv"));
         chooser.setDialogTitle("Selecionar arquivo CSV para importar");
+        chooser.setCurrentDirectory(new java.io.File("."));
 
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File arquivo = chooser.getSelectedFile();
+            JDialog loadingDialog = criarLoadingDialog("Importando arquivo CSV...", "Processando...");
 
-            // Mostrar loading
-            JDialog loadingDialog = new JDialog(this, "Importando...", true);
-            loadingDialog.setSize(300, 100);
-            loadingDialog.setLocationRelativeTo(this);
-            loadingDialog.setLayout(new BorderLayout());
+            SwingWorker<DataImporter.ImportResult, String> worker = new SwingWorker<>() {
+                @Override
+                protected DataImporter.ImportResult doInBackground() throws Exception {
+                    return dataImporter.importFromCSV(arquivo);
+                }
 
-            JLabel loadingLabel = new JLabel("Importando arquivo CSV...", JLabel.CENTER);
-            loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-            loadingDialog.add(loadingLabel, BorderLayout.CENTER);
-
-            SwingWorker<DataImporter.ImportResult, Void> worker =
-                    new SwingWorker<DataImporter.ImportResult, Void>() {
-                        @Override
-                        protected DataImporter.ImportResult doInBackground() throws Exception {
-                            return dataImporter.importFromCSV(arquivo);
+                @Override
+                protected void done() {
+                    try {
+                        DataImporter.ImportResult resultado = get();
+                        if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
+                            atualizarDashboard();
                         }
-
-                        @Override
-                        protected void done() {
-                            loadingDialog.dispose();
-                            try {
-                                DataImporter.ImportResult resultado = get();
-                                mostrarResultadoImportacao(resultado);
-                                if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
-                                    // Atualizar dashboard somente se houve importações bem-sucedidas
-                                    atualizarDashboard();
-                                    JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
-                                            String.format("✅ Importação concluída!\n\n" +
-                                                            "• %d vendas importadas com sucesso\n" +
-                                                            "• %d erros encontrados\n" +
-                                                            "• Dashboard atualizado automaticamente",
-                                                    resultado.getSuccessCount(),
-                                                    resultado.getErrorCount()),
-                                            "Importação CSV",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                            } catch (Exception e) {
-                                JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
-                                        "❌ Erro na importação CSV:\n\n" + e.getMessage() +
-                                                "\n\nVerifique se o arquivo está no formato correto:\n" +
-                                                "produto,quantidade,valor_unitario,data",
-                                        "Erro de Importação",
-                                        JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
-                    };
-
-            loadingDialog.setVisible(true);
+                        mostrarResultadoImportacao(resultado);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(SimplifiedDashboardView.this, "Erro na importação CSV:\n" + e.getMessage(), "Erro de Importação", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        loadingDialog.dispose();
+                    }
+                }
+            };
             worker.execute();
+            loadingDialog.setVisible(true);
         }
     }
 
@@ -915,75 +891,46 @@ public class SimplifiedDashboardView extends JFrame {
 
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File arquivo = chooser.getSelectedFile();
+            JDialog loadingDialog = criarLoadingDialog("Importando arquivo de Texto...", "Processando...");
 
-            // Mostrar loading
-            JDialog loadingDialog = new JDialog(this, "Importando...", true);
-            loadingDialog.setSize(300, 100);
-            loadingDialog.setLocationRelativeTo(this);
-            loadingDialog.setLayout(new BorderLayout());
+            SwingWorker<DataImporter.ImportResult, Void> worker = new SwingWorker<>() {
+                @Override
+                protected DataImporter.ImportResult doInBackground() throws Exception {
+                    return dataImporter.importFromTextFile(arquivo);
+                }
 
-            JLabel loadingLabel = new JLabel("Processando arquivo TXT...", JLabel.CENTER);
-            loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-            loadingDialog.add(loadingLabel, BorderLayout.CENTER);
-
-            SwingWorker<DataImporter.ImportResult, Void> worker =
-                    new SwingWorker<DataImporter.ImportResult, Void>() {
-                        @Override
-                        protected DataImporter.ImportResult doInBackground() throws Exception {
-                            return dataImporter.importFromTextFile(arquivo);
+                @Override
+                protected void done() {
+                    try {
+                        DataImporter.ImportResult resultado = get();
+                        if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
+                            atualizarDashboard();
                         }
-
-                        @Override
-                        protected void done() {
-                            loadingDialog.dispose();
-                            try {
-                                DataImporter.ImportResult resultado = get();
-                                mostrarResultadoImportacao(resultado);
-                                if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
-                                    atualizarDashboard();
-                                    JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
-                                            String.format("✅ Importação TXT concluída!\n\n" +
-                                                            "• %d vendas importadas com sucesso\n" +
-                                                            "• %d erros encontrados\n" +
-                                                            "• Dashboard atualizado automaticamente\n\n" +
-                                                            "Formatos reconhecidos:\n" +
-                                                            "- Produto - Quantidade - Valor\n" +
-                                                            "- Produto: Quantidade x Valor",
-                                                    resultado.getSuccessCount(),
-                                                    resultado.getErrorCount()),
-                                            "Importação TXT",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                }
-                            } catch (Exception e) {
-                                JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
-                                        "❌ Erro na importação TXT:\n\n" + e.getMessage() +
-                                                "\n\nFormatos aceitos:\n" +
-                                                "• Produto - Quantidade - Valor - Data\n" +
-                                                "• Produto: Quantidade x Valor\n" +
-                                                "• Linhas que começam com # são ignoradas",
-                                        "Erro de Importação",
-                                        JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
-                    };
-
-            loadingDialog.setVisible(true);
+                        mostrarResultadoImportacao(resultado);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(SimplifiedDashboardView.this, "Erro na importação de Texto:\n" + e.getMessage(), "Erro de Importação", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        loadingDialog.dispose();
+                    }
+                }
+            };
             worker.execute();
+            loadingDialog.setVisible(true);
         }
     }
 
     private void importarWhatsApp() {
         JDialog dialog = new JDialog(this, "Importar WhatsApp", true);
-        dialog.setSize(650, 500); // Aumentado para melhor visualização
+        dialog.setSize(650, 520);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(PRIMARY_COLOR);
+        headerPanel.setBackground(new Color(242, 48, 100));
         headerPanel.setBorder(new EmptyBorder(15, 0, 15, 0));
 
         JLabel titulo = new JLabel("IMPORTAR WHATSAPP", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         headerPanel.add(titulo);
 
@@ -992,10 +939,9 @@ public class SimplifiedDashboardView extends JFrame {
         contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel instrucao = new JLabel("Cole aqui as mensagens do WhatsApp com informações de vendas:");
-        instrucao.setFont(new Font("Arial", Font.BOLD, 14));
-        instrucao.setForeground(TEXT_COLOR);
+        instrucao.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        instrucao.setForeground(new Color(38, 38, 38));
 
-        // ADICIONADO: Exemplo prático na caixa de texto
         String exemploTexto = "Vendeu 5 Mouse Logitech por R$ 85,50 cada\n" +
                 "João: Comprei 2 Teclado Mecânico R$ 320,00\n" +
                 "Maria vendeu 3 Notebook Dell - R$ 2500 cada\n" +
@@ -1009,26 +955,25 @@ public class SimplifiedDashboardView extends JFrame {
                 "- Formatos variados de texto";
 
         JTextArea textArea = new JTextArea(12, 50);
-        textArea.setFont(new Font("Arial", Font.PLAIN, 12));
+        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         textArea.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
         textArea.setBackground(Color.WHITE);
-        textArea.setText(exemploTexto); // Exemplo pré-preenchido
-        textArea.setCaretPosition(0); // Cursor no início
+        textArea.setText(exemploTexto);
+        textArea.setCaretPosition(0);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)));
 
-        // Painel de instruções adicionais
         JPanel instrucaoPanel = new JPanel(new BorderLayout());
         instrucaoPanel.setOpaque(false);
         instrucaoPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JLabel subtitulo = new JLabel("<html><i>Substitua o exemplo acima pelas suas mensagens reais do WhatsApp</i></html>");
-        subtitulo.setFont(new Font("Arial", Font.ITALIC, 11));
+        subtitulo.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         subtitulo.setForeground(Color.GRAY);
 
         instrucaoPanel.add(instrucao, BorderLayout.NORTH);
@@ -1038,29 +983,41 @@ public class SimplifiedDashboardView extends JFrame {
         contentPanel.add(instrucaoPanel, BorderLayout.NORTH);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 15));
         buttonPanel.setBackground(new Color(245, 245, 245));
 
+        Dimension buttonSize = new Dimension(140, 45);
+
         JButton btnLimpar = new JButton("Limpar");
-        btnLimpar.setBackground(WARNING_COLOR);
+        btnLimpar.setBackground(new Color(243, 156, 18));
         btnLimpar.setForeground(Color.WHITE);
-        btnLimpar.setFont(new Font("Arial", Font.BOLD, 14));
+        btnLimpar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnLimpar.setFocusPainted(false);
-        btnLimpar.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        btnLimpar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnLimpar.setPreferredSize(buttonSize);
+        btnLimpar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnImportar = new JButton("Importar");
-        btnImportar.setBackground(ACCENT_COLOR);
+        btnImportar.setBackground(new Color(46, 204, 113));
         btnImportar.setForeground(Color.WHITE);
-        btnImportar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnImportar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnImportar.setFocusPainted(false);
         btnImportar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnImportar.setPreferredSize(buttonSize);
+        btnImportar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBackground(new Color(149, 165, 166));
         btnCancelar.setForeground(Color.WHITE);
-        btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        btnCancelar.setPreferredSize(buttonSize);
+        btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        adicionarEfeitoHoverWhatsApp(btnLimpar, new Color(243, 156, 18));
+        adicionarEfeitoHoverWhatsApp(btnImportar, new Color(46, 204, 113));
+        adicionarEfeitoHoverWhatsApp(btnCancelar, new Color(149, 165, 166));
 
         btnLimpar.addActionListener(e -> {
             textArea.setText("");
@@ -1071,14 +1028,36 @@ public class SimplifiedDashboardView extends JFrame {
             String texto = textArea.getText().trim();
             if (!texto.isEmpty() && !texto.equals(exemploTexto)) {
                 dialog.dispose();
-                DataImporter.ImportResult resultado = dataImporter.importFromWhatsApp(texto);
-                mostrarResultadoImportacao(resultado);
-                if (resultado.isSuccess()) {
-                    atualizarDashboard();
-                }
+
+                JDialog loadingDialog = criarLoadingDialog("Processando mensagens...", "Analisando formato do WhatsApp...");
+
+                SwingWorker<DataImporter.ImportResult, Void> worker = new SwingWorker<>() {
+                    @Override
+                    protected DataImporter.ImportResult doInBackground() throws Exception {
+                        return dataImporter.importFromWhatsApp(texto);
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            DataImporter.ImportResult resultado = get();
+                            if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
+                                atualizarDashboard();
+                            }
+                            mostrarResultadoImportacao(resultado);
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(SimplifiedDashboardView.this, "Erro ao processar mensagens:\n" + ex.getMessage(), "Erro WhatsApp", JOptionPane.ERROR_MESSAGE);
+                        } finally {
+                            loadingDialog.dispose();
+                        }
+                    }
+                };
+                worker.execute();
+                loadingDialog.setVisible(true);
+
             } else {
                 JOptionPane.showMessageDialog(dialog,
-                        "Por favor, substitua o exemplo pelas suas mensagens reais do WhatsApp!",
+                        "⚠️ Por favor, substitua o exemplo pelas suas mensagens reais do WhatsApp!",
                         "Dados Necessários",
                         JOptionPane.WARNING_MESSAGE);
                 textArea.selectAll();
@@ -1098,44 +1077,102 @@ public class SimplifiedDashboardView extends JFrame {
 
         dialog.setVisible(true);
 
-        // Focar na caixa de texto e selecionar exemplo para fácil substituição
         SwingUtilities.invokeLater(() -> {
             textArea.requestFocus();
             textArea.selectAll();
         });
     }
 
-    private void gerarTemplate() {
-        try {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setDialogTitle("Salvar Template CSV");
-            chooser.setSelectedFile(new File("template_vendas.csv"));
-
-            if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = chooser.getSelectedFile();
-                String path = selectedFile.getAbsolutePath();
-                if (!path.toLowerCase().endsWith(".csv")) {
-                    path += ".csv";
+    private void adicionarEfeitoHoverWhatsApp(JButton botao, Color corOriginal) {
+        botao.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (botao.isEnabled()) {
+                    botao.setBackground(corOriginal.darker());
                 }
-
-                try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(path))) {
-                    writer.println("produto,quantidade,valor_unitario,data");
-                    writer.println("\"Produto Exemplo\",5,25.50,\"" + java.time.LocalDate.now() + "\"");
-                    writer.println("\"Outro Produto\",2,150.00,\"" + java.time.LocalDate.now() + "\"");
-                }
-
-                JOptionPane.showMessageDialog(this,
-                        "Template CSV gerado com sucesso!\n\n" +
-                                "Arquivo: " + path +
-                                "\n\nUse este arquivo como base para suas importações.",
-                        "Template Criado",
-                        JOptionPane.INFORMATION_MESSAGE);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Erro ao gerar template: " + e.getMessage(),
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                if (botao.isEnabled()) {
+                    botao.setBackground(corOriginal);
+                }
+            }
+        });
+    }
+
+    private JDialog criarLoadingDialog(String titulo, String mensagem) {
+        JDialog loadingDialog = new JDialog(this, titulo, true);
+        loadingDialog.setSize(350, 120);
+        loadingDialog.setLocationRelativeTo(this);
+        loadingDialog.setLayout(new BorderLayout());
+        loadingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        JLabel loadingLabel = new JLabel(mensagem, JLabel.CENTER);
+        loadingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.setString("Processando...");
+        progressBar.setStringPainted(true);
+
+        contentPanel.add(loadingLabel, BorderLayout.CENTER);
+        contentPanel.add(progressBar, BorderLayout.SOUTH);
+
+        loadingDialog.add(contentPanel, BorderLayout.CENTER);
+
+        return loadingDialog;
+    }
+
+    private void updateLoadingDialog(JDialog loadingDialog, String mensagem) {
+        if (loadingDialog != null && loadingDialog.isVisible()) {
+            JPanel contentPanel = (JPanel) loadingDialog.getContentPane().getComponent(0);
+            JLabel loadingLabel = (JLabel) contentPanel.getComponent(0);
+            loadingLabel.setText(mensagem);
+        }
+    }
+
+    private void gerarTemplate() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Salvar Template CSV");
+        chooser.setSelectedFile(new File("template_vendas_com_produtos.csv"));
+
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            String path = selectedFile.getAbsolutePath();
+            if (!path.toLowerCase().endsWith(".csv")) {
+                path += ".csv";
+                selectedFile = new File(path);
+            }
+
+            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(selectedFile), StandardCharsets.UTF_8))) {
+                writer.write("\uFEFF");
+                writer.println("produto,quantidade,valor_unitario,data");
+
+                List<Venda> vendas = vendaController.obterTodasVendas();
+                List<String> produtosUnicos = vendas.stream()
+                        .map(Venda::getProduto)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                for (String produto : produtosUnicos) {
+                    writer.println("\"" + produto + "\",1,0.00,\"" + java.time.LocalDate.now() + "\"");
+                }
+
+                writer.println("\n# INSTRUÇÕES DE USO:");
+                writer.println("# 1. Preencha a quantidade e o valor_unitario para os produtos que desejar importar.");
+                writer.println("# 2. Mantenha o cabeçalho (primeira linha) e o formato das colunas.");
+                writer.println("# 3. A data pode ser alterada (formato AAAA-MM-DD).");
+                writer.println("# 4. Use ponto (.) como separador decimal.");
+
+                JOptionPane.showMessageDialog(this, "Template CSV com " + produtosUnicos.size() + " produtos gerado com sucesso!", "Template Criado", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erro ao gerar template:\n" + e.getMessage(), "Erro de E/S", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -1161,7 +1198,7 @@ public class SimplifiedDashboardView extends JFrame {
         JTextArea textArea = new JTextArea(mensagem.toString());
         textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        textArea.setBackground(WHITE);
+        textArea.setBackground(Color.WHITE);
         textArea.setBorder(new EmptyBorder(15, 15, 15, 15));
 
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -1218,9 +1255,39 @@ public class SimplifiedDashboardView extends JFrame {
         }
     }
 
-    // Método auxiliar para atualizar estatísticas no sidebar
-    private void updateStatsInSidebar(Container container, JPanel newStatsPanel) {
-        // Este método pode ser expandido para atualizar estatísticas em tempo real
-        // Por enquanto, as estatísticas são atualizadas quando a aplicação é reiniciada
+    private void mostrarErroInsights(String mensagem) {
+        insightsPanel.removeAll();
+        JLabel erroLabel = new JLabel("<html><center>" + mensagem.replace("\n", "<br>") + "</center></html>");
+        erroLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        erroLabel.setForeground(new Color(231, 76, 60));
+        erroLabel.setHorizontalAlignment(JLabel.CENTER);
+        insightsPanel.add(erroLabel);
+        insightsPanel.revalidate();
+        insightsPanel.repaint();
+    }
+
+    private void updateStatsInSidebar() {
+        JPanel sidebar = null;
+        for (Component comp : ((JPanel) this.getContentPane().getComponent(0)).getComponents()) {
+            if (comp instanceof JPanel && "sidebar".equals(comp.getName())) {
+                sidebar = (JPanel) comp;
+                break;
+            }
+        }
+
+        if (sidebar != null) {
+            for (int i = 0; i < sidebar.getComponentCount(); i++) {
+                Component sidebarComp = sidebar.getComponent(i);
+                if (sidebarComp instanceof JPanel && "statsPanel".equals(sidebarComp.getName())) {
+                    sidebar.remove(i);
+                    JPanel newStatsPanel = criarPainelEstatisticas();
+                    newStatsPanel.setName("statsPanel");
+                    sidebar.add(newStatsPanel, i);
+                    sidebar.revalidate();
+                    sidebar.repaint();
+                    return;
+                }
+            }
+        }
     }
 }

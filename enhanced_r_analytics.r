@@ -31,12 +31,13 @@ tema_sellout <- theme_minimal(base_size = 12) +
   )
 
 cores_sellout <- c(
-  primaria = '#3498db',
-  secundaria = '#2980b9', 
-  sucesso = '#2ecc71',
-  alerta = '#f39c12',
-  perigo = '#e74c3c',
-  escuro = '#2c3e50'
+  primaria = '#F23064',      # FIAP_PINK_VIBRANT
+  secundaria = '#2C3E50',    # ASTERIA_MIDNIGHT_BLUE
+  sucesso = '#BF3B5E',       # FIAP_PINK_DARK
+  acento = '#8E44AD',       # ASTERIA_AMETHYST
+  alerta = '#f39c12',       # Mantido para avisos
+  perigo = '#e74c3c',       # Mantido para perigo
+  escuro = '#262626'        # FIAP_BLACK_TECH
 )
 
 # ===== LEITURA E PREPARAÇÃO DOS DADOS =====
@@ -154,7 +155,7 @@ tryCatch({
       values = c(
         'A - Top Performers' = cores_sellout[['primaria']],
         'B - Performers Médios' = cores_sellout[['sucesso']],
-        'C - Performers Baixos' = cores_sellout[['alerta']]
+        'C - Performers Baixos' = cores_sellout[['acento']]
       )
     ) +
     scale_x_continuous(

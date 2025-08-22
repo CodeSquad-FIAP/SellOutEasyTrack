@@ -4,6 +4,7 @@ import util.DBConnection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class Main {
 
@@ -43,17 +44,16 @@ public class Main {
             UIManager.put("ProgressBar.arc", 8);
             UIManager.put("TextComponent.arc", 8);
 
-            Color primaryColor = new Color(41, 128, 185);
-            Color accentColor = new Color(46, 204, 113);
-
-            UIManager.put("Button.default.background", primaryColor);
+            UIManager.put("Button.default.background", new Color(242, 48, 100));
             UIManager.put("Button.default.foreground", Color.WHITE);
-            UIManager.put("Component.focusColor", primaryColor);
-            UIManager.put("ProgressBar.foreground", accentColor);
+            UIManager.put("Component.focusColor", new Color(142, 68, 173));
+            UIManager.put("ProgressBar.foreground", new Color(46, 204, 113));
+            UIManager.put("TitlePane.background", new Color(44, 62, 80));
+            UIManager.put("TitlePane.foreground", Color.WHITE);
 
             configurarFontes();
 
-            System.out.println("Interface moderna configurada");
+            System.out.println("Interface moderna configurada com a paleta FIAP + Asteria");
 
         } catch (Exception e) {
             System.err.println("Erro ao configurar interface: " + e.getMessage());
@@ -122,13 +122,11 @@ public class Main {
 
     private static boolean verificarDependencias() {
         System.out.println("Verificando dependências...");
-
         boolean todasOk = true;
 
         try {
             String javaVersion = System.getProperty("java.version");
             System.out.println("Java: " + javaVersion);
-
             String[] versionParts = javaVersion.split("\\.");
             int majorVersion = Integer.parseInt(versionParts[0]);
             if (majorVersion < 11) {
@@ -164,38 +162,10 @@ public class Main {
             System.out.println("R não verificado: " + e.getMessage());
         }
 
-        try {
-            long espacoMB = new java.io.File(".").getFreeSpace() / (1024 * 1024);
-            System.out.println("Espaço livre: " + espacoMB + " MB");
-
-            if (espacoMB < 50) {
-                System.err.println("Pouco espaço em disco");
-            } else {
-                System.out.println("Espaço suficiente");
-            }
-        } catch (Exception e) {
-            System.out.println("Não foi possível verificar espaço");
-        }
-
-        try {
-            java.io.File testFile = new java.io.File("test_permission.tmp");
-            if (testFile.createNewFile()) {
-                testFile.delete();
-                System.out.println("Permissões OK");
-            } else {
-                System.err.println("Sem permissões de escrita");
-                todasOk = false;
-            }
-        } catch (Exception e) {
-            System.err.println("Erro nas permissões: " + e.getMessage());
-            todasOk = false;
-        }
-
         if (todasOk) {
             System.out.println("Todas as dependências verificadas!");
         } else {
             System.err.println("Algumas dependências falharam");
-
             int resposta = JOptionPane.showConfirmDialog(
                     null,
                     "Algumas dependências não foram atendidas.\n" +
@@ -205,73 +175,15 @@ public class Main {
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE
             );
-
             return resposta == JOptionPane.YES_OPTION;
         }
-
         return true;
     }
 
     private static void mostrarErroInicializacao(Exception e) {
         System.err.println("ERRO CRÍTICO NA INICIALIZAÇÃO");
-        System.err.println("==========================================");
-
-        String mensagemErro = "Erro ao inicializar o " + SYSTEM_NAME + ":\n\n" +
-                e.getClass().getSimpleName() + ": " + e.getMessage() + "\n\n" +
-                "Verificações:\n" +
-                "MySQL está executando?\n" +
-                "Credenciais do banco corretas?\n" +
-                "Java 11+ instalado?\n" +
-                "Permissões de escrita?\n\n" +
-                "Para suporte, envie os logs do console.";
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-            JTextArea textArea = new JTextArea(mensagemErro);
-            textArea.setEditable(false);
-            textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-            textArea.setBackground(new Color(245, 245, 245));
-            textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            scrollPane.setPreferredSize(new Dimension(600, 400));
-
-            JPanel panel = new JPanel(new BorderLayout());
-            panel.add(scrollPane, BorderLayout.CENTER);
-
-            JButton btnCopy = new JButton("Copiar Log");
-            btnCopy.addActionListener(event -> {
-                try {
-                    java.awt.datatransfer.StringSelection selection =
-                            new java.awt.datatransfer.StringSelection(mensagemErro + "\n\nStackTrace:\n" +
-                                    java.util.Arrays.toString(e.getStackTrace()));
-                    java.awt.Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .setContents(selection, null);
-                    JOptionPane.showMessageDialog(null, "Log copiado!");
-                } catch (Exception ex) {
-                    System.err.println("Erro ao copiar: " + ex.getMessage());
-                }
-            });
-
-            JPanel buttonPanel = new JPanel(new FlowLayout());
-            buttonPanel.add(btnCopy);
-            panel.add(buttonPanel, BorderLayout.SOUTH);
-
-            JOptionPane.showMessageDialog(null, panel,
-                    SYSTEM_NAME + " - Erro de Inicialização",
-                    JOptionPane.ERROR_MESSAGE);
-
-        } catch (Exception dialogError) {
-            System.err.println("==========================================");
-            System.err.println("ERRO - " + SYSTEM_NAME.toUpperCase());
-            System.err.println("==========================================");
-            System.err.println(mensagemErro);
-            System.err.println("==========================================");
-        }
-
-        System.err.println("\nStackTrace:");
         e.printStackTrace();
+        JOptionPane.showMessageDialog(null, e.getMessage(), "Erro Crítico", JOptionPane.ERROR_MESSAGE);
         System.exit(1);
     }
 }
