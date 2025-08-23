@@ -1,0 +1,60 @@
+produto,quantidade,valor_unitario,data
+"Notebook Dell Inspiron 15",2,2500.00,"2024-01-15"
+"Mouse Logitech MX Master",5,85.50,"2024-01-16"
+"Teclado Mecânico Corsair",3,320.00,"2024-01-17"
+"Monitor Samsung 24 polegadas",1,899.99,"2024-01-18"
+"Smartphone Samsung Galaxy S23",4,1200.00,"2024-01-19"
+"Tablet Apple iPad Pro",2,2800.00,"2024-01-20"
+"Fone Bluetooth Sony WH-1000XM4",8,150.00,"2024-01-21"
+"Carregador USB-C Anker",10,45.90,"2024-01-22"
+"SSD Kingston NVMe 1TB",3,480.00,"2024-01-23"
+"Webcam Logitech HD C920",6,220.00,"2024-01-24"
+"Cabo HDMI 2.0 Premium",15,35.50,"2024-01-25"
+"Hub USB 3.0 com 4 portas",4,65.90,"2024-01-26"
+"Mousepad Gamer RGB",12,28.99,"2024-01-27"
+"Headset Gamer HyperX",7,185.00,"2024-01-28"
+"Adaptador USB para RJ45",20,22.50,"2024-01-29"
+
+# ═══════════════════════════════════════════════════════
+# INSTRUÇÕES PARA USO DO TEMPLATE CSV
+# ═══════════════════════════════════════════════════════
+#
+# 1. ESTRUTURA OBRIGATÓRIA:
+#    - Cabeçalho: produto,quantidade,valor_unitario,data
+#    - Não altere a primeira linha!
+#
+# 2. FORMATO DOS DADOS:
+#    - produto: Nome do produto (use aspas se tiver vírgula)
+#    - quantidade: Número inteiro positivo
+#    - valor_unitario: Use ponto como separador decimal (25.50)
+#    - data: Formato AAAA-MM-DD (2024-01-15)
+#
+# 3. REGRAS IMPORTANTES:
+#    ✅ Use vírgula (,) como separador de campos
+#    ✅ Use ponto (.) para decimais: 1250.00
+#    ✅ Produtos com vírgula devem ter aspas: "Monitor 24, Full HD"
+#    ✅ Datas no formato ISO: 2024-01-15
+#    ✅ Linhas com # são comentários (ignoradas)
+#
+# 4. EXEMPLOS DE FORMATOS CORRETOS:
+#    "Notebook Dell",1,2500.00,"2024-01-15"
+#    "Mouse, Teclado e Mousepad",3,150.50,"2024-01-16"
+#    Smartphone,2,1200.00,"2024-01-17"
+#
+# 5. FORMATOS INCORRETOS (NÃO FAÇA):
+#    ❌ Notebook Dell;1;2500,00;15/01/2024  (separador errado)
+#    ❌ Mouse Logitech,1,85,50,2024-01-15   (vírgula nos decimais)
+#    ❌ "Teclado,3,320.00                    (data faltando)
+#
+# 6. COMO USAR:
+#    - Substitua os dados de exemplo pelos seus dados reais
+#    - Mantenha o cabeçalho (primeira linha)
+#    - Salve o arquivo com extensão .csv
+#    - Importe no SellOut EasyTrack
+#
+# 7. DICAS:
+#    - Use Excel/LibreOffice para editar facilmente
+#    - Teste com poucas linhas primeiro
+#    - Verifique se não há linhas vazias entre os dados
+#
+# ═══════════════════════════════════════════════════════

@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════
+# EXEMPLO DE MENSAGENS WHATSAPP PARA IMPORTAÇÃO
+# SellOut EasyTrack - Sistema de Gestão de Vendas
+# ═══════════════════════════════════════════════════════
+
+# Cole aqui suas mensagens reais do WhatsApp no lugar dos exemplos abaixo:
+
+Vendeu 5 Mouse Logitech por R$ 85,50 cada
+João: Comprei 2 Teclado Mecânico R$ 320,00
+Maria vendeu 3 Notebook Dell - R$ 2500 cada
+10 Carregador USB-C vendidos por 45,90 reais
+Smartphone Samsung: 4 unidades x R$ 1200
+Pedro vendeu 8 Fones Bluetooth a 150 reais cada
+Consegui vender 6 Webcam HD por R$ 220,00
+Ana: 15 Cabos HDMI vendidos por 35,50 cada
+Mousepad Gamer RGB - 12 vendas por 28,99
+Headset Gamer: vendeu 7 por R$ 185 cada
+Carlos vendeu 20 Adaptadores USB por 22,50
+Hub USB 3.0 - foram 4 vendas a R$ 65,90
+Tablet Apple - consegui vender 2 por 2800 cada
+SSD 1TB Kingston: 3 unidades vendidas por R$ 480
+Monitor Samsung 24" - vendi 1 por 899,99 reais
+
+# ═══════════════════════════════════════════════════════
+# COMO FUNCIONA A IMPORTAÇÃO WHATSAPP
+# ═══════════════════════════════════════════════════════
+
+# O SISTEMA É INTELIGENTE E RECONHECE AUTOMATICAMENTE:
+#
+# 1. PRODUTOS (qualquer texto):
+#    ✅ Mouse Logitech
+#    ✅ Teclado Mecânico  
+#    ✅ Smartphone Samsung
+#    ✅ Notebook Dell
+#
+# 2. QUANTIDADES (números + palavras):
+#    ✅ 5, 2, 10, 15 unidades
+#    ✅ "x", "por", "cada", "vendas"
+#    ✅ "vendeu", "vendidos", "comprou"
+#
+# 3. VALORES (com diferentes formatos):
+#    ✅ R$ 85,50
+#    ✅ 320,00 reais  
+#    ✅ por 2500 cada
+#    ✅ a 150 reais
+#    ✅ 45.90
+#
+# 4. DATA:
+#    ✅ Sempre usa data atual para WhatsApp
+#
+# ═══════════════════════════════════════════════════════
+# EXEMPLOS DE MENSAGENS QUE FUNCIONAM
+# ═══════════════════════════════════════════════════════
+
+# FORMATO VENDEDOR:
+# "Vendeu X produtos por R$ Y cada"
+# "Consegui vender X produtos a Y reais"
+# "Foram X vendas por R$ Y"
+
+# FORMATO CLIENTE:  
+# "Comprei X produtos R$ Y"
+# "João: X produtos por Y cada"
+# "Maria vendeu X produtos - R$ Y"
+
+# FORMATO INFORMAL:
+# "X produtos vendidos por Y reais"
+# "Produto: X unidades x R$ Y"
+# "X vendas a Y cada"
+
+# ═══════════════════════════════════════════════════════
+# DICAS PARA MELHORES RESULTADOS
+# ═══════════════════════════════════════════════════════
+
+# ✅ FUNCIONA BEM:
+# - Textos com números claros (5, 10, 2)
+# - Valores com R$, reais, por, cada
+# - Nomes simples de produtos
+# - Mensagens em português natural
+
+# ⚠️ PODE CAUSAR PROBLEMAS:
+# - Produtos com muitos números no nome
+# - Mensagens sem valores claros
+# - Textos muito confusos ou longos
+# - Múltiplos produtos na mesma linha
+
+# 🔧 COMO CORRIGIR PROBLEMAS:
+# - Simplifique os nomes dos produtos
+# - Uma venda por linha de mensagem
+# - Use números e valores claros
+# - Teste com poucas mensagens primeiro
+
+# ═══════════════════════════════════════════════════════
+# SUBSTITUA OS EXEMPLOS ACIMA PELAS SUAS MENSAGENS REAIS
+# ═══════════════════════════════════════════════════════

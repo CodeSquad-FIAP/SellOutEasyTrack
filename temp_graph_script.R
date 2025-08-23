@@ -2,6 +2,7 @@ cat('Iniciando script R com paleta FIAP + Asteria...\n')
 
 library(ggplot2)
 
+# ===== PALETA DE CORES FIAP + ASTERIA =====
 cores_fiap_asteria <- c(
   fiap_pink_vibrant = '#F23064',
   fiap_pink_dark = '#BF3B5E',
@@ -15,6 +16,7 @@ cores_fiap_asteria <- c(
   soft_charcoal = '#2C3E50'
 )
 
+# Paleta para séries de dados
 cores_series <- c(
   '#F23064',
   '#3498DB',
@@ -32,6 +34,7 @@ cat(paste('Dados lidos:', nrow(dados), 'linhas\n'))
 dados <- dados[order(-dados$Quantidade), ]
 if(nrow(dados) > 10) dados <- dados[1:10, ]
 
+# Atribuir cores dinamicamente baseado no número de produtos
 num_produtos <- nrow(dados)
 cores_usadas <- cores_series[1:min(num_produtos, length(cores_series))]
 if(num_produtos > length(cores_series)) {
@@ -145,5 +148,3 @@ if(file.exists('vendas_grafico.png')) {
 }
 
 cat('Script R concluído com paleta FIAP + Asteria!\n')
-
-}

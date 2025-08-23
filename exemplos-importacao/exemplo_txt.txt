@@ -1,0 +1,74 @@
+# ═══════════════════════════════════════════════════════
+# EXEMPLO DE ARQUIVO TXT PARA IMPORTAÇÃO
+# SellOut EasyTrack - Sistema de Gestão de Vendas
+# ═══════════════════════════════════════════════════════
+
+# FORMATO 1: Com separadores hífen (mais estruturado)
+# Formato: Produto - Quantidade - Valor - Data
+Notebook Dell Inspiron 15 - 2 - 2500.00 - 2024-01-15
+Mouse Logitech MX Master - 5 - 85.50 - 2024-01-16
+Teclado Mecânico Corsair - 3 - 320.00 - 2024-01-17
+Monitor Samsung 24 polegadas - 1 - 899.99 - 2024-01-18
+Smartphone Samsung Galaxy - 4 - 1200.00 - 2024-01-19
+
+# FORMATO 2: Com dois pontos e "x" (mais natural)
+# Formato: Produto: Quantidade x Valor
+Tablet Apple iPad Pro: 2x 2800.00
+Fone Bluetooth Sony: 8x 150.00
+Carregador USB-C Anker: 10x 45.90
+SSD Kingston NVMe 1TB: 3x 480.00
+Webcam Logitech HD: 6x 220.00
+
+# FORMATO 3: Formato livre (mais flexível)
+Cabo HDMI Premium 15 unidades 35.50 cada
+Hub USB 3.0 - vendidos 4 por 65.90
+Mousepad Gamer RGB: 12 vendas a 28.99
+Headset Gamer 7 unidades R$ 185.00
+20 Adaptadores USB-RJ45 por 22.50 reais cada
+
+# ═══════════════════════════════════════════════════════
+# INSTRUÇÕES DETALHADAS PARA ARQUIVO TXT
+# ═══════════════════════════════════════════════════════
+
+# 1. FORMATOS ACEITOS:
+#    ✅ Produto - Quantidade - Valor - Data
+#    ✅ Produto: Quantidade x Valor
+#    ✅ Formato livre com números e valores
+#
+# 2. REGRAS IMPORTANTES:
+#    ✅ Linhas começando com # são comentários (ignoradas)
+#    ✅ Linhas vazias são ignoradas
+#    ✅ Use vírgula ou ponto para decimais (aceita ambos)
+#    ✅ Se não informar data, usa data atual automaticamente
+#
+# 3. O QUE O SISTEMA RECONHECE:
+#    - Produtos: texto que sobra após extrair números
+#    - Quantidades: números inteiros
+#    - Valores: números com decimais, com ou sem R$
+#    - Datas: formato AAAA-MM-DD (opcional)
+#
+# 4. EXEMPLOS QUE FUNCIONAM:
+#    Mouse Logitech - 5 - 85.50
+#    Teclado: 3x 320,00
+#    10 Carregadores por R$ 45.90
+#    Vendeu 2 Notebooks a 2500 reais
+#
+# 5. DICAS PARA MELHOR RECONHECIMENTO:
+#    - Seja claro com números e valores
+#    - Use palavras como "x", "por", "cada", "unidades"
+#    - Evite muitos números no nome do produto
+#    - Teste com poucas linhas primeiro
+#
+# 6. VANTAGENS DO FORMATO TXT:
+#    - Mais flexível que CSV
+#    - Aceita linguagem natural
+#    - Fácil de editar em qualquer editor
+#    - Ideal para dados não estruturados
+#
+# ═══════════════════════════════════════════════════════
+
+// Exemplos adicionais para teste:
+// Notebook Dell Gaming 1 unidade 3500.00
+// Vendeu 3 Mouses Gamer por 120 cada
+// 5 Teclados Mecânicos - R$ 280,00 cada
+// Monitor 4K: 2x 1800.50

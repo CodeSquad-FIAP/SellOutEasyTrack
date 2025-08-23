@@ -6,14 +6,13 @@ import util.AnalyticsEngine;
 import util.DataImporter;
 import listener.VendaListener;
 import util.ColorPalette;
-import util.RGraphUtil;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -1164,7 +1163,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
     private void gerarTemplate() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Salvar Template CSV");
-        chooser.setSelectedFile(new File("template_vendas_com_produtos.csv"));
+        chooser.setSelectedFile(new File("template_vendas_com_dados.csv"));
 
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
@@ -1176,28 +1175,81 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
             try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(selectedFile), StandardCharsets.UTF_8))) {
                 writer.write("\uFEFF");
-                writer.println("produto,quantidade,valor_unitario,data");
 
-                List<Venda> vendas = vendaController.obterTodasVendas();
-                List<String> produtosUnicos = vendas.stream()
-                        .map(Venda::getProduto)
-                        .distinct()
-                        .collect(Collectors.toList());
+                // Cabeçalho exato
+                writer.write("produto,quantidade,valor_unitario,data\n");
 
-                for (String produto : produtosUnicos) {
-                    writer.println("\"" + produto + "\",1,0.00,\"" + java.time.LocalDate.now() + "\"");
+                int linhasGeradas = 0;
+
+                // Buscar vendas do banco de dados
+                try {
+                    List<Venda> todasVendas = vendaController.obterTodasVendas();
+                    System.out.println("Template: encontradas " + todasVendas.size() + " vendas no banco");
+
+                    if (!todasVendas.isEmpty()) {
+                        // Para cada venda, escrever linha por linha
+                        for (Venda venda : todasVendas) {
+                            // Produto (limpar e colocar entre aspas se necessário)
+                            String produto = venda.getProduto().trim();
+                            if (produto.contains(",")) {
+                                produto = "\"" + produto + "\"";
+                            }
+
+                            // Quantidade (número inteiro)
+                            int quantidade = venda.getQuantidade();
+
+                            // Valor (FORÇAR PONTO DECIMAL EM VEZ DE VÍRGULA)
+                            double valor = venda.getValorUnitario();
+                            String valorStr = String.format(java.util.Locale.US, "%.2f", valor);
+
+                            // Data (formato ISO)
+                            String data = venda.getData().toString();
+
+                            // Montar linha manualmente
+                            String linha = produto + "," + quantidade + "," + valorStr + "," + data;
+
+                            // Escrever linha
+                            writer.write(linha + "\n");
+
+                            linhasGeradas++;
+
+                            // Debug - só mostrar as primeiras 3 para não poluir
+                            if (linhasGeradas <= 3) {
+                                System.out.println("Linha gerada: " + linha);
+                            }
+                        }
+                    } else {
+                        // Se não tem vendas, adicionar exemplos
+                        writer.write("Mouse Gamer RGB,2,85.50,2025-08-23\n");
+                        writer.write("Teclado Mecânico,1,320.00,2025-08-23\n");
+                        writer.write("Monitor 24 polegadas,1,899.99,2025-08-23\n");
+                        linhasGeradas = 3;
+                    }
+
+                } catch (Exception e) {
+                    System.err.println("Erro ao buscar vendas: " + e.getMessage());
+                    e.printStackTrace();
+
+                    // Em caso de erro, adicionar exemplos
+                    writer.write("Mouse Gamer RGB,2,85.50,2025-08-23\n");
+                    writer.write("Teclado Mecânico,1,320.00,2025-08-23\n");
+                    writer.write("Monitor 24 polegadas,1,899.99,2025-08-23\n");
+                    linhasGeradas = 3;
                 }
 
-                writer.println("\n# INSTRUÇÕES DE USO:");
-                writer.println("# 1. Preencha a quantidade e o valor_unitario para os produtos que desejar importar.");
-                writer.println("# 2. Mantenha o cabeçalho (primeira linha) e o formato das colunas.");
-                writer.println("# 3. A data pode ser alterada (formato AAAA-MM-DD).");
-                writer.println("# 4. Use ponto (.) como separador decimal.");
-
-                JOptionPane.showMessageDialog(this, "Template CSV com " + produtosUnicos.size() + " produtos gerado com sucesso!", "Template Criado", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Template CSV criado com dados do banco!\n\n" +
+                                "Arquivo: " + selectedFile.getName() + "\n" +
+                                "Linhas geradas: " + linhasGeradas + "\n\n" +
+                                "Agora com formato decimal correto (ponto em vez de vírgula)!",
+                        "Template Criado",
+                        JOptionPane.INFORMATION_MESSAGE);
 
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Erro ao gerar template:\n" + e.getMessage(), "Erro de E/S", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Erro ao criar template: " + e.getMessage(),
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
