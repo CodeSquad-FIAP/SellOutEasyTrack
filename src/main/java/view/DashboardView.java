@@ -43,7 +43,6 @@ public class DashboardView extends JFrame implements VendaListener {
         try {
             setIconImage(Toolkit.getDefaultToolkit().getImage("agent-seller-svgrepo-com"));
         } catch (Exception e) {
-            // Ícone não encontrado, ignorar
         }
     }
 
@@ -75,7 +74,6 @@ public class DashboardView extends JFrame implements VendaListener {
         titulo.setForeground(Color.WHITE);
 
         JLabel subtitulo = new JLabel("Sistema de Gestão de Vendas");
-        subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         subtitulo.setForeground(new Color(189, 195, 199));
 
         JPanel tituloPanel = new JPanel(new BorderLayout());
@@ -87,7 +85,6 @@ public class DashboardView extends JFrame implements VendaListener {
         userPanel.setOpaque(false);
 
         JLabel userInfo = new JLabel("Dashboard Executivo");
-        userInfo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         userInfo.setForeground(new Color(189, 195, 199));
 
         userPanel.add(userInfo);
@@ -145,7 +142,6 @@ public class DashboardView extends JFrame implements VendaListener {
         tituloLabel.setForeground(Color.WHITE);
 
         JLabel descLabel = new JLabel(descricao);
-        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         descLabel.setForeground(new Color(189, 195, 199));
 
         JPanel textPanel = new JPanel(new BorderLayout());
@@ -234,7 +230,6 @@ public class DashboardView extends JFrame implements VendaListener {
         cardTitle.setForeground(new Color(44, 62, 80));
 
         JLabel cardSubtitle = new JLabel("Produtos com melhor desempenho");
-        cardSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cardSubtitle.setForeground(new Color(38, 38, 38));
 
         JPanel titlePanel = new JPanel(new BorderLayout());
@@ -298,13 +293,11 @@ public class DashboardView extends JFrame implements VendaListener {
         leftPanel.setOpaque(false);
 
         JLabel footerText = new JLabel("SellOut EasyTrack - Sistema de Gestão de Vendas");
-        footerText.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         footerText.setForeground(Color.WHITE);
 
         leftPanel.add(footerText);
 
         JLabel status = new JLabel("Sistema Online");
-        status.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         status.setForeground(new Color(189, 195, 199));
 
         footer.add(leftPanel, BorderLayout.WEST);
@@ -367,7 +360,6 @@ public class DashboardView extends JFrame implements VendaListener {
         tituloLabel.setForeground(new Color(44, 62, 80));
 
         JLabel descLabel = new JLabel(descricao);
-        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         descLabel.setForeground(new Color(38, 38, 38));
 
         JPanel textPanel = new JPanel(new BorderLayout());
@@ -395,19 +387,19 @@ public class DashboardView extends JFrame implements VendaListener {
     }
 
     private void mostrarMenuVendas() {
-        System.out.println("🔍 [DEBUG] Botão VENDAS clicado");
+        System.out.println(" Botão VENDAS clicado");
         try {
             if (crudMenu == null) {
-                System.out.println("🔍 [DEBUG] Configurando menu CRUD...");
+                System.out.println(" Configurando menu CRUD...");
                 configurarMenuCrud();
             }
             Point frameLocation = this.getLocationOnScreen();
             int menuX = 280;
             int menuY = 180;
-            System.out.println("🔍 [DEBUG] Mostrando menu na posição: " + menuX + ", " + menuY);
+            System.out.println(" Mostrando menu na posição: " + menuX + ", " + menuY);
             crudMenu.show(this, menuX, menuY);
         } catch (Exception e) {
-            System.err.println("❌ [ERROR] Erro ao mostrar menu VENDAS: " + e.getMessage());
+            System.err.println(" Erro ao mostrar menu VENDAS: " + e.getMessage());
             e.printStackTrace();
             mostrarMenuVendasSimples();
         }
@@ -436,7 +428,7 @@ public class DashboardView extends JFrame implements VendaListener {
 
     private void abrirRelatorios() {
         try {
-            System.out.println("🔍 [DEBUG] Gerando relatório automático...");
+            System.out.println(" Gerando relatório automático...");
             List<Venda> vendas = vendaController.obterTodasVendas();
             if (vendas.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -605,7 +597,6 @@ public class DashboardView extends JFrame implements VendaListener {
     private void mostrarLoading() {
         chartPanel.removeAll();
         JLabel loading = new JLabel("Gerando gráfico...", JLabel.CENTER);
-        loading.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         loading.setForeground(new Color(38, 38, 38));
         chartPanel.add(loading);
         chartPanel.revalidate();
@@ -613,32 +604,47 @@ public class DashboardView extends JFrame implements VendaListener {
     }
 
     private void exibirGrafico(String imagePath) {
-        File imageFile = new File(imagePath);
-        if (imageFile.exists()) {
+        chartPanel.removeAll();
+
+        try {
             ImageIcon grafico = new ImageIcon(imagePath);
-            int originalWidth = grafico.getIconWidth();
-            int originalHeight = grafico.getIconHeight();
-            int panelWidth = chartPanel.getWidth() - 40;
-            int panelHeight = chartPanel.getHeight() - 40;
-            if (panelWidth <= 0) panelWidth = 800;
-            if (panelHeight <= 0) panelHeight = 400;
-            double scaleX = (double) panelWidth / originalWidth;
-            double scaleY = (double) panelHeight / originalHeight;
-            double scale = Math.min(scaleX, scaleY);
-            int scaledWidth = (int) (originalWidth * scale);
-            int scaledHeight = (int) (originalHeight * scale);
-            Image img = grafico.getImage();
-            Image scaledImg = img.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
-            ImageIcon finalIcon = new ImageIcon(scaledImg);
-            JLabel lblGrafico = new JLabel(finalIcon);
-            lblGrafico.setHorizontalAlignment(JLabel.CENTER);
-            lblGrafico.setVerticalAlignment(JLabel.CENTER);
-            chartPanel.removeAll();
-            chartPanel.add(lblGrafico, BorderLayout.CENTER);
-            chartPanel.revalidate();
-            chartPanel.repaint();
-            System.out.println("Gráfico 1080p exibido com sucesso!");
+            int panelWidth = chartPanel.getWidth() - 20;
+            int panelHeight = chartPanel.getHeight() - 20;
+
+            if (panelWidth > 100 && panelHeight > 100) {
+                int originalWidth = grafico.getIconWidth();
+                int originalHeight = grafico.getIconHeight();
+                double scaleX = (double) panelWidth / originalWidth;
+                double scaleY = (double) panelHeight / originalHeight;
+                double scale = Math.min(scaleX, scaleY) * 0.95;
+                int scaledWidth = (int) (originalWidth * scale);
+                int scaledHeight = (int) (originalHeight * scale);
+
+                // Código para redimensionamento de alta qualidade
+                java.awt.Image img = grafico.getImage();
+                java.awt.image.BufferedImage resizedImg = new java.awt.image.BufferedImage(scaledWidth, scaledHeight, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                java.awt.Graphics2D g2 = resizedImg.createGraphics();
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.drawImage(img, 0, 0, scaledWidth, scaledHeight, null);
+                g2.dispose();
+
+                ImageIcon finalIcon = new ImageIcon(resizedImg);
+                JLabel lblGrafico = new JLabel(finalIcon);
+                lblGrafico.setHorizontalAlignment(JLabel.CENTER);
+                lblGrafico.setVerticalAlignment(JLabel.CENTER);
+                chartPanel.add(lblGrafico, BorderLayout.CENTER);
+            } else {
+                JLabel lblGrafico = new JLabel(grafico);
+                lblGrafico.setHorizontalAlignment(JLabel.CENTER);
+                chartPanel.add(lblGrafico, BorderLayout.CENTER);
+            }
+        } catch (Exception e) {
+            mostrarErroGrafico("Erro ao exibir gráfico: " + e.getMessage());
         }
+        chartPanel.revalidate();
+        chartPanel.repaint();
     }
 
     private void mostrarErroGrafico(String mensagem) {
@@ -649,7 +655,6 @@ public class DashboardView extends JFrame implements VendaListener {
         iconError.setFont(new Font("Segoe UI", Font.PLAIN, 48));
         iconError.setForeground(new Color(231, 76, 60));
         JLabel textError = new JLabel(mensagem, JLabel.CENTER);
-        textError.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         textError.setForeground(new Color(38, 38, 38));
         errorPanel.add(iconError, BorderLayout.CENTER);
         errorPanel.add(textError, BorderLayout.SOUTH);

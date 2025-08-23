@@ -40,7 +40,7 @@ public class DataImporter {
 
     public ImportResult importFromCSV(File csvFile) {
         clearErrorsAndWarnings();
-        System.out.println("🔍 Iniciando importação CSV: " + csvFile.getAbsolutePath());
+        System.out.println(" Iniciando importação CSV: " + csvFile.getAbsolutePath());
 
         if (!validateFile(csvFile, ".csv")) {
             return new ImportResult(false, 0, 0, errors, warnings);
@@ -66,11 +66,11 @@ public class DataImporter {
 
                 if (isFirstLine) {
                     headers = parseCSVLine(line);
-                    System.out.println("📋 Cabeçalhos encontrados: " + Arrays.toString(headers));
+                    System.out.println(" Cabeçalhos encontrados: " + Arrays.toString(headers));
 
                     if (!validateHeaders(headers)) {
                         addError(lineNumber, "Cabeçalhos inválidos. Esperado: produto,quantidade,valor_unitario,data");
-                        System.err.println("❌ Cabeçalhos inválidos");
+                        System.err.println(" Cabeçalhos inválidos");
                         return new ImportResult(false, 0, 0, errors, warnings);
                     }
                     isFirstLine = false;
@@ -79,7 +79,7 @@ public class DataImporter {
 
                 try {
                     String[] values = parseCSVLine(line);
-                    System.out.println("📝 Processando linha " + lineNumber + ": " + Arrays.toString(values));
+                    System.out.println(" Processando linha " + lineNumber + ": " + Arrays.toString(values));
 
                     Venda venda = parseVendaFromCSV(values, lineNumber);
 
@@ -87,30 +87,30 @@ public class DataImporter {
                         vendaController.salvarVenda(venda);
                         vendasImportadas.add(venda);
                         successCount++;
-                        System.out.println("✅ Venda salva: " + venda.getProduto());
+                        System.out.println(" Venda salva: " + venda.getProduto());
                     } else {
                         errorCount++;
                     }
                 } catch (Exception e) {
                     addError(lineNumber, "Erro ao processar linha: " + e.getMessage());
                     errorCount++;
-                    System.err.println("❌ Erro na linha " + lineNumber + ": " + e.getMessage());
+                    System.err.println(" Erro na linha " + lineNumber + ": " + e.getMessage());
                 }
             }
 
         } catch (IOException e) {
             addError(0, "Erro ao ler arquivo: " + e.getMessage());
-            System.err.println("❌ Erro de E/S: " + e.getMessage());
+            System.err.println(" Erro de E/S: " + e.getMessage());
             return new ImportResult(false, 0, 0, errors, warnings);
         }
 
-        System.out.println("🎯 Importação CSV concluída: " + successCount + " sucessos, " + errorCount + " erros");
+        System.out.println(" Importação CSV concluída: " + successCount + " sucessos, " + errorCount + " erros");
         return new ImportResult(true, successCount, errorCount, errors, warnings);
     }
 
     public ImportResult importFromTextFile(File textFile) {
         clearErrorsAndWarnings();
-        System.out.println("🔍 Iniciando importação TXT: " + textFile.getAbsolutePath());
+        System.out.println(" Iniciando importação TXT: " + textFile.getAbsolutePath());
 
         if (!validateFile(textFile, ".txt")) {
             return new ImportResult(false, 0, 0, errors, warnings);
@@ -139,14 +139,14 @@ public class DataImporter {
                         vendaController.salvarVenda(venda);
                         vendasImportadas.add(venda);
                         successCount++;
-                        System.out.println("✅ Venda TXT salva: " + venda.getProduto());
+                        System.out.println(" Venda TXT salva: " + venda.getProduto());
                     } else {
                         errorCount++;
                     }
                 } catch (Exception e) {
                     addError(lineNumber, "Erro ao processar linha: " + e.getMessage());
                     errorCount++;
-                    System.err.println("❌ Erro TXT na linha " + lineNumber + ": " + e.getMessage());
+                    System.err.println(" Erro TXT na linha " + lineNumber + ": " + e.getMessage());
                 }
             }
 
@@ -155,13 +155,13 @@ public class DataImporter {
             return new ImportResult(false, 0, 0, errors, warnings);
         }
 
-        System.out.println("🎯 Importação TXT concluída: " + successCount + " sucessos, " + errorCount + " erros");
+        System.out.println(" Importação TXT concluída: " + successCount + " sucessos, " + errorCount + " erros");
         return new ImportResult(true, successCount, errorCount, errors, warnings);
     }
 
     public ImportResult importFromWhatsApp(String whatsappText) {
         clearErrorsAndWarnings();
-        System.out.println("🔍 Iniciando importação WhatsApp");
+        System.out.println(" Iniciando importação WhatsApp");
 
         if (whatsappText == null || whatsappText.trim().isEmpty()) {
             addError(0, "Texto do WhatsApp está vazio");
@@ -189,18 +189,18 @@ public class DataImporter {
                     vendaController.salvarVenda(venda);
                     vendasImportadas.add(venda);
                     successCount++;
-                    System.out.println("✅ Venda WhatsApp salva: " + venda.getProduto() + " - " + venda.getQuantidade() + " - R$ " + venda.getValorUnitario());
+                    System.out.println(" Venda WhatsApp salva: " + venda.getProduto() + " - " + venda.getQuantidade() + " - R$ " + venda.getValorUnitario());
                 } else {
                     addWarning(lineNumber, "Linha ignorada (sem dados de venda): " + line);
                 }
             } catch (Exception e) {
                 addError(lineNumber, "Erro ao processar mensagem: " + e.getMessage());
                 errorCount++;
-                System.err.println("❌ Erro WhatsApp na linha " + lineNumber + ": " + e.getMessage());
+                System.err.println(" Erro WhatsApp na linha " + lineNumber + ": " + e.getMessage());
             }
         }
 
-        System.out.println("🎯 Importação WhatsApp concluída: " + successCount + " sucessos, " + errorCount + " erros");
+        System.out.println(" Importação WhatsApp concluída: " + successCount + " sucessos, " + errorCount + " erros");
         return new ImportResult(true, successCount, errorCount, errors, warnings);
     }
 
@@ -296,7 +296,7 @@ public class DataImporter {
             line = line.replaceFirst("\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2} - ", "");
             line = line.replaceFirst("^[^:]+: ", "");
 
-            System.out.println("🔍 Analisando linha WhatsApp: " + line);
+            System.out.println(" Analisando linha WhatsApp: " + line);
 
             String produto = "";
             int quantidade = 1;
@@ -305,14 +305,14 @@ public class DataImporter {
             Matcher quantMatcher = QUANTITY_PATTERN.matcher(line);
             if (quantMatcher.find()) {
                 quantidade = Integer.parseInt(quantMatcher.group(1));
-                System.out.println("📊 Quantidade encontrada: " + quantidade);
+                System.out.println(" Quantidade encontrada: " + quantidade);
             }
 
             Matcher moneyMatcher = MONEY_PATTERN.matcher(line);
             if (moneyMatcher.find()) {
                 String valorStr = moneyMatcher.group(1).replace(",", ".");
                 valor = Double.parseDouble(valorStr);
-                System.out.println("💰 Valor encontrado: " + valor);
+                System.out.println(" Valor encontrado: " + valor);
             } else {
                 Matcher decimalMatcher = DECIMAL_PATTERN.matcher(line);
                 List<Double> valores = new ArrayList<>();
@@ -326,7 +326,7 @@ public class DataImporter {
                 }
                 if (!valores.isEmpty()) {
                     valor = valores.get(valores.size() - 1);
-                    System.out.println("💰 Valor decimal encontrado: " + valor);
+                    System.out.println(" Valor decimal encontrado: " + valor);
                 }
             }
 
@@ -343,8 +343,8 @@ public class DataImporter {
                 produto = "Produto WhatsApp " + lineNumber;
             }
 
-            System.out.println("🏷️ Produto extraído: '" + produto + "'");
-            System.out.println("📊 Dados finais: " + produto + " | " + quantidade + " | " + valor);
+            System.out.println(" Produto extraído: '" + produto + "'");
+            System.out.println(" Dados finais: " + produto + " | " + quantidade + " | " + valor);
 
             if (valor > 0 && !produto.trim().isEmpty()) {
                 Date data = Date.valueOf(LocalDate.now());
@@ -356,7 +356,7 @@ public class DataImporter {
 
         } catch (Exception e) {
             addError(lineNumber, "Erro ao processar mensagem WhatsApp: " + e.getMessage());
-            System.err.println("❌ Erro detalhado WhatsApp: " + e.getMessage());
+            System.err.println(" Erro detalhado WhatsApp: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -475,12 +475,12 @@ public class DataImporter {
 
     private void addError(int lineNumber, String message) {
         errors.add(new ImportError(lineNumber, message));
-        System.err.println("❌ Erro linha " + lineNumber + ": " + message);
+        System.err.println(" Erro linha " + lineNumber + ": " + message);
     }
 
     private void addWarning(int lineNumber, String message) {
         warnings.add(new ImportWarning(lineNumber, message));
-        System.out.println("⚠️ Aviso linha " + lineNumber + ": " + message);
+        System.out.println(" Aviso linha " + lineNumber + ": " + message);
     }
 
     private void clearErrorsAndWarnings() {

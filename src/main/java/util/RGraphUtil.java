@@ -4,6 +4,7 @@ import model.Venda;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
 
 public class RGraphUtil {
 
@@ -57,6 +58,15 @@ public class RGraphUtil {
     private static boolean verificarRDisponivel() {
         String[] comandosR = {
                 "C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe",
+                "C:\\Program Files\\R\\R-4.4.1\\bin\\Rscript.exe",
+                "C:\\Program Files\\R\\R-4.4.0\\bin\\Rscript.exe",
+                "C:\\Program Files\\R\\R-4.3.2\\bin\\Rscript.exe",
+                "C:\\Program Files\\R\\R-4.3.1\\bin\\Rscript.exe",
+                "C:\\Program Files\\R\\R-4.3.0\\bin\\Rscript.exe",
+                "C:\\Program Files (x86)\\R\\R-4.5.1\\bin\\Rscript.exe",
+                "C:\\Program Files (x86)\\R\\R-4.4.1\\bin\\Rscript.exe",
+                "C:\\R\\R-4.5.1\\bin\\Rscript.exe",
+                "C:\\R\\R-4.4.1\\bin\\Rscript.exe",
                 "Rscript",
                 "R",
                 "/usr/bin/Rscript",
@@ -92,10 +102,16 @@ public class RGraphUtil {
     }
 
     private static void criarArquivoCSVTemp(Map<String, Integer> dados) throws IOException {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(CSV_DATA_PATH))) {
+        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(CSV_DATA_PATH), StandardCharsets.UTF_8))) {
+            writer.write('\uFEFF');
             writer.println("Produto,Quantidade");
             for (Map.Entry<String, Integer> entry : dados.entrySet()) {
-                writer.println("\"" + entry.getKey() + "\"," + entry.getValue());
+                String produto = entry.getKey().replace("\"", "'");
+                if (produto.contains(",")) {
+                    writer.println("\"" + produto + "\"," + entry.getValue());
+                } else {
+                    writer.println(produto + "," + entry.getValue());
+                }
             }
         }
         System.out.println("CSV criado com " + dados.size() + " produtos");
@@ -165,10 +181,10 @@ public class RGraphUtil {
             writer.println("  ) +");
             writer.println("  labs(");
             writer.println("    title = 'Produtos Mais Vendidos',");
-            writer.println("    subtitle = 'SellOut EasyTrack - Paleta FIAP + Asteria',");
+            writer.println("    subtitle = 'SellOut EasyTrack - Análise de Vendas',");
             writer.println("    x = 'Produtos',");
             writer.println("    y = 'Quantidade Vendida',");
-            writer.println("    caption = 'Gerado automaticamente com paleta unificada'");
+            writer.println("    caption = 'SellOut EasyTrack - Análise de Vendas'");
             writer.println("  ) +");
             writer.println("  scale_y_continuous(expand = c(0, 0, 0.1, 0)) +");
             writer.println("  theme_minimal(base_size = 16) +");
@@ -236,7 +252,7 @@ public class RGraphUtil {
             writer.println("  plot = grafico,");
             writer.println("  width = 16,");
             writer.println("  height = 12,");
-            writer.println("  dpi = 600,");
+            writer.println("  dpi = 1200,");
             writer.println("  units = 'in',");
             writer.println("  device = 'png',");
             writer.println("  type = 'cairo-png',");
@@ -310,7 +326,6 @@ public class RGraphUtil {
             new File(R_SCRIPT_PATH).delete();
             new File(CSV_DATA_PATH).delete();
         } catch (Exception e) {
-            // Ignorar erros de limpeza
         }
     }
 
@@ -322,20 +337,19 @@ public class RGraphUtil {
         System.out.println("=== TESTE DE INTEGRAÇÃO R COM PALETA FIAP + ASTERIA ===");
 
         if (verificarRDisponivel()) {
-            System.out.println("✅ R está disponível");
-            System.out.println("🎨 Paleta FIAP + Asteria será aplicada aos gráficos");
+            System.out.println("R está disponível");
+            System.out.println("Paleta FIAP + Asteria será aplicada aos gráficos");
 
-            // Exibir informações da paleta
-            System.out.println("\n🎨 CORES DA PALETA:");
-            System.out.println("• FIAP Pink Vibrant: " + ColorPalette.toHex(ColorPalette.FIAP_PINK_VIBRANT));
-            System.out.println("• FIAP Pink Dark: " + ColorPalette.toHex(ColorPalette.FIAP_PINK_DARK));
-            System.out.println("• Asteria Midnight Blue: " + ColorPalette.toHex(ColorPalette.ASTERIA_MIDNIGHT_BLUE));
-            System.out.println("• Asteria Amethyst: " + ColorPalette.toHex(ColorPalette.ASTERIA_AMETHYST));
-            System.out.println("• Asteria Ocean Blue: " + ColorPalette.toHex(ColorPalette.ASTERIA_OCEAN_BLUE));
-            System.out.println("• Success Emerald: " + ColorPalette.toHex(ColorPalette.SUCCESS_EMERALD));
+            System.out.println("\nCORES DA PALETA:");
+            System.out.println("FIAP Pink Vibrant: " + ColorPalette.toHex(ColorPalette.FIAP_PINK_VIBRANT));
+            System.out.println("FIAP Pink Dark: " + ColorPalette.toHex(ColorPalette.FIAP_PINK_DARK));
+            System.out.println("Asteria Midnight Blue: " + ColorPalette.toHex(ColorPalette.ASTERIA_MIDNIGHT_BLUE));
+            System.out.println("Asteria Amethyst: " + ColorPalette.toHex(ColorPalette.ASTERIA_AMETHYST));
+            System.out.println("Asteria Ocean Blue: " + ColorPalette.toHex(ColorPalette.ASTERIA_OCEAN_BLUE));
+            System.out.println("Success Emerald: " + ColorPalette.toHex(ColorPalette.SUCCESS_EMERALD));
         } else {
-            System.out.println("❌ R não está disponível");
-            System.out.println("⚠️ Gráficos não poderão ser gerados");
+            System.out.println("R não está disponível");
+            System.out.println("Gráficos não poderão ser gerados");
         }
 
         System.out.println("=== FIM DO TESTE ===");

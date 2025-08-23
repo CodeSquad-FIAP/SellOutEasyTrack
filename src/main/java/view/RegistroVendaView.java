@@ -39,7 +39,6 @@ public class RegistroVendaView extends JDialog {
         btnSalvar.setBackground(new Color(46, 204, 113));
         btnSalvar.setForeground(Color.WHITE);
         btnSalvar.setFocusPainted(false);
-        btnSalvar.setFont(new Font("Arial", Font.BOLD, 16));
 
         btnSalvar.addActionListener(e -> salvarVenda());
 

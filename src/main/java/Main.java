@@ -1,10 +1,10 @@
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarculaLaf;
 import view.SimplifiedDashboardView;
 import util.DBConnection;
+import util.RGraphUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class Main {
 
@@ -37,23 +37,23 @@ public class Main {
 
     private static void configurarLookAndFeel() {
         try {
-            FlatLightLaf.setup();
+            FlatDarculaLaf.setup();
 
             UIManager.put("Button.arc", 8);
             UIManager.put("Component.arc", 8);
             UIManager.put("ProgressBar.arc", 8);
             UIManager.put("TextComponent.arc", 8);
 
-            UIManager.put("Button.default.background", new Color(242, 48, 100));
-            UIManager.put("Button.default.foreground", Color.WHITE);
+            UIManager.put("Button.default.background", new Color(225, 80, 96));
             UIManager.put("Component.focusColor", new Color(142, 68, 173));
             UIManager.put("ProgressBar.foreground", new Color(46, 204, 113));
-            UIManager.put("TitlePane.background", new Color(44, 62, 80));
+
             UIManager.put("TitlePane.foreground", Color.WHITE);
+            UIManager.put("TitlePane.inactiveForeground", Color.WHITE);
 
             configurarFontes();
 
-            System.out.println("Interface moderna configurada com a paleta FIAP + Asteria");
+            System.out.println("Interface moderna configurada com o tema FlatDarculaLaf");
 
         } catch (Exception e) {
             System.err.println("Erro ao configurar interface: " + e.getMessage());
@@ -69,7 +69,7 @@ public class Main {
     private static void configurarFontes() {
         try {
             String[] fontCandidates = {
-                    "Segoe UI", "SF Pro Display", "Ubuntu", "Liberation Sans", "Arial"
+                    "Roboto", "Poppins", "Segoe UI", "Liberation Sans", "Arial"
             };
 
             Font baseFont = null;
@@ -88,6 +88,8 @@ public class Main {
             UIManager.put("Label.font", baseFont);
             UIManager.put("Button.font", new Font(baseFont.getName(), Font.BOLD, 12));
             UIManager.put("TextField.font", baseFont);
+            UIManager.put("TextArea.font", baseFont);
+            UIManager.put("Table.font", baseFont);
 
             System.out.println("Fonte configurada: " + baseFont.getName());
 
@@ -97,8 +99,9 @@ public class Main {
     }
 
     private static boolean isFontAvailable(String fontName) {
-        Font[] availableFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-        for (Font font : availableFonts) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Font[] allFonts = ge.getAllFonts();
+        for (Font font : allFonts) {
             if (font.getName().equals(fontName)) {
                 return true;
             }
@@ -153,7 +156,7 @@ public class Main {
         }
 
         try {
-            if (util.RGraphUtil.isRDisponivel()) {
+            if (RGraphUtil.isRDisponivel()) {
                 System.out.println("R disponível para gráficos avançados");
             } else {
                 System.out.println("R não disponível - gráficos básicos serão usados");

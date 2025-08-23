@@ -5,12 +5,15 @@ import model.Venda;
 import util.AnalyticsEngine;
 import util.DataImporter;
 import listener.VendaListener;
+import util.ColorPalette;
+import util.RGraphUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -52,7 +55,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private void criarInterface() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(236, 240, 241));
 
         JPanel headerPanel = criarHeader();
         JPanel sidebarPanel = criarSidebar();
@@ -69,7 +71,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private JPanel criarHeader() {
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(new Color(44, 62, 80));
+        header.setBackground(new Color(38, 38, 38));
         header.setBorder(new EmptyBorder(15, 25, 15, 25));
         header.setPreferredSize(new Dimension(0, 80));
 
@@ -78,7 +80,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         titulo.setForeground(Color.WHITE);
 
         JLabel subtitulo = new JLabel("BI Inteligente - Múltiplas Fontes - Analytics Avançado");
-        subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         subtitulo.setForeground(new Color(189, 195, 199));
 
         JPanel tituloPanel = new JPanel(new BorderLayout());
@@ -95,7 +96,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         JPanel sidebar = new JPanel();
         sidebar.setName("sidebar");
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(44, 62, 80));
+        sidebar.setBackground(new Color(38, 38, 38));
         sidebar.setPreferredSize(new Dimension(300, 0));
         sidebar.setBorder(new EmptyBorder(20, 0, 20, 0));
 
@@ -135,12 +136,12 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private JPanel criarAreaConteudo() {
         JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(new Color(236, 240, 241));
+        content.setBackground(new Color(64, 64, 64));
         content.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(500);
-        splitPane.setBackground(new Color(236, 240, 241));
+        splitPane.setOpaque(false);
         splitPane.setBorder(null);
         splitPane.setDividerSize(5);
 
@@ -157,17 +158,16 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private JPanel criarPainelInsights() {
         JPanel container = new JPanel(new BorderLayout());
-        container.setBackground(Color.WHITE);
+        container.setOpaque(false);
         container.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor")),
                 new EmptyBorder(20, 20, 20, 20)
         ));
 
         JLabel headerLabel = new JLabel("Insights Inteligentes Automáticos");
         headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        headerLabel.setForeground(new Color(44, 62, 80));
 
-        JButton btnRefreshInsights = criarBotaoModerno("ATUALIZAR", new Color(52, 152, 219));
+        JButton btnRefreshInsights = criarBotaoModerno("ATUALIZAR", new Color(242, 48, 100));
         btnRefreshInsights.addActionListener(e -> atualizarInsights());
 
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -178,10 +178,12 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
         insightsPanel = new JPanel();
         insightsPanel.setLayout(new BoxLayout(insightsPanel, BoxLayout.Y_AXIS));
-        insightsPanel.setBackground(Color.WHITE);
+        insightsPanel.setOpaque(false);
 
         JScrollPane scrollPane = new JScrollPane(insightsPanel);
         scrollPane.setBorder(null);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -193,17 +195,16 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private JPanel criarPainelGraficos() {
         JPanel container = new JPanel(new BorderLayout());
-        container.setBackground(Color.WHITE);
+        container.setOpaque(false);
         container.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor")),
                 new EmptyBorder(20, 20, 20, 20)
         ));
 
         JLabel headerLabel = new JLabel("Analytics Visuais Avançados");
         headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        headerLabel.setForeground(new Color(44, 62, 80));
 
-        JButton btnRefreshChart = criarBotaoModerno("GERAR GRÁFICOS", new Color(52, 152, 219));
+        JButton btnRefreshChart = criarBotaoModerno("GERAR GRÁFICOS", new Color(242, 48, 100));
         btnRefreshChart.addActionListener(e -> atualizarGraficos());
 
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -213,8 +214,8 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         headerPanel.add(btnRefreshChart, BorderLayout.EAST);
 
         chartPanel = new JPanel(new BorderLayout());
-        chartPanel.setBackground(Color.WHITE);
-        chartPanel.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241), 1));
+        chartPanel.setOpaque(false);
+        chartPanel.setBorder(BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor")));
         chartPanel.setMinimumSize(new Dimension(600, 400));
 
         container.add(headerPanel, BorderLayout.NORTH);
@@ -231,7 +232,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
         JLabel titleLabel = new JLabel("ESTATÍSTICAS LIVE");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        titleLabel.setForeground(new Color(46, 204, 113));
+        titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         try {
@@ -241,13 +242,12 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                     .sum();
 
             JLabel vendasLabel = new JLabel(String.format("Vendas: %d", vendas.size()));
-            vendasLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
             vendasLabel.setForeground(Color.WHITE);
             vendasLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel faturamentoLabel = new JLabel(String.format("R$ %.0f", faturamento));
             faturamentoLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            faturamentoLabel.setForeground(new Color(46, 204, 113));
+            faturamentoLabel.setForeground(new Color(242, 48, 100));
             faturamentoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             panel.add(titleLabel);
@@ -257,7 +257,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
         } catch (SQLException e) {
             JLabel errorLabel = new JLabel("Erro ao carregar");
-            errorLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
             errorLabel.setForeground(new Color(231, 76, 60));
             errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             panel.add(errorLabel);
@@ -268,16 +267,14 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private JPanel criarFooter() {
         JPanel footer = new JPanel(new BorderLayout());
-        footer.setBackground(new Color(127, 140, 141));
+        footer.setBackground(new Color(38, 38, 38));
         footer.setBorder(new EmptyBorder(0, 25, 0, 25));
         footer.setPreferredSize(new Dimension(0, 50));
 
         JLabel footerText = new JLabel("SellOut EasyTrack");
-        footerText.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         footerText.setForeground(Color.WHITE);
 
         JLabel versionInfo = new JLabel("v2.0 - Sistema Completo");
-        versionInfo.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         versionInfo.setForeground(Color.WHITE);
 
         footer.add(footerText, BorderLayout.WEST);
@@ -298,7 +295,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         tituloLabel.setForeground(Color.WHITE);
 
         JLabel descLabel = new JLabel(descricao);
-        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         descLabel.setForeground(new Color(189, 195, 199));
 
         JPanel textPanel = new JPanel(new BorderLayout());
@@ -350,7 +346,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private JButton criarBotaoModerno(String texto, Color cor) {
         JButton btn = new JButton(texto);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btn.setForeground(Color.WHITE);
         btn.setBackground(cor);
         btn.setBorder(new EmptyBorder(8, 15, 8, 15));
@@ -375,25 +370,22 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
     private JButton criarBotaoDialog(String texto, String descricao) {
         JButton btn = new JButton();
         btn.setLayout(new BorderLayout());
-        btn.setBackground(Color.WHITE);
-        btn.setForeground(new Color(38, 38, 38));
+        btn.setBackground(new Color(60, 63, 65));
         btn.setFocusPainted(false);
-
         btn.setPreferredSize(new Dimension(400, 70));
         btn.setMaximumSize(new Dimension(400, 70));
         btn.setMinimumSize(new Dimension(400, 70));
 
         btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(new Color(80, 80, 80)),
                 BorderFactory.createEmptyBorder(12, 15, 12, 15)));
 
         JLabel lblTitulo = new JLabel(texto);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblTitulo.setForeground(new Color(38, 38, 38));
+        lblTitulo.setForeground(Color.WHITE);
 
         JLabel lblDesc = new JLabel("<html><div style='width: 350px;'>" + descricao + "</div></html>");
-        lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblDesc.setForeground(Color.GRAY);
+        lblDesc.setForeground(ColorPalette.ASTERIA_SILVER);
 
         JPanel textPanel = new JPanel(new BorderLayout());
         textPanel.setOpaque(false);
@@ -406,7 +398,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                btn.setBackground(new Color(236, 240, 241));
+                btn.setBackground(new Color(75, 78, 80));
                 btn.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(242, 48, 100), 2),
                         BorderFactory.createEmptyBorder(11, 14, 11, 14)));
@@ -414,9 +406,9 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                btn.setBackground(Color.WHITE);
+                btn.setBackground(new Color(60, 63, 65));
                 btn.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                        BorderFactory.createLineBorder(new Color(80, 80, 80)),
                         BorderFactory.createEmptyBorder(12, 15, 12, 15)));
             }
         });
@@ -439,7 +431,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         headerPanel.add(titulo);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(64, 64, 64));
 
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
@@ -476,11 +468,11 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         buttonPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(Color.GRAY);
+        btnCancelar.setBackground(new Color(140, 140, 140));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCancelar.setFocusPainted(false);
-        btnCancelar.setBorder(new EmptyBorder(10, 20, 10, 20));
+        btnCancelar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         btnCancelar.addActionListener(e -> dialog.dispose());
         buttonPanel.add(btnCancelar);
 
@@ -500,7 +492,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         dialog.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(46, 204, 113));
+        headerPanel.setBackground(new Color(242, 48, 100));
         headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
         JLabel titulo = new JLabel("IMPORTAR DADOS", JLabel.CENTER);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
@@ -508,7 +500,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         headerPanel.add(titulo);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(64, 64, 64));
 
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
@@ -545,11 +537,11 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         buttonPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(149, 165, 166));
+        btnCancelar.setBackground(new Color(140, 140, 140));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCancelar.setFocusPainted(false);
-        btnCancelar.setBorder(new EmptyBorder(10, 20, 10, 20));
+        btnCancelar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         btnCancelar.addActionListener(e -> dialog.dispose());
         buttonPanel.add(btnCancelar);
 
@@ -563,7 +555,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
     }
 
     private void atualizarInsights() {
-        System.out.println("🧠 Atualizando insights...");
+        System.out.println(" Atualizando insights...");
 
         insightsPanel.removeAll();
 
@@ -579,7 +571,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                     @Override
                     protected List<AnalyticsEngine.Insight> doInBackground() throws Exception {
                         List<Venda> vendas = vendaController.obterTodasVendas();
-                        System.out.println("📊 Carregando " + vendas.size() + " vendas para insights");
+                        System.out.println(" Carregando " + vendas.size() + " vendas para insights");
                         return analyticsEngine.gerarInsightsAutomaticos(vendas);
                     }
 
@@ -587,10 +579,10 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                     protected void done() {
                         try {
                             List<AnalyticsEngine.Insight> insights = get();
-                            System.out.println("💡 " + insights.size() + " insights gerados");
+                            System.out.println(" " + insights.size() + " insights gerados");
                             exibirInsights(insights);
                         } catch (Exception e) {
-                            System.err.println("❌ Erro ao gerar insights: " + e.getMessage());
+                            System.err.println(" Erro ao gerar insights: " + e.getMessage());
                             mostrarErroInsights("Erro ao gerar insights: " + e.getMessage());
                         }
                     }
@@ -669,11 +661,11 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
     }
 
     private void atualizarGraficos() {
-        System.out.println("📈 Atualizando gráficos...");
+        System.out.println(" Atualizando gráficos...");
 
         try {
             List<Venda> vendas = vendaController.obterTodasVendas();
-            System.out.println("📊 Carregando " + vendas.size() + " vendas para gráficos");
+            System.out.println(" Carregando " + vendas.size() + " vendas para gráficos");
 
             if (vendas.isEmpty()) {
                 mostrarMensagemGrafico("Nenhuma venda registrada para gerar gráficos.");
@@ -699,15 +691,15 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                     try {
                         String imagePath = get();
                         if (imagePath != null && new File(imagePath).exists()) {
-                            System.out.println("✅ Gráfico gerado: " + imagePath);
+                            System.out.println(" Gráfico gerado: " + imagePath);
                             exibirGrafico(imagePath);
                         } else {
-                            System.err.println("❌ Gráfico não foi gerado");
-                            mostrarErroGrafico();
+                            System.err.println(" Gráfico não foi gerado");
+                            mostrarErroGrafico("O arquivo de imagem não foi gerado pelo R.");
                         }
                     } catch (Exception e) {
-                        System.err.println("❌ Erro ao gerar gráfico: " + e.getMessage());
-                        mostrarErroGrafico();
+                        System.err.println(" Erro ao gerar gráfico: " + e.getMessage());
+                        mostrarErroGrafico("Erro ao processar a imagem do gráfico: " + e.getMessage());
                     }
                 }
             };
@@ -715,11 +707,12 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
             worker.execute();
 
         } catch (Exception e) {
-            System.err.println("❌ Erro ao atualizar gráficos: " + e.getMessage());
+            System.err.println(" Erro ao atualizar gráficos: " + e.getMessage());
             JOptionPane.showMessageDialog(this,
                     "Erro ao carregar dados para gráficos: " + e.getMessage(),
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
+            mostrarErroGrafico("Erro ao carregar dados para gráficos.");
         }
     }
 
@@ -759,16 +752,16 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
             }
 
         } catch (Exception e) {
-            mostrarErroGrafico();
+            mostrarErroGrafico("Erro ao exibir gráfico: " + e.getMessage());
         }
 
         chartPanel.revalidate();
         chartPanel.repaint();
     }
 
-    private void mostrarErroGrafico() {
+    private void mostrarErroGrafico(String mensagem) {
         chartPanel.removeAll();
-        JLabel erro = new JLabel("<html><center>Erro ao gerar gráfico.<br>Verifique se o R está instalado.</center></html>");
+        JLabel erro = new JLabel("<html><center>Erro ao gerar gráfico.<br>" + mensagem + "</center></html>");
         erro.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         erro.setForeground(new Color(231, 76, 60));
         erro.setHorizontalAlignment(JLabel.CENTER);
@@ -797,20 +790,42 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                 return;
             }
 
-            StringBuilder analytics = new StringBuilder();
-            analytics.append("ANALYTICS AVANÇADOS\n");
-            analytics.append("==================\n\n");
+            JDialog dialog = new JDialog(this, "Analytics Avançados", true);
+            dialog.setSize(650, 550);
+            dialog.setLocationRelativeTo(this);
+            dialog.setLayout(new BorderLayout());
+            dialog.getContentPane().setBackground(new Color(64, 64, 64));
+
+            JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            headerPanel.setBackground(new Color(242, 48, 100));
+            headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+            JLabel titleLabel = new JLabel("ANALYTICS AVANÇADOS");
+            titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            titleLabel.setForeground(Color.WHITE);
+            headerPanel.add(titleLabel);
+
+            JPanel contentPanel = new JPanel();
+            contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+            contentPanel.setOpaque(false);
+            contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
             int totalVendas = vendas.size();
             double somaTotal = vendas.stream().mapToDouble(v -> v.getQuantidade() * v.getValorUnitario()).sum();
-            double ticketMedio = somaTotal / totalVendas;
+            double ticketMedio = (totalVendas > 0) ? somaTotal / totalVendas : 0.0;
 
-            analytics.append("MÉTRICAS PRINCIPAIS:\n");
-            analytics.append(String.format("• Total de vendas: %d\n", totalVendas));
-            analytics.append(String.format("• Faturamento total: R$ %.2f\n", somaTotal));
-            analytics.append(String.format("• Ticket médio: R$ %.2f\n\n", ticketMedio));
+            contentPanel.add(createSectionTitle("MÉTRICAS PRINCIPAIS"));
+            contentPanel.add(Box.createVerticalStrut(10));
+            contentPanel.add(createMetricPanel("Total de vendas:", String.format("%d", totalVendas)));
+            contentPanel.add(Box.createVerticalStrut(5));
+            contentPanel.add(createMetricPanel("Faturamento total:", String.format("R$ %.2f", somaTotal)));
+            contentPanel.add(Box.createVerticalStrut(5));
+            contentPanel.add(createMetricPanel("Ticket médio:", String.format("R$ %.2f", ticketMedio)));
 
-            analytics.append("PRODUTOS MAIS VENDIDOS:\n");
+            contentPanel.add(Box.createVerticalStrut(25));
+
+            contentPanel.add(createSectionTitle("PRODUTOS MAIS VENDIDOS"));
+            contentPanel.add(Box.createVerticalStrut(10));
+
             vendas.stream()
                     .collect(Collectors.groupingBy(
                             Venda::getProduto,
@@ -819,18 +834,29 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                     .entrySet().stream()
                     .sorted(java.util.Map.Entry.<String, Integer>comparingByValue().reversed())
                     .limit(5)
-                    .forEach(entry -> analytics.append(String.format("• %s: %d unidades\n", entry.getKey(), entry.getValue())));
+                    .forEach(entry -> {
+                        contentPanel.add(createMetricPanel(entry.getKey() + ":", String.format("%d unidades", entry.getValue())));
+                        contentPanel.add(Box.createVerticalStrut(5));
+                    });
 
-            JTextArea areaAnalytics = new JTextArea(analytics.toString());
-            areaAnalytics.setFont(new Font("Courier New", Font.PLAIN, 12));
-            areaAnalytics.setEditable(false);
-            areaAnalytics.setBackground(Color.WHITE);
-            areaAnalytics.setBorder(new EmptyBorder(20, 20, 20, 20));
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
+            buttonPanel.setOpaque(false);
+            buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
 
-            JScrollPane scrollPane = new JScrollPane(areaAnalytics);
-            scrollPane.setPreferredSize(new Dimension(600, 400));
+            JButton btnFechar = new JButton("Fechar");
+            btnFechar.setBackground(new Color(140, 140, 140));
+            btnFechar.setForeground(Color.WHITE);
+            btnFechar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            btnFechar.setFocusPainted(false);
+            btnFechar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+            btnFechar.addActionListener(e -> dialog.dispose());
+            buttonPanel.add(btnFechar);
 
-            JOptionPane.showMessageDialog(this, scrollPane, "Analytics Avançados", JOptionPane.INFORMATION_MESSAGE);
+            dialog.add(headerPanel, BorderLayout.NORTH);
+            dialog.add(contentPanel, BorderLayout.CENTER);
+            dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+            dialog.setVisible(true);
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
@@ -838,6 +864,32 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private JLabel createSectionTitle(String title) {
+        JLabel label = new JLabel(title);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        label.setForeground(new Color(242, 48, 100));
+        label.setBorder(new EmptyBorder(0, 0, 5, 0));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return label;
+    }
+
+    private JPanel createMetricPanel(String labelText, String valueText) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        label.setForeground(new Color(221, 221, 221));
+
+        JLabel value = new JLabel(" " + valueText);
+        value.setFont(new Font("Monospaced", Font.BOLD, 12));
+        value.setForeground(Color.WHITE);
+
+        panel.add(label, BorderLayout.WEST);
+        panel.add(value, BorderLayout.EAST);
+        return panel;
     }
 
     private void atualizarDashboard() {
@@ -924,6 +976,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         dialog.setSize(650, 520);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
+        dialog.getContentPane().setBackground(new Color(64, 64, 64));
 
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(242, 48, 100));
@@ -935,12 +988,12 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         headerPanel.add(titulo);
 
         JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.setBackground(new Color(245, 245, 245));
+        contentPanel.setOpaque(false);
         contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel instrucao = new JLabel("Cole aqui as mensagens do WhatsApp com informações de vendas:");
         instrucao.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        instrucao.setForeground(new Color(38, 38, 38));
+        instrucao.setForeground(Color.WHITE);
 
         String exemploTexto = "Vendeu 5 Mouse Logitech por R$ 85,50 cada\n" +
                 "João: Comprei 2 Teclado Mecânico R$ 320,00\n" +
@@ -957,16 +1010,16 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         JTextArea textArea = new JTextArea(12, 50);
         textArea.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         textArea.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_MEDIUM),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
-        textArea.setBackground(Color.WHITE);
+        textArea.setBackground(new Color(38, 38, 38));
+        textArea.setForeground(Color.WHITE);
+        textArea.setCaretColor(Color.WHITE);
         textArea.setText(exemploTexto);
         textArea.setCaretPosition(0);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+        scrollPane.setBorder(null);
 
         JPanel instrucaoPanel = new JPanel(new BorderLayout());
         instrucaoPanel.setOpaque(false);
@@ -974,7 +1027,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
         JLabel subtitulo = new JLabel("<html><i>Substitua o exemplo acima pelas suas mensagens reais do WhatsApp</i></html>");
         subtitulo.setFont(new Font("Segoe UI", Font.ITALIC, 11));
-        subtitulo.setForeground(Color.GRAY);
+        subtitulo.setForeground(ColorPalette.ASTERIA_SILVER);
 
         instrucaoPanel.add(instrucao, BorderLayout.NORTH);
         instrucaoPanel.add(Box.createVerticalStrut(5), BorderLayout.CENTER);
@@ -984,12 +1037,12 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 15));
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        buttonPanel.setOpaque(false);
 
         Dimension buttonSize = new Dimension(140, 45);
 
         JButton btnLimpar = new JButton("Limpar");
-        btnLimpar.setBackground(new Color(243, 156, 18));
+        btnLimpar.setBackground(ColorPalette.WARNING_AMBER);
         btnLimpar.setForeground(Color.WHITE);
         btnLimpar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnLimpar.setFocusPainted(false);
@@ -998,7 +1051,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         btnLimpar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnImportar = new JButton("Importar");
-        btnImportar.setBackground(new Color(46, 204, 113));
+        btnImportar.setBackground(new Color(242, 48, 100));
         btnImportar.setForeground(Color.WHITE);
         btnImportar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnImportar.setFocusPainted(false);
@@ -1007,7 +1060,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         btnImportar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(149, 165, 166));
+        btnCancelar.setBackground(new Color(140, 140, 140));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCancelar.setFocusPainted(false);
@@ -1015,9 +1068,9 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         btnCancelar.setPreferredSize(buttonSize);
         btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        adicionarEfeitoHoverWhatsApp(btnLimpar, new Color(243, 156, 18));
-        adicionarEfeitoHoverWhatsApp(btnImportar, new Color(46, 204, 113));
-        adicionarEfeitoHoverWhatsApp(btnCancelar, new Color(149, 165, 166));
+        adicionarEfeitoHoverWhatsApp(btnLimpar, ColorPalette.WARNING_AMBER);
+        adicionarEfeitoHoverWhatsApp(btnImportar, new Color(242, 48, 100));
+        adicionarEfeitoHoverWhatsApp(btnCancelar, new Color(140, 140, 140));
 
         btnLimpar.addActionListener(e -> {
             textArea.setText("");
@@ -1028,36 +1081,9 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
             String texto = textArea.getText().trim();
             if (!texto.isEmpty() && !texto.equals(exemploTexto)) {
                 dialog.dispose();
-
-                JDialog loadingDialog = criarLoadingDialog("Processando mensagens...", "Analisando formato do WhatsApp...");
-
-                SwingWorker<DataImporter.ImportResult, Void> worker = new SwingWorker<>() {
-                    @Override
-                    protected DataImporter.ImportResult doInBackground() throws Exception {
-                        return dataImporter.importFromWhatsApp(texto);
-                    }
-
-                    @Override
-                    protected void done() {
-                        try {
-                            DataImporter.ImportResult resultado = get();
-                            if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
-                                atualizarDashboard();
-                            }
-                            mostrarResultadoImportacao(resultado);
-                        } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(SimplifiedDashboardView.this, "Erro ao processar mensagens:\n" + ex.getMessage(), "Erro WhatsApp", JOptionPane.ERROR_MESSAGE);
-                        } finally {
-                            loadingDialog.dispose();
-                        }
-                    }
-                };
-                worker.execute();
-                loadingDialog.setVisible(true);
-
             } else {
                 JOptionPane.showMessageDialog(dialog,
-                        "⚠️ Por favor, substitua o exemplo pelas suas mensagens reais do WhatsApp!",
+                        " Por favor, substitua o exemplo pelas suas mensagens reais do WhatsApp!",
                         "Dados Necessários",
                         JOptionPane.WARNING_MESSAGE);
                 textArea.selectAll();

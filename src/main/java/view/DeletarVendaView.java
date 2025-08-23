@@ -3,6 +3,7 @@ package view;
 import controller.VendaController;
 import model.Venda;
 import listener.VendaListener;
+import util.ColorPalette;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -27,7 +28,7 @@ public class DeletarVendaView extends JDialog {
         setSize(850, 600);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(Color.WHITE);
+        getContentPane().setBackground(new Color(64, 64, 64));
 
         criarInterface();
         carregarVendas();
@@ -36,7 +37,7 @@ public class DeletarVendaView extends JDialog {
 
     private void criarInterface() {
         JPanel painelTitulo = new JPanel();
-        painelTitulo.setBackground(Color.RED);
+        painelTitulo.setBackground(ColorPalette.FIAP_PINK_DARK);
         painelTitulo.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 
         JLabel titulo = new JLabel("DELETAR VENDA", JLabel.CENTER);
@@ -45,15 +46,14 @@ public class DeletarVendaView extends JDialog {
         painelTitulo.add(titulo);
 
         JPanel painelInstrucoes = new JPanel();
-        painelInstrucoes.setBackground(new Color(255, 248, 220));
+        painelInstrucoes.setBackground(new Color(100, 100, 100));
         painelInstrucoes.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.ORANGE, 2),
+                BorderFactory.createLineBorder(ColorPalette.WARNING_AMBER, 2),
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
         JLabel lblInstrucoes = new JLabel(
-                "<html><b>⚠️ ATENÇÃO:</b> Selecione uma venda na tabela abaixo e clique em 'Deletar Selecionada' para remover permanentemente.</html>");
-        lblInstrucoes.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblInstrucoes.setForeground(new Color(133, 100, 4));
+                "<html><b style='color:white;'> ATENÇÃO:</b><font color='white'> Selecione uma venda na tabela abaixo e clique em 'Deletar Selecionada' para remover permanentemente.</font></html>");
+
         painelInstrucoes.add(lblInstrucoes);
 
         String[] colunas = {"ID", "Produto", "Quantidade", "Valor Unit. (R$)", "Total (R$)", "Data"};
@@ -66,23 +66,17 @@ public class DeletarVendaView extends JDialog {
 
         tabelaVendas = new JTable(modeloTabela);
         tabelaVendas.setRowHeight(30);
-        tabelaVendas.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tabelaVendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabelaVendas.setGridColor(new Color(230, 230, 230));
-        tabelaVendas.setSelectionBackground(new Color(255, 235, 235));
-        tabelaVendas.setSelectionForeground(Color.BLACK);
+        tabelaVendas.setBackground(new Color(64, 64, 64));
+        tabelaVendas.setForeground(Color.WHITE);
+        tabelaVendas.setGridColor(ColorPalette.FIAP_GRAY_DARK);
+        tabelaVendas.setSelectionBackground(ColorPalette.Buttons.DANGER_HOVER);
+        tabelaVendas.setSelectionForeground(Color.WHITE);
 
         JTableHeader header = tabelaVendas.getTableHeader();
-        header.setBackground(new Color(240, 240, 240));
-        header.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        header.setBorder(BorderFactory.createRaisedBevelBorder());
-
-        tabelaVendas.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tabelaVendas.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tabelaVendas.getColumnModel().getColumn(2).setPreferredWidth(80);
-        tabelaVendas.getColumnModel().getColumn(3).setPreferredWidth(100);
-        tabelaVendas.getColumnModel().getColumn(4).setPreferredWidth(100);
-        tabelaVendas.getColumnModel().getColumn(5).setPreferredWidth(120);
+        header.setBackground(new Color(38, 38, 38));
+        header.setForeground(Color.WHITE);
+        header.setBorder(BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_DARK));
 
         tabelaVendas.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -92,41 +86,26 @@ public class DeletarVendaView extends JDialog {
 
         JScrollPane scrollPane = new JScrollPane(tabelaVendas);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        scrollPane.getViewport().setBackground(new Color(64, 64, 64));
 
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 15));
-        painelBotoes.setBackground(Color.WHITE);
+        painelBotoes.setOpaque(false);
 
         btnDeletar = new JButton("Deletar Selecionada");
-        btnDeletar.setBackground(Color.RED);
-        btnDeletar.setForeground(Color.WHITE);
-        btnDeletar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDeletar.setFocusPainted(false);
+        btnDeletar.setBackground(ColorPalette.Buttons.DANGER_NORMAL);
+        btnDeletar.setForeground(ColorPalette.Buttons.DANGER_TEXT);
         btnDeletar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
-        btnDeletar.setPreferredSize(new Dimension(160, 45));
         btnDeletar.setEnabled(false);
-        btnDeletar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnAtualizar = new JButton("Atualizar Lista");
-        btnAtualizar.setBackground(Color.BLUE);
+        btnAtualizar.setBackground(new Color(242, 48, 100));
         btnAtualizar.setForeground(Color.WHITE);
-        btnAtualizar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnAtualizar.setFocusPainted(false);
         btnAtualizar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
-        btnAtualizar.setPreferredSize(new Dimension(160, 45));
-        btnAtualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JButton btnFechar = new JButton("Fechar");
-        btnFechar.setBackground(Color.GRAY);
+        btnFechar.setBackground(new Color(140, 140, 140));
         btnFechar.setForeground(Color.WHITE);
-        btnFechar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnFechar.setFocusPainted(false);
         btnFechar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
-        btnFechar.setPreferredSize(new Dimension(160, 45));
-        btnFechar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        adicionarEfeitoHover(btnDeletar, Color.RED);
-        adicionarEfeitoHover(btnAtualizar, Color.BLUE);
-        adicionarEfeitoHover(btnFechar, Color.GRAY);
 
         btnDeletar.addActionListener(e -> deletarVendaSelecionada());
         btnAtualizar.addActionListener(e -> carregarVendas());
@@ -137,30 +116,13 @@ public class DeletarVendaView extends JDialog {
         painelBotoes.add(btnFechar);
 
         JPanel painelCentral = new JPanel(new BorderLayout());
+        painelCentral.setOpaque(false);
         painelCentral.add(painelInstrucoes, BorderLayout.NORTH);
         painelCentral.add(scrollPane, BorderLayout.CENTER);
 
         add(painelTitulo, BorderLayout.NORTH);
         add(painelCentral, BorderLayout.CENTER);
         add(painelBotoes, BorderLayout.SOUTH);
-    }
-
-    private void adicionarEfeitoHover(JButton botao, Color corOriginal) {
-        botao.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                if (botao.isEnabled()) {
-                    botao.setBackground(corOriginal.darker());
-                }
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                if (botao.isEnabled()) {
-                    botao.setBackground(corOriginal);
-                }
-            }
-        });
     }
 
     private void carregarVendas() {
@@ -196,12 +158,12 @@ public class DeletarVendaView extends JDialog {
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                    "❌ Erro ao carregar vendas:\n\n" + e.getMessage(),
+                    " Erro ao carregar vendas:\n\n" + e.getMessage(),
                     "Erro de Banco de Dados",
                     JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "❌ Erro inesperado:\n\n" + e.getMessage(),
+                    " Erro inesperado:\n\n" + e.getMessage(),
                     "Erro",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -212,7 +174,7 @@ public class DeletarVendaView extends JDialog {
 
         if (linhaSelecionada == -1) {
             JOptionPane.showMessageDialog(this,
-                    "⚠️ Por favor, selecione uma venda para deletar!",
+                    " Por favor, selecione uma venda para deletar!",
                     "Nenhuma Seleção",
                     JOptionPane.WARNING_MESSAGE);
             return;
@@ -221,7 +183,7 @@ public class DeletarVendaView extends JDialog {
         Object idObj = modeloTabela.getValueAt(linhaSelecionada, 0);
         if (!(idObj instanceof Integer)) {
             JOptionPane.showMessageDialog(this,
-                    "⚠️ Não é possível deletar: nenhuma venda válida selecionada!",
+                    " Não é possível deletar: nenhuma venda válida selecionada!",
                     "Seleção Inválida",
                     JOptionPane.WARNING_MESSAGE);
             return;
@@ -230,7 +192,7 @@ public class DeletarVendaView extends JDialog {
         int id = (Integer) idObj;
         String produto = (String) modeloTabela.getValueAt(linhaSelecionada, 1);
 
-        String[] opcoes = {"🗑️ Deletar", "❌ Cancelar"};
+        String[] opcoes = {" Deletar", " Cancelar"};
         int resposta = JOptionPane.showOptionDialog(this,
                 "Confirma a exclusão permanente da venda do produto " + produto + "?",
                 "Confirmar Exclusão Permanente",
@@ -249,16 +211,16 @@ public class DeletarVendaView extends JDialog {
                 }
 
                 JOptionPane.showMessageDialog(this,
-                        "✅ Venda deletada com sucesso!",
+                        " Venda deletada com sucesso!",
                         "Exclusão Realizada",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 carregarVendas();
 
             } catch (SQLException ex) {
-                String mensagemErro = "❌ Erro ao deletar venda do banco de dados:\n\n" + ex.getMessage();
+                String mensagemErro = " Erro ao deletar venda do banco de dados:\n\n" + ex.getMessage();
                 if (ex.getMessage().contains("não encontrada")) {
-                    mensagemErro = "⚠️ A venda selecionada não existe mais no banco de dados.\n" +
+                    mensagemErro = " A venda selecionada não existe mais no banco de dados.\n" +
                             "A lista será atualizada automaticamente.";
                     carregarVendas();
                 }
@@ -269,7 +231,7 @@ public class DeletarVendaView extends JDialog {
                         JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
-                        "❌ Erro inesperado ao deletar venda:\n\n" + ex.getMessage(),
+                        " Erro inesperado ao deletar venda:\n\n" + ex.getMessage(),
                         "Erro",
                         JOptionPane.ERROR_MESSAGE);
             }

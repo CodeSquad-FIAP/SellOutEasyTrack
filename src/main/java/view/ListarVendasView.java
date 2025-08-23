@@ -2,6 +2,7 @@ package view;
 
 import controller.VendaController;
 import model.Venda;
+import util.ColorPalette;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -25,14 +26,14 @@ public class ListarVendasView extends JDialog {
         setSize(800, 600);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(Color.WHITE);
+        getContentPane().setBackground(new Color(38, 38, 38));
 
         JPanel painelTitulo = new JPanel();
-        painelTitulo.setBackground(new Color(52, 152, 219));
+        painelTitulo.setBackground(new Color(242, 48, 100));
         painelTitulo.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 
         JLabel titulo = new JLabel("LISTA DE VENDAS", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titulo.setForeground(Color.WHITE);
         painelTitulo.add(titulo);
 
@@ -46,58 +47,53 @@ public class ListarVendasView extends JDialog {
 
         tabelaVendas = new JTable(modeloTabela);
         tabelaVendas.setRowHeight(30);
-        tabelaVendas.setFont(new Font("Arial", Font.PLAIN, 12));
         tabelaVendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabelaVendas.setGridColor(new Color(230, 230, 230));
+        tabelaVendas.setBackground(new Color(64, 64, 64));
+        tabelaVendas.setForeground(Color.WHITE);
+        tabelaVendas.setGridColor(ColorPalette.FIAP_GRAY_MEDIUM);
+        tabelaVendas.setSelectionBackground(ColorPalette.FIAP_PINK_DARK);
+        tabelaVendas.setSelectionForeground(Color.WHITE);
 
         JTableHeader header = tabelaVendas.getTableHeader();
-        header.setBackground(new Color(240, 240, 240));
-        header.setFont(new Font("Arial", Font.BOLD, 12));
-        header.setBorder(BorderFactory.createRaisedBevelBorder());
-
-        tabelaVendas.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tabelaVendas.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tabelaVendas.getColumnModel().getColumn(2).setPreferredWidth(80);
-        tabelaVendas.getColumnModel().getColumn(3).setPreferredWidth(100);
-        tabelaVendas.getColumnModel().getColumn(4).setPreferredWidth(100);
-        tabelaVendas.getColumnModel().getColumn(5).setPreferredWidth(120);
+        header.setBackground(new Color(38, 38, 38));
+        header.setForeground(Color.WHITE);
+        header.setBorder(BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_DARK));
 
         JScrollPane scrollPane = new JScrollPane(tabelaVendas);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        scrollPane.getViewport().setBackground(new Color(64, 64, 64));
 
         JPanel painelEstatisticas = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
-        painelEstatisticas.setBackground(new Color(245, 245, 245));
+        painelEstatisticas.setOpaque(false);
         painelEstatisticas.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_MEDIUM),
                 "Estatísticas",
-                0, 0, new Font("Arial", Font.BOLD, 14)));
+                0, 0, new Font("Segoe UI", Font.BOLD, 14), Color.WHITE));
 
         lblTotalVendas = new JLabel("Total de Vendas: 0");
-        lblTotalVendas.setFont(new Font("Arial", Font.BOLD, 14));
         lblTotalVendas.setForeground(new Color(242, 48, 100));
 
         lblValorTotal = new JLabel("Valor Total: R$ 0,00");
-        lblValorTotal.setFont(new Font("Arial", Font.BOLD, 14));
-        lblValorTotal.setForeground(new Color(46, 204, 113));
+        lblValorTotal.setForeground(new Color(242, 48, 100));
 
         painelEstatisticas.add(lblTotalVendas);
-        painelEstatisticas.add(new JLabel("|"));
+        JLabel separador = new JLabel("|");
+        separador.setForeground(ColorPalette.FIAP_GRAY_MEDIUM);
+        painelEstatisticas.add(separador);
         painelEstatisticas.add(lblValorTotal);
 
         JPanel painelBotoes = new JPanel(new FlowLayout());
-        painelBotoes.setBackground(Color.WHITE);
+        painelBotoes.setOpaque(false);
 
         JButton btnAtualizar = new JButton("Atualizar Lista");
-        btnAtualizar.setBackground(new Color(52, 152, 219));
+        btnAtualizar.setBackground(new Color(242, 48, 100));
         btnAtualizar.setForeground(Color.WHITE);
-        btnAtualizar.setFont(new Font("Arial", Font.BOLD, 14));
         btnAtualizar.setFocusPainted(false);
         btnAtualizar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JButton btnFechar = new JButton("Fechar");
-        btnFechar.setBackground(Color.GRAY);
+        btnFechar.setBackground(new Color(140, 140, 140));
         btnFechar.setForeground(Color.WHITE);
-        btnFechar.setFont(new Font("Arial", Font.BOLD, 14));
         btnFechar.setFocusPainted(false);
         btnFechar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
@@ -111,12 +107,12 @@ public class ListarVendasView extends JDialog {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel painelSul = new JPanel(new BorderLayout());
+        painelSul.setOpaque(false);
         painelSul.add(painelEstatisticas, BorderLayout.CENTER);
         painelSul.add(painelBotoes, BorderLayout.SOUTH);
         add(painelSul, BorderLayout.SOUTH);
 
         carregarVendas();
-
         setVisible(true);
     }
 
@@ -127,7 +123,6 @@ public class ListarVendasView extends JDialog {
             List<Venda> vendas = vendaController.obterTodasVendas();
 
             if (vendas.isEmpty()) {
-                // Lógica para mostrar mensagem de "nenhuma venda"
                 return;
             }
 

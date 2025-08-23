@@ -3,6 +3,7 @@ package view;
 import controller.VendaController;
 import model.Venda;
 import listener.VendaListener;
+import util.ColorPalette;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,8 +26,8 @@ public class AtualizarVendaView extends JDialog {
         this.vendaListener = listener;
         setSize(550, 500);
         setLocationRelativeTo(parent);
-        setLayout(new GridBagLayout());
-        getContentPane().setBackground(new Color(245, 245, 245));
+        setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(64, 64, 64));
 
         criarInterface();
         carregarVendas();
@@ -34,95 +35,112 @@ public class AtualizarVendaView extends JDialog {
     }
 
     private void criarInterface() {
+        JPanel painelTitulo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelTitulo.setBackground(new Color(242, 48, 100));
+        painelTitulo.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+        JLabel titulo = new JLabel("ATUALIZAR VENDA");
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setForeground(Color.WHITE);
+        painelTitulo.add(titulo);
+
+        JPanel painelPrincipal = new JPanel(new GridBagLayout());
+        painelPrincipal.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel titulo = new JLabel("ATUALIZAR VENDA", JLabel.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setForeground(Color.BLACK);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        add(titulo, gbc);
-
-        gbc.gridwidth = 1;
-
         JLabel lblSelecionar = new JLabel("Selecionar Venda:");
-        lblSelecionar.setFont(new Font("Arial", Font.BOLD, 14));
+        lblSelecionar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblSelecionar.setForeground(Color.WHITE);
 
         comboVendas = new JComboBox<>();
-        comboVendas.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        comboVendas.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                setForeground(Color.WHITE);
+                if (isSelected) {
+                    setBackground(ColorPalette.FIAP_PINK_DARK);
+                } else {
+                    setBackground(new Color(64, 64, 64));
+                }
+                return this;
+            }
+        });
+
         comboVendas.addActionListener(e -> carregarDadosVenda());
 
-        gbc.gridx = 0; gbc.gridy = 1; add(lblSelecionar, gbc);
-        gbc.gridx = 1; add(comboVendas, gbc);
-
-        JSeparator separador = new JSeparator();
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(separador, gbc);
-
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0; gbc.gridy = 1; painelPrincipal.add(lblSelecionar, gbc);
+        gbc.gridx = 1; painelPrincipal.add(comboVendas, gbc);
 
         JLabel lblProduto = new JLabel("Produto:");
-        lblProduto.setFont(new Font("Arial", Font.BOLD, 14));
+        lblProduto.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblProduto.setForeground(Color.WHITE);
+
         txtProduto = new JTextField(20);
-        txtProduto.setFont(new Font("Arial", Font.PLAIN, 14));
         txtProduto.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_MEDIUM),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
-        txtProduto.setEnabled(false);
+        txtProduto.setBackground(new Color(38, 38, 38));
+        txtProduto.setForeground(Color.WHITE);
+        txtProduto.setCaretColor(Color.WHITE);
 
         JLabel lblQuantidade = new JLabel("Quantidade:");
-        lblQuantidade.setFont(new Font("Arial", Font.BOLD, 14));
+        lblQuantidade.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblQuantidade.setForeground(Color.WHITE);
+
         txtQuantidade = new JTextField(20);
-        txtQuantidade.setFont(new Font("Arial", Font.PLAIN, 14));
         txtQuantidade.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_MEDIUM),
                 BorderFactory.createEmptyBorder(8, 8, 8, 8)));
-        txtQuantidade.setEnabled(false);
+        txtQuantidade.setBackground(new Color(38, 38, 38));
+        txtQuantidade.setForeground(Color.WHITE);
+        txtQuantidade.setCaretColor(Color.WHITE);
 
         JLabel lblValor = new JLabel("Valor Unitário (R$):");
-        lblValor.setFont(new Font("Arial", Font.BOLD, 14));
-        txtValorUnitario = new JTextField(20);
-        txtValorUnitario.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtValorUnitario.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(8, 8, 8, 8)));
-        txtValorUnitario.setEnabled(false);
+        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblValor.setForeground(Color.WHITE);
 
-        gbc.gridx = 0; gbc.gridy = 3; add(lblProduto, gbc);
-        gbc.gridx = 1; add(txtProduto, gbc);
-        gbc.gridx = 0; gbc.gridy = 4; add(lblQuantidade, gbc);
-        gbc.gridx = 1; add(txtQuantidade, gbc);
-        gbc.gridx = 0; gbc.gridy = 5; add(lblValor, gbc);
-        gbc.gridx = 1; add(txtValorUnitario, gbc);
+        txtValorUnitario = new JTextField(20);
+        txtValorUnitario.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_MEDIUM),
+                BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+        txtValorUnitario.setBackground(new Color(38, 38, 38));
+        txtValorUnitario.setForeground(Color.WHITE);
+        txtValorUnitario.setCaretColor(Color.WHITE);
+
+        gbc.gridx = 0; gbc.gridy = 3; painelPrincipal.add(lblProduto, gbc);
+        gbc.gridx = 1; painelPrincipal.add(txtProduto, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; painelPrincipal.add(lblQuantidade, gbc);
+        gbc.gridx = 1; painelPrincipal.add(txtQuantidade, gbc);
+        gbc.gridx = 0; gbc.gridy = 5; painelPrincipal.add(lblValor, gbc);
+        gbc.gridx = 1; painelPrincipal.add(txtValorUnitario, gbc);
 
         btnAtualizar = new JButton("Atualizar Venda");
-        btnAtualizar.setBackground(new Color(220, 20, 60));
+        btnAtualizar.setBackground(new Color(242, 48, 100));
         btnAtualizar.setForeground(Color.WHITE);
-        btnAtualizar.setFocusPainted(false);
-        btnAtualizar.setFont(new Font("Arial", Font.BOLD, 16));
         btnAtualizar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         btnAtualizar.setEnabled(false);
 
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(Color.GRAY);
+        btnCancelar.setBackground(new Color(140, 140, 140));
         btnCancelar.setForeground(Color.WHITE);
-        btnCancelar.setFocusPainted(false);
-        btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
         btnCancelar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
         btnAtualizar.addActionListener(e -> atualizarVenda());
         btnCancelar.addActionListener(e -> dispose());
 
         JPanel panelBotoes = new JPanel(new FlowLayout());
-        panelBotoes.setBackground(new Color(245, 245, 245));
+        panelBotoes.setOpaque(false);
         panelBotoes.add(btnAtualizar);
         panelBotoes.add(btnCancelar);
 
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
-        add(panelBotoes, gbc);
+        painelPrincipal.add(panelBotoes, gbc);
+
+        add(painelTitulo, BorderLayout.NORTH);
+        add(painelPrincipal, BorderLayout.CENTER);
     }
 
     private void carregarVendas() {

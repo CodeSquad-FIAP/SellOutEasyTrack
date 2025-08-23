@@ -28,7 +28,6 @@ public class RelatorioView extends JDialog {
         btnGerar.setBackground(new Color(52, 152, 219));
         btnGerar.setForeground(Color.WHITE);
         btnGerar.setFocusPainted(false);
-        btnGerar.setFont(new Font("Arial", Font.BOLD, 16));
 
         btnGerar.addActionListener(e -> gerarRelatorio());
 
