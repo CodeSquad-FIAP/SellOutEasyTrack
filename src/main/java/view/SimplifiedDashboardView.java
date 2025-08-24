@@ -1,12 +1,24 @@
 package view;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import controller.VendaController;
 import model.Venda;
 import util.AnalyticsEngine;
 import util.DataImporter;
 import listener.VendaListener;
 import util.ColorPalette;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,6 +33,12 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Locale;
 
 public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
@@ -119,8 +137,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         sidebar.add(Box.createVerticalStrut(5));
         sidebar.add(criarBotaoMenu("ANALYTICS", "Relatórios e análises avançadas", this::abrirAnalytics));
         sidebar.add(Box.createVerticalStrut(5));
-        sidebar.add(criarBotaoMenu("EXPORTAR", "CSV e relatórios completos", this::exportarDados));
-
         sidebar.add(Box.createVerticalGlue());
 
         statsPanel = criarPainelEstatisticas();
@@ -509,7 +525,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         JButton btnCSV = criarBotaoDialog("Importar CSV", "Carregar arquivo CSV estruturado");
         JButton btnTexto = criarBotaoDialog("Importar Arquivo Texto", "Processar arquivo TXT com dados");
         JButton btnWhatsApp = criarBotaoDialog("Colar dados WhatsApp", "Importar mensagens do WhatsApp");
-        JButton btnTemplate = criarBotaoDialog("Gerar Template", "Criar arquivo modelo para importação");
+        JButton btnTemplate = criarBotaoDialog("Exportar Dados", "Exportar vendas existentes para CSV");
 
         btnCSV.addActionListener(e -> { dialog.dispose(); importarCSV(); });
         btnTexto.addActionListener(e -> { dialog.dispose(); importarTexto(); });
@@ -1079,7 +1095,28 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
         btnImportar.addActionListener(e -> {
             String texto = textArea.getText().trim();
             if (!texto.isEmpty() && !texto.equals(exemploTexto)) {
+                // ✅ PROCESSAR OS DADOS DIRETAMENTE SEM LOADING
                 dialog.dispose();
+
+                try {
+                    // Processar diretamente na thread principal
+                    DataImporter.ImportResult resultado = dataImporter.importFromWhatsApp(texto);
+
+                    // ✅ ATUALIZAR DASHBOARD SE HOUVE SUCESSO
+                    if (resultado.isSuccess() && resultado.getSuccessCount() > 0) {
+                        atualizarDashboard();
+                    }
+
+                    // ✅ MOSTRAR RESULTADO
+                    mostrarResultadoImportacao(resultado);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(SimplifiedDashboardView.this,
+                            "Erro na importação WhatsApp:\n" + ex.getMessage(),
+                            "Erro de Importação",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
             } else {
                 JOptionPane.showMessageDialog(dialog,
                         " Por favor, substitua o exemplo pelas suas mensagens reais do WhatsApp!",
@@ -1162,8 +1199,8 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private void gerarTemplate() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Salvar Template CSV");
-        chooser.setSelectedFile(new File("template_vendas_com_dados.csv"));
+        chooser.setDialogTitle("Exportar Dados Completos");
+        chooser.setSelectedFile(new File("vendas_completas_com_metricas.csv"));
 
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
@@ -1176,79 +1213,172 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
             try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(selectedFile), StandardCharsets.UTF_8))) {
                 writer.write("\uFEFF");
 
-                // Cabeçalho exato
-                writer.write("produto,quantidade,valor_unitario,data\n");
+                List<Venda> todasVendas = vendaController.obterTodasVendas();
+                System.out.println("DEBUG: Encontradas " + todasVendas.size() + " vendas no banco de dados");
 
-                int linhasGeradas = 0;
+                writer.println("# DADOS DETALHADOS DE VENDAS");
+                writer.println("ID,Produto,Quantidade,Valor_Unitario,Valor_Total,Data,Dia_Semana");
 
-                // Buscar vendas do banco de dados
-                try {
-                    List<Venda> todasVendas = vendaController.obterTodasVendas();
-                    System.out.println("Template: encontradas " + todasVendas.size() + " vendas no banco");
+                double faturamentoTotal = 0.0;
+                Map<String, Double> faturamentoPorProduto = new HashMap<>();
+                Map<String, Integer> quantidadePorProduto = new HashMap<>();
+                Map<String, Integer> vendasPorMes = new HashMap<>();
+                Map<String, Double> faturamentoPorMes = new HashMap<>();
 
-                    if (!todasVendas.isEmpty()) {
-                        // Para cada venda, escrever linha por linha
-                        for (Venda venda : todasVendas) {
-                            // Produto (limpar e colocar entre aspas se necessário)
-                            String produto = venda.getProduto().trim();
-                            if (produto.contains(",")) {
-                                produto = "\"" + produto + "\"";
-                            }
+                int linhasExportadas = 0;
 
-                            // Quantidade (número inteiro)
-                            int quantidade = venda.getQuantidade();
+                for (Venda venda : todasVendas) {
+                    double valorTotal = venda.getQuantidade() * venda.getValorUnitario();
+                    faturamentoTotal += valorTotal;
 
-                            // Valor (FORÇAR PONTO DECIMAL EM VEZ DE VÍRGULA)
-                            double valor = venda.getValorUnitario();
-                            String valorStr = String.format(java.util.Locale.US, "%.2f", valor);
+                    String produto = venda.getProduto();
+                    faturamentoPorProduto.put(produto,
+                            faturamentoPorProduto.getOrDefault(produto, 0.0) + valorTotal);
+                    quantidadePorProduto.put(produto,
+                            quantidadePorProduto.getOrDefault(produto, 0) + venda.getQuantidade());
 
-                            // Data (formato ISO)
-                            String data = venda.getData().toString();
+                    java.sql.Date sqlDate = venda.getData();
+                    java.time.LocalDate dataLocal = sqlDate.toLocalDate();
+                    String chaveMes = dataLocal.getYear() + "-" + String.format("%02d", dataLocal.getMonthValue());
 
-                            // Montar linha manualmente
-                            String linha = produto + "," + quantidade + "," + valorStr + "," + data;
+                    vendasPorMes.put(chaveMes, vendasPorMes.getOrDefault(chaveMes, 0) + 1);
+                    faturamentoPorMes.put(chaveMes, faturamentoPorMes.getOrDefault(chaveMes, 0.0) + valorTotal);
 
-                            // Escrever linha
-                            writer.write(linha + "\n");
+                    writer.printf(java.util.Locale.US, "%d,\"%s\",%d,%.2f,%.2f,%s,%s%n",
+                            venda.getId(),
+                            produto.replace("\"", "'"),
+                            venda.getQuantidade(),
+                            venda.getValorUnitario(),
+                            valorTotal,
+                            sqlDate.toString(),
+                            dataLocal.getDayOfWeek().toString()
+                    );
 
-                            linhasGeradas++;
-
-                            // Debug - só mostrar as primeiras 3 para não poluir
-                            if (linhasGeradas <= 3) {
-                                System.out.println("Linha gerada: " + linha);
-                            }
-                        }
-                    } else {
-                        // Se não tem vendas, adicionar exemplos
-                        writer.write("Mouse Gamer RGB,2,85.50,2025-08-23\n");
-                        writer.write("Teclado Mecânico,1,320.00,2025-08-23\n");
-                        writer.write("Monitor 24 polegadas,1,899.99,2025-08-23\n");
-                        linhasGeradas = 3;
-                    }
-
-                } catch (Exception e) {
-                    System.err.println("Erro ao buscar vendas: " + e.getMessage());
-                    e.printStackTrace();
-
-                    // Em caso de erro, adicionar exemplos
-                    writer.write("Mouse Gamer RGB,2,85.50,2025-08-23\n");
-                    writer.write("Teclado Mecânico,1,320.00,2025-08-23\n");
-                    writer.write("Monitor 24 polegadas,1,899.99,2025-08-23\n");
-                    linhasGeradas = 3;
+                    linhasExportadas++;
                 }
 
+                writer.println();
+
+                writer.println("# RESUMO EXECUTIVO");
+                writer.println("Métrica,Valor");
+                writer.printf(java.util.Locale.US, "Total_de_Vendas,%d%n", todasVendas.size());
+                writer.printf(java.util.Locale.US, "Faturamento_Total,%.2f%n", faturamentoTotal);
+
+                double ticketMedio = todasVendas.isEmpty() ? 0 : faturamentoTotal / todasVendas.size();
+                writer.printf(java.util.Locale.US, "Ticket_Medio,%.2f%n", ticketMedio);
+                writer.printf(java.util.Locale.US, "Produtos_Únicos,%d%n", faturamentoPorProduto.size());
+
+                if (!todasVendas.isEmpty()) {
+                    java.sql.Date primeiraVenda = null;
+                    java.sql.Date ultimaVenda = null;
+
+                    for (Venda v : todasVendas) {
+                        if (primeiraVenda == null || v.getData().before(primeiraVenda)) {
+                            primeiraVenda = v.getData();
+                        }
+                        if (ultimaVenda == null || v.getData().after(ultimaVenda)) {
+                            ultimaVenda = v.getData();
+                        }
+                    }
+
+                    writer.println("Primeira_Venda," + (primeiraVenda != null ? primeiraVenda : "N/A"));
+                    writer.println("Ultima_Venda," + (ultimaVenda != null ? ultimaVenda : "N/A"));
+                }
+
+                writer.println();
+
+                writer.println("# TOP PRODUTOS POR FATURAMENTO");
+                writer.println("Produto,Faturamento_Total,Quantidade_Vendida,Preco_Medio,Participacao_Percentual");
+
+                List<Map.Entry<String, Double>> produtosOrdenados = new ArrayList<>(faturamentoPorProduto.entrySet());
+                produtosOrdenados.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+                for (Map.Entry<String, Double> entry : produtosOrdenados) {
+                    String produto = entry.getKey();
+                    double faturamentoProduto = entry.getValue();
+                    int quantidadeTotal = quantidadePorProduto.get(produto);
+                    double precoMedio = faturamentoProduto / quantidadeTotal;
+                    double participacao = faturamentoTotal > 0 ? (faturamentoProduto / faturamentoTotal) * 100 : 0;
+
+                    writer.printf(java.util.Locale.US, "\"%s\",%.2f,%d,%.2f,%.2f%%%n",
+                            produto.replace("\"", "'"),
+                            faturamentoProduto,
+                            quantidadeTotal,
+                            precoMedio,
+                            participacao
+                    );
+                }
+
+                writer.println();
+
+                writer.println("# ANÁLISE POR MÊS");
+                writer.println("Ano_Mes,Quantidade_Vendas,Faturamento_Periodo");
+
+                List<String> mesesOrdenados = new ArrayList<>(vendasPorMes.keySet());
+                mesesOrdenados.sort(String::compareTo);
+
+                for (String mes : mesesOrdenados) {
+                    int quantidadeVendas = vendasPorMes.get(mes);
+                    double faturamentoMes = faturamentoPorMes.getOrDefault(mes, 0.0);
+                    writer.printf(java.util.Locale.US, "%s,%d,%.2f%n", mes, quantidadeVendas, faturamentoMes);
+                }
+
+                writer.println();
+
+                writer.println("# INSIGHTS AUTOMÁTICOS");
+                writer.println("Tipo,Titulo,Descricao,Recomendacao");
+
+                try {
+                    List<AnalyticsEngine.Insight> insights = analyticsEngine.gerarInsightsAutomaticos(todasVendas);
+                    for (AnalyticsEngine.Insight insight : insights) {
+                        writer.printf("\"%s\",\"%s\",\"%s\",\"%s\"%n",
+                                insight.getTipo().toString(),
+                                insight.getTitulo().replace("\"", "'"),
+                                insight.getDescricao().replace("\"", "'"),
+                                insight.getRecomendacao().replace("\"", "'")
+                        );
+                    }
+                } catch (Exception e) {
+                    writer.println("ERRO,\"Falha ao gerar insights\",\"" + e.getMessage() + "\",\"Verifique os dados\"");
+                }
+
+                writer.println();
+
+                writer.println("# INFORMAÇÕES DO SISTEMA");
+                writer.println("Sistema,SellOut EasyTrack v2.0");
+
+                java.time.LocalDateTime agora = java.time.LocalDateTime.now();
+                java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                writer.println("Data_Exportacao," + agora.format(formatter));
+                writer.println("Total_Registros_Exportados," + linhasExportadas);
+                writer.println("Encoding,UTF-8");
+                writer.println("Separador,Virgula");
+
                 JOptionPane.showMessageDialog(this,
-                        "Template CSV criado com dados do banco!\n\n" +
+                        "EXPORTAÇÃO COMPLETA REALIZADA COM SUCESSO!\n\n" +
                                 "Arquivo: " + selectedFile.getName() + "\n" +
-                                "Linhas geradas: " + linhasGeradas + "\n\n" +
-                                "Agora com formato decimal correto (ponto em vez de vírgula)!",
-                        "Template Criado",
+                                "Registros exportados: " + linhasExportadas + "\n" +
+                                "Faturamento total: R$ " + String.format("%.2f", faturamentoTotal) + "\n" +
+                                "Produtos únicos: " + faturamentoPorProduto.size() + "\n\n" +
+                                "Incluídos:\n" +
+                                "• Dados detalhados de todas as vendas\n" +
+                                "• Resumo executivo completo\n" +
+                                "• Análise de produtos (faturamento + participação)\n" +
+                                "• Análise temporal por mês\n" +
+                                "• Insights automáticos de IA\n" +
+                                "• Informações do sistema\n\n" +
+                                "Formato otimizado para análise em Excel/Google Sheets!",
+                        "Exportação Avançada Concluída",
                         JOptionPane.INFORMATION_MESSAGE);
 
+                System.out.println("Exportação completa finalizada: " + linhasExportadas + " registros");
+
             } catch (Exception e) {
+                e.printStackTrace();
                 JOptionPane.showMessageDialog(this,
-                        "Erro ao criar template: " + e.getMessage(),
-                        "Erro",
+                        "Erro ao exportar dados avançados:\n\n" + e.getMessage() +
+                                "\n\nVerifique:\n• Permissões de escrita no arquivo\n• Espaço em disco disponível\n• Se o arquivo não está aberto em outro programa",
+                        "Erro na Exportação",
                         JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -1284,44 +1414,6 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
         JOptionPane.showMessageDialog(this, scrollPane, "Resultado da Importação",
                 resultado.hasErrors() ? JOptionPane.WARNING_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void exportarDados() {
-        try {
-            List<Venda> vendas = vendaController.obterTodasVendas();
-
-            if (vendas.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Não há vendas para exportar.",
-                        "Exportação",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            JFileChooser chooser = new JFileChooser();
-            chooser.setDialogTitle("Exportar Dados de Vendas");
-            chooser.setSelectedFile(new File("vendas_export.csv"));
-
-            if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-                String path = chooser.getSelectedFile().getAbsolutePath();
-                if (!path.toLowerCase().endsWith(".csv")) {
-                    path += ".csv";
-                }
-
-                util.ReportUtil.exportarCSV(vendas, path);
-                JOptionPane.showMessageDialog(this,
-                        "Dados exportados com sucesso!\n\n" +
-                                "Arquivo: " + path + "\n\n" +
-                                "Total de " + vendas.size() + " vendas exportadas.",
-                        "Exportação Concluída",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Erro na exportação: " + e.getMessage(),
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     private void sairAplicacao() {
