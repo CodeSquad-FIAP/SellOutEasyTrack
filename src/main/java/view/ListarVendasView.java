@@ -60,21 +60,20 @@ public class ListarVendasView extends JDialog {
         header.setBorder(BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_DARK));
 
         JScrollPane scrollPane = new JScrollPane(tabelaVendas);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         scrollPane.getViewport().setBackground(new Color(64, 64, 64));
 
-        JPanel painelEstatisticas = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
+        JPanel painelEstatisticas = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
         painelEstatisticas.setOpaque(false);
-        painelEstatisticas.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(ColorPalette.FIAP_GRAY_MEDIUM),
-                "Estatísticas",
-                0, 0, new Font("Segoe UI", Font.BOLD, 14), Color.WHITE));
+        painelEstatisticas.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
         lblTotalVendas = new JLabel("Total de Vendas: 0");
         lblTotalVendas.setForeground(new Color(242, 48, 100));
+        lblTotalVendas.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
         lblValorTotal = new JLabel("Valor Total: R$ 0,00");
         lblValorTotal.setForeground(new Color(242, 48, 100));
+        lblValorTotal.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
         painelEstatisticas.add(lblTotalVendas);
         JLabel separador = new JLabel("|");
@@ -82,34 +81,38 @@ public class ListarVendasView extends JDialog {
         painelEstatisticas.add(separador);
         painelEstatisticas.add(lblValorTotal);
 
-        JPanel painelBotoes = new JPanel(new FlowLayout());
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
         painelBotoes.setOpaque(false);
 
         JButton btnAtualizar = new JButton("Atualizar Lista");
         btnAtualizar.setBackground(new Color(242, 48, 100));
         btnAtualizar.setForeground(Color.WHITE);
         btnAtualizar.setFocusPainted(false);
-        btnAtualizar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnAtualizar.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
 
         JButton btnFechar = new JButton("Fechar");
         btnFechar.setBackground(new Color(140, 140, 140));
         btnFechar.setForeground(Color.WHITE);
         btnFechar.setFocusPainted(false);
-        btnFechar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnFechar.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
+
+        JPanel wrapperBotoes = new JPanel(new GridLayout(1, 0, 10, 0));
+        wrapperBotoes.setOpaque(false);
+        wrapperBotoes.add(btnAtualizar);
+        wrapperBotoes.add(btnFechar);
+        painelBotoes.add(wrapperBotoes);
 
         btnAtualizar.addActionListener(e -> carregarVendas());
         btnFechar.addActionListener(e -> dispose());
-
-        painelBotoes.add(btnAtualizar);
-        painelBotoes.add(btnFechar);
 
         add(painelTitulo, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel painelSul = new JPanel(new BorderLayout());
         painelSul.setOpaque(false);
-        painelSul.add(painelEstatisticas, BorderLayout.CENTER);
-        painelSul.add(painelBotoes, BorderLayout.SOUTH);
+        painelSul.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        painelSul.add(painelEstatisticas, BorderLayout.NORTH);
+        painelSul.add(painelBotoes, BorderLayout.CENTER);
         add(painelSul, BorderLayout.SOUTH);
 
         carregarVendas();
@@ -123,6 +126,8 @@ public class ListarVendasView extends JDialog {
             List<Venda> vendas = vendaController.obterTodasVendas();
 
             if (vendas.isEmpty()) {
+                lblTotalVendas.setText("Total de Vendas: 0");
+                lblValorTotal.setText("Valor Total: R$ 0,00");
                 return;
             }
 

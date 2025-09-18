@@ -107,13 +107,16 @@ public class DeletarVendaView extends JDialog {
         btnFechar.setForeground(Color.WHITE);
         btnFechar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
+        JPanel wrapperBotoes = new JPanel(new GridLayout(1, 0, 10, 0));
+        wrapperBotoes.setOpaque(false);
+        wrapperBotoes.add(btnDeletar);
+        wrapperBotoes.add(btnAtualizar);
+        wrapperBotoes.add(btnFechar);
+        painelBotoes.add(wrapperBotoes);
+
         btnDeletar.addActionListener(e -> deletarVendaSelecionada());
         btnAtualizar.addActionListener(e -> carregarVendas());
         btnFechar.addActionListener(e -> dispose());
-
-        painelBotoes.add(btnDeletar);
-        painelBotoes.add(btnAtualizar);
-        painelBotoes.add(btnFechar);
 
         JPanel painelCentral = new JPanel(new BorderLayout());
         painelCentral.setOpaque(false);

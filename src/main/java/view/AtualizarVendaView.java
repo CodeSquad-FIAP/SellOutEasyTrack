@@ -131,12 +131,17 @@ public class AtualizarVendaView extends JDialog {
         btnAtualizar.addActionListener(e -> atualizarVenda());
         btnCancelar.addActionListener(e -> dispose());
 
-        JPanel panelBotoes = new JPanel(new FlowLayout());
+        JPanel panelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         panelBotoes.setOpaque(false);
-        panelBotoes.add(btnAtualizar);
-        panelBotoes.add(btnCancelar);
+
+        JPanel wrapperBotoes = new JPanel(new GridLayout(1, 0, 10, 0));
+        wrapperBotoes.setOpaque(false);
+        wrapperBotoes.add(btnAtualizar);
+        wrapperBotoes.add(btnCancelar);
+        panelBotoes.add(wrapperBotoes);
 
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
+        gbc.insets = new Insets(20, 15, 15, 15);
         painelPrincipal.add(panelBotoes, gbc);
 
         add(painelTitulo, BorderLayout.NORTH);
