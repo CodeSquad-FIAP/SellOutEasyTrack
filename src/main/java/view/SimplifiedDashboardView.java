@@ -65,7 +65,7 @@ public class SimplifiedDashboardView extends JFrame implements VendaListener {
 
     private void configurarJanela() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1600, 900);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
     }

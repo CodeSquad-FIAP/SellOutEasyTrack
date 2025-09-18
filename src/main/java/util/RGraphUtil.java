@@ -252,7 +252,7 @@ public class RGraphUtil {
             writer.println("  plot = grafico,");
             writer.println("  width = 16,");
             writer.println("  height = 12,");
-            writer.println("  dpi = 1200,");
+            writer.println("  dpi = 150,");
             writer.println("  units = 'in',");
             writer.println("  device = 'png',");
             writer.println("  type = 'cairo-png',");

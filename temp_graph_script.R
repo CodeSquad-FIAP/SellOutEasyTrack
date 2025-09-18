@@ -130,7 +130,7 @@ ggsave(
   plot = grafico,
   width = 16,
   height = 12,
-  dpi = 1200,
+  dpi = 150,
   units = 'in',
   device = 'png',
   type = 'cairo-png',
