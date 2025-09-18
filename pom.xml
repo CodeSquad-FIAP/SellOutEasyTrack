@@ -21,6 +21,12 @@
             <version>3.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
+        </dependency>
+
         <!-- FlatLaf IntelliJ Theme (para aparência ainda mais moderna) -->
         <dependency>
             <groupId>com.formdev</groupId>

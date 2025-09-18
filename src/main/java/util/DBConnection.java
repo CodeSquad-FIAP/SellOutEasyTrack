@@ -1,45 +1,17 @@
 package util;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Classe para gerenciamento de conexão com o banco de dados MySQL
- * SellOut EasyTrack - Versão 2.0
- */
 public class DBConnection {
 
-    // ===============================================
-    // CONFIGURAÇÕES DE CONEXÃO
-    // ===============================================
+    private static final Dotenv dotenv = Dotenv.load();
 
-    // URL com parâmetros otimizados para o projeto
-    private static final String URL = "jdbc:mysql://localhost:3306/SellOutEasyTrack_SQL?" +
-            "useSSL=false&" +
-            "allowPublicKeyRetrieval=true&" +
-            "serverTimezone=America/Sao_Paulo&" +
-            "useUnicode=true&" +
-            "characterEncoding=UTF-8";
-
-    // OPÇÃO 1: Usuário específico criado (RECOMENDADO)
-    private static final String USER = "root";
-    private static final String PASSWORD = "SenhaForte123#";
-
-    // OPÇÃO 2: Se preferir usar root (descomente as linhas abaixo e comente as de cima)
-    // private static final String USER = "root";
-    // private static final String PASSWORD = ""; // Sua senha do root aqui
-
-    // ===============================================
-    // CONFIGURAÇÕES DE POOL DE CONEXÕES
-    // ===============================================
-
-    private static final int MAX_CONNECTIONS = 10;
-    private static final int CONNECTION_TIMEOUT = 30000; // 30 segundos
-
-    // ===============================================
-    // MÉTODOS DE CONEXÃO
-    // ===============================================
+    private static final String URL = dotenv.get("DB_URL");
+    private static final String USER = dotenv.get("DB_USER");
+    private static final String PASSWORD = dotenv.get("DB_PASSWORD");
 
     /**
      * Obtém uma conexão com o banco de dados
@@ -47,18 +19,14 @@ public class DBConnection {
      * @throws SQLException se houver erro na conexão
      */
     public static Connection getConnection() throws SQLException {
+        if (URL == null || USER == null || PASSWORD == null) {
+            throw new SQLException("As variáveis de ambiente DB_URL, DB_USER, ou DB_PASSWORD não foram encontradas no arquivo .env");
+        }
         try {
-            // Carrega o driver MySQL (necessário para versões antigas do Java)
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Cria e retorna a conexão
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-
-            // Configurações otimizadas para a conexão
             connection.setAutoCommit(true);
-
             return connection;
-
         } catch (ClassNotFoundException e) {
             throw new SQLException("Driver MySQL não encontrado: " + e.getMessage());
         } catch (SQLException e) {
@@ -116,10 +84,6 @@ public class DBConnection {
         }
     }
 
-    // ===============================================
-    // MÉTODO MAIN PARA TESTE
-    // ===============================================
-
     /**
      * Método para testar a conexão
      */
@@ -148,7 +112,7 @@ public class DBConnection {
                 System.out.println("\nVerifique:");
                 System.out.println("1. MySQL está rodando?");
                 System.out.println("2. Banco SellOutEasyTrack_SQL existe?");
-                System.out.println("3. Usuário/senha estão corretos?");
+                System.out.println("3. Usuário/senha estão corretos no .env?");
                 System.out.println("4. Execute o script setup_database.sql");
             }
 
@@ -156,7 +120,7 @@ public class DBConnection {
             System.out.println("❌ Erro durante o teste: " + e.getMessage());
             System.out.println("\nDicas de solução:");
             System.out.println("- Verifique se o MySQL está rodando");
-            System.out.println("- Execute: mysql -u " + USER + " -p");
+            System.out.println("- Verifique as credenciais no seu arquivo .env");
             System.out.println("- Verifique a porta 3306");
         }
 
