@@ -1,0 +1,10 @@
+20/01/2024 10:00 - João Silva: Cliente A comprou: 1 iPhone 16 Pro por R$ 7999
+20/01/2024 10:15 - João Silva: Cliente B: 2 AirPods Pro, 1899 cada
+20/01/2024 10:30 - Maria Santos: Cliente C: 3 Capas de iPhone - 89,90 por unidade
+
+20/01/2024 11:00 - Pedro Costa: Empresa XYZ: 1 Notebook Dell XPS 15 - R$ 8500
+20/01/2024 11:15 - Pedro Costa: Mesmo cliente: 1 Monitor 27 4K por 1899
+
+20/01/2024 14:00 - João Silva: Loja ABC: 3 Teclados Mecânicos - 450 cada
+20/01/2024 14:05 - João Silva: Loja ABC: 4 Mouses Gamer - R$ 250,00 por unidade
+20/01/2024 14:10 - João Silva: Loja ABC: 2 Webcams Logitech - 500 reais cada

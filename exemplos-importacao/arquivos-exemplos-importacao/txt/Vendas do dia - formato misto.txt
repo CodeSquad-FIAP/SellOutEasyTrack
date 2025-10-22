@@ -1,0 +1,16 @@
+# VENDAS - 20 DE JANEIRO DE 2024
+
+# Vendedor: João Silva
+iPhone 16 Pro - 1 - 7999.00
+AirPods Pro 3 - 2 - 1899.00
+Capa iPhone - 3 - 89.90
+Película Temperada - 5 - 34.50
+
+# Vendedor: Maria Santos
+Notebook Dell - 1 - 8500.00
+Monitor 27 4K - 1 - 1899.00
+
+# Vendedor: Pedro Costa
+Teclado Mecânico: 3 x 450.00
+Mouse Gamer: 4 x 250.00
+Webcam 4K: 2 x 500.00
