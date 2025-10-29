@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SellOut EasyTrack - O Futuro da Sua Gestão de Vendas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Add icon library for mobile menu -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #111827;
+      /* Tailwind gray-900 */
+      color: #d1d5db;
+      /* Tailwind gray-300 */
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #F23064, #8E44AD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      /* Standard property */
+      text-fill-color: transparent;
+      /* Standard property */
+    }
+
+    .hero-bg {
+      background-color: #111827;
+      background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 20px 20px;
+    }
+
+    .feature-card:hover,
+    .team-card:hover,
+    .plan-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 0 40px rgba(242, 48, 100, 0.2);
+    }
+
+    .glow-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 0.375rem;
+      /* rounded-md */
+      background: linear-gradient(90deg, #F23064, #8E44AD);
+      filter: blur(15px);
+      opacity: 0.75;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .glow-button:hover::before {
+      opacity: 1;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    /* Mobile menu styles */
+    #mobile-menu {
+      transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    #mobile-menu.active {
+      max-height: 500px;
+      /* Adjust as needed */
+      opacity: 1;
+    }
+
+    /* Custom input style */
+    .ai-input {
+      background-color: #1f2937;
+      /* gray-800 */
+      border: 1px solid #4b5563;
+      /* gray-600 */
+      color: #d1d5db;
+      /* gray-300 */
+      border-radius: 0.375rem;
+      /* rounded-md */
+      padding: 0.5rem 0.75rem;
+      /* py-2 px-3 */
+      transition: border-color 0.2s ease;
+    }
+
+    .ai-input:focus {
+      outline: none;
+      border-color: #ec4899;
+      /* pink-500 */
+      box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.5);
+    }
+
+    /* Loading spinner */
+    .spinner {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 2px solid #ec4899;
+      /* pink-500 */
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Modal Style */
+    .modal {
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      /* Stay in place */
+      z-index: 100;
+      /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%;
+      /* Full width */
+      height: 100%;
+      /* Full height */
+      overflow: auto;
+      /* Enable scroll if needed */
+      background-color: rgba(0, 0, 0, 0.6);
+      /* Black w/ opacity */
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #1f2937;
+      /* gray-800 */
+      margin: 5% auto;
+      /* 5% from the top and centered */
+      padding: 25px;
+      border: 1px solid #4b5563;
+      /* gray-600 */
+      width: 90%;
+      /* Could be more or less, depending on screen size */
+      max-width: 500px;
+      border-radius: 0.5rem;
+      /* rounded-lg */
+      position: relative;
+    }
+
+    .close-button {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+      color: #d1d5db;
+      /* gray-300 */
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body class="text-gray-300">
+
+  <!-- Header -->
+  <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold gradient-text">SellOut EasyTrack</h1>
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+        <a href="#features" class="hover:text-pink-500 transition-colors">Benefícios</a>
+        <a href="#ai-demo" class="hover:text-pink-500 transition-colors">Demonstração IA</a>
+        <a href="#who-is-it-for" class="hover:text-pink-500 transition-colors">Soluções</a>
+        <a href="#plans" class="hover:text-pink-500 transition-colors">Preços</a>
+        <a href="#team" class="hover:text-pink-500 transition-colors">Equipe</a>
+        <a href="#contact" class="hover:text-pink-500 transition-colors">Contato</a>
+        <a href="#"
+          class="bg-pink-600 text-white font-bold py-2 px-6 rounded-md hover:bg-pink-700 transition-all">Baixar
+          Agora</a>
+      </div>
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button id="menu-btn" class="text-white focus:outline-none">
+          <i class="fas fa-bars fa-lg"></i>
+        </button>
+      </div>
+    </nav>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden bg-gray-900 absolute top-full left-0 w-full">
+      <div class="flex flex-col items-center py-4 space-y-4">
+        <a href="#features" class="block hover:text-pink-500 transition-colors py-2 mobile-menu-link">Benefícios</a>
+        <a href="#ai-demo" class="block hover:text-pink-500 transition-colors py-2 mobile-menu-link">Demonstração IA</a>
+        <a href="#who-is-it-for" class="block hover:text-pink-500 transition-colors py-2 mobile-menu-link">Soluções</a>
+        <a href="#plans" class="block hover:text-pink-500 transition-colors py-2 mobile-menu-link">Preços</a>
+        <a href="#team" class="block hover:text-pink-500 transition-colors py-2 mobile-menu-link">Equipe</a>
+        <a href="#contact" class="block hover:text-pink-500 transition-colors py-2 mobile-menu-link">Contato</a>
+        <a href="#"
+          class="bg-pink-600 text-white font-bold py-2 px-6 rounded-md hover:bg-pink-700 transition-all w-3/4 text-center mt-2 mobile-menu-link">Baixar
+          Agora</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-bg py-20 md:py-32">
+      <div class="container mx-auto px-6 text-center">
+        <div class="max-w-3xl mx-auto fade-in">
+          <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
+            O Futuro da Sua Gestão de Vendas. <span class="gradient-text">Hoje.</span>
+          </h2>
+          <p class="mt-6 text-base sm:text-lg text-gray-400">
+            Abandone as planilhas. Centralize, visualize e acelere suas vendas com SellOut EasyTrack, a plataforma
+            inteligente projetada para o seu crescimento.
+          </p>
+          <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <a href="#plans"
+              class="relative inline-block bg-pink-600 text-white font-bold py-3 px-8 rounded-md hover:bg-pink-700 transition-all glow-button">
+              Ver Planos
+            </a>
+            <a href="./SellOutEasyTrack_Windows/SellOutEasyTrack_Windows.zip" download class="bg-gray-700 text-white font-bold py-3 px-8 rounded-md hover:bg-gray-600 transition-all">
+              <i class="fas fa-download mr-2"></i>Baixar Agora
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 md:py-20 bg-gray-900">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-white">Inteligência que <span class="gradient-text">Gera
+              Resultados</span></h2>
+          <p class="text-gray-400 mt-4 max-w-2xl mx-auto">SellOut EasyTrack não é apenas um sistema, é o seu novo
+            parceiro estratégico.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div
+            class="feature-card bg-gray-800 p-6 md:p-8 rounded-lg border border-gray-700 transition-all duration-300">
+            <div class="text-pink-500 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M234.82,78.82,176,20,162.82,6.82a16,16,0,0,0-21.64,0L19.17,128.83a16,16,0,0,0-5.17,11.31V216a16,16,0,0,0,16,16H116.86a16,16,0,0,0,11.31-5.17L240,115.18a16,16,0,0,0,0-22.63ZM128,216H40V144l96-96,72,72Z">
+                </path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Controle Unificado</h3>
+            <p class="text-gray-400">Gerencie todo o ciclo de vendas — do registro à exclusão — em uma interface única e
+              veloz.</p>
+          </div>
+          <!-- Feature 2 -->
+          <div
+            class="feature-card bg-gray-800 p-6 md:p-8 rounded-lg border border-gray-700 transition-all duration-300">
+            <div class="text-purple-500 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm48-80a8,8,0,0,1-8,8H136v32a8,8,0,0,1-16,0V144H88a8,8,0,0,1,0-16h32V96a8,8,0,0,1,16,0v32h32A8,8,0,0,1,176,136Z">
+                </path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Importação Simplificada</h3>
+            <p class="text-gray-400">Abandone o trabalho manual. Importe dados de planilhas, textos e até de conversas
+              do WhatsApp.</p>
+          </div>
+          <!-- Feature 3 -->
+          <div
+            class="feature-card bg-gray-800 p-6 md:p-8 rounded-lg border border-gray-700 transition-all duration-300">
+            <div class="text-blue-500 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M244,144v56a16,16,0,0,1-16,16H28a16,16,0,0,1-16-16V56A16,16,0,0,1,28,40h56a8,8,0,0,1,0,16H28V200H228V144a8,8,0,0,1,16,0ZM120,115.06l-48,48V136a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8h48a8,8,0,0,0,0-16H87.06l48-48a8,8,0,0,0-11.31-11.32Zm114.34-93.8-80,80a8,8,0,0,1-11.32,0L128,86.34,97.66,116.69a8,8,0,0,1-11.32-11.32l32-32a8,8,0,0,1,11.32,0L144,86.34l74.34-74.35a8,8,0,0,1,11.32,11.32Z">
+                </path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Dashboards Inteligentes</h3>
+            <p class="text-gray-400">Transforme números em insights acionáveis com gráficos que revelam tendências e
+              oportunidades.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Demo Section -->
+    <section id="ai-demo" class="py-16 md:py-20">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-white">Experimente a Inteligência <span
+              class="gradient-text">SellOut EasyTrack</span></h2>
+          <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Insira dados de uma venda e veja a IA gerar um insight
+            instantâneo.</p>
+        </div>
+        <div class="max-w-xl mx-auto bg-gray-800/50 p-8 rounded-lg border border-gray-700">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label for="ai-product" class="block text-sm font-medium text-gray-400 mb-1">Produto</label>
+              <input type="text" id="ai-product" class="ai-input w-full" placeholder="Ex: Notebook Gamer">
+            </div>
+            <div>
+              <label for="ai-quantity" class="block text-sm font-medium text-gray-400 mb-1">Quantidade</label>
+              <input type="number" id="ai-quantity" class="ai-input w-full" placeholder="Ex: 5">
+            </div>
+            <div>
+              <label for="ai-price" class="block text-sm font-medium text-gray-400 mb-1">Preço Médio (R$)</label>
+              <input type="number" id="ai-price" class="ai-input w-full" placeholder="Ex: 2500.50">
+            </div>
+          </div>
+          <button id="generate-insight-btn"
+            class="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-700 transition-all flex items-center justify-center">
+            ✨ Gerar Insight com IA
+            <span id="insight-spinner" class="spinner hidden"></span>
+          </button>
+          <div id="insight-result"
+            class="mt-6 p-4 bg-gray-700/50 rounded-md border border-gray-600 min-h-[50px] text-gray-300 italic hidden">
+            <!-- Insight will appear here -->
+          </div>
+          <div id="insight-error" class="mt-4 text-red-400 text-sm hidden">
+            <!-- Error message will appear here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Who is it for Section -->
+    <section id="who-is-it-for" class="py-16 md:py-20 bg-gray-900">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-white">Criado para Negócios que <span class="gradient-text">Não
+              Param de Crescer</span></h2>
+        </div>
+        <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-lg">
+          <div class="bg-gray-800/50 p-6 rounded-lg flex items-start gap-4">
+            <span class="text-blue-400 mt-1">✓</span>
+            <p><strong class="text-white">Varejistas e PMEs:</strong> Simplifique sua gestão diária e foque no que
+              realmente importa: seus clientes.</p>
+          </div>
+          <div class="bg-gray-800/50 p-6 rounded-lg flex items-start gap-4">
+            <span class="text-blue-400 mt-1">✓</span>
+            <p><strong class="text-white">Empreendedores:</strong> Tenha uma ferramenta ágil e eficiente para acompanhar
+              cada venda sem perder tempo.</p>
+          </div>
+          <div class="bg-gray-800/50 p-6 rounded-lg flex items-start gap-4">
+            <span class="text-blue-400 mt-1">✓</span>
+            <p><strong class="text-white">Equipes de Vendas:</strong> Ganhe visibilidade, organize suas metas e analise
+              a performance de forma colaborativa.</p>
+          </div>
+          <div class="bg-gray-800/50 p-6 rounded-lg flex items-start gap-4">
+            <span class="text-blue-400 mt-1">✓</span>
+            <p><strong class="text-white">Visionários:</strong> Abandone as planilhas e adote uma solução profissional
+              para escalar seu negócio.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plans Section -->
+    <section id="plans" class="py-16 md:py-20">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-white">Acesso Total. <span class="gradient-text">Sem
+              Complicações.</span></h2>
+          <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Escolha o plano ideal para a sua jornada de crescimento.</p>
+        </div>
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch md:items-center">
+          <!-- Plano Essencial -->
+          <div
+            class="plan-card bg-gray-800 rounded-xl shadow-lg p-6 md:p-8 border border-gray-700 flex flex-col justify-between transition-all duration-300">
+            <div>
+              <h3 class="text-2xl font-bold text-center text-white">Essencial</h3>
+              <p class="text-center text-gray-400 mt-2">Para quem está começando.</p>
+              <div class="text-center my-8">
+                <span class="text-4xl sm:text-5xl font-bold text-white">R$ 29,90</span>
+                <span class="text-gray-400">/ mês</span>
+              </div>
+              <ul class="space-y-4 text-gray-300">
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Até 100 vendas/mês</li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Dashboard Essencial</li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Relatórios Padrão</li>
+                <li class="flex items-center gap-3"><span class="text-gray-500">✗</span> Importação de Dados</li>
+                <li class="flex items-center gap-3"><span class="text-gray-500">✗</span> Suporte Prioritário</li>
+              </ul>
+            </div>
+            <a href="#"
+              class="block w-full mt-10 bg-gray-700 text-white font-bold py-3 px-8 rounded-md hover:bg-gray-600 transition-all text-center">
+              Começar
+            </a>
+          </div>
+
+          <!-- Plano Profissional (Destaque) -->
+          <div
+            class="plan-card relative bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8 border-2 border-pink-500 md:scale-105 flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
+                <span
+                  class="bg-pink-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full">Mais
+                  Popular</span>
+              </div>
+              <h3 class="text-2xl font-bold text-center text-white">Profissional</h3>
+              <p class="text-center text-gray-400 mt-2">Tudo que você precisa para decolar.</p>
+              <div class="text-center my-8">
+                <span class="text-4xl sm:text-5xl font-bold text-white">R$ 49,90</span>
+                <span class="text-gray-400">/ mês</span>
+              </div>
+              <ul class="space-y-4 text-gray-300">
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Vendas e Relatórios Ilimitados
+                </li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Dashboard Analítico Completo
+                </li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Importação de Dados (CSV, TXT,
+                  WA)</li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Insights Automáticos por IA
+                </li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Suporte Prioritário</li>
+              </ul>
+            </div>
+            <a href="#"
+              class="relative block w-full mt-10 bg-pink-600 text-white font-bold py-3 px-8 rounded-md hover:bg-pink-700 transition-all text-center glow-button">
+              Quero Crescer com SellOut EasyTrack
+            </a>
+          </div>
+
+          <!-- Plano Enterprise -->
+          <div
+            class="plan-card bg-gray-800 rounded-xl shadow-lg p-6 md:p-8 border border-gray-700 flex flex-col justify-between transition-all duration-300">
+            <div>
+              <h3 class="text-2xl font-bold text-center text-white">Enterprise</h3>
+              <p class="text-center text-gray-400 mt-2">Para negócios em escala.</p>
+              <div class="text-center my-8">
+                <span class="text-3xl sm:text-4xl font-bold text-white">Sob Consulta</span>
+              </div>
+              <ul class="space-y-4 text-gray-300">
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Tudo do Plano Profissional
+                </li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Múltiplos Usuários e
+                  Permissões</li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Acesso à API para Integrações
+                </li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Gerente de Conta Dedicado</li>
+                <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Onboarding Personalizado</li>
+              </ul>
+            </div>
+            <a href="#"
+              class="block w-full mt-10 bg-transparent border-2 border-purple-500 text-purple-400 font-bold py-3 px-8 rounded-md hover:bg-purple-500 hover:text-white transition-all text-center">
+              Fale com um Especialista
+            </a>
+          </div>
+        </div>
+        <!-- AI Plan Recommendation -->
+        <div class="text-center mt-12">
+          <button id="recommend-plan-btn"
+            class="text-purple-400 hover:text-purple-300 transition-colors flex items-center justify-center mx-auto">
+            ✨ Não sabe qual plano escolher? Gere uma recomendação!
+            <span id="recommend-spinner" class="spinner hidden"></span>
+          </button>
+          <div id="recommendation-result"
+            class="mt-4 p-4 bg-gray-800 rounded-md border border-gray-700 max-w-md mx-auto hidden text-sm">
+            <!-- Recommendation appears here -->
+          </div>
+          <div id="recommendation-error" class="mt-4 text-red-400 text-sm hidden">
+            <!-- Error message appears here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-16 md:py-20 bg-gray-900">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-white">A Equipe por Trás do <span class="gradient-text">SellOut
+              EasyTrack</span></h2>
+          <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Conheça os desenvolvedores que tornaram este projeto uma
+            realidade.</p>
+        </div>
+        <div class="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+          <!-- André Flores -->
+          <div class="team-card text-center transition-all duration-300">
+            <img src="./Profile-pictures/andre.jpg" alt="Foto de perfil de André Flores"
+              class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-pink-500">
+            <h3 class="text-lg font-bold text-white">André Flores</h3>
+            <a href="https://www.linkedin.com/in/andréflores/" target="_blank"
+              class="text-pink-500 hover:text-pink-400 transition-colors text-sm">LinkedIn</a>
+          </div>
+          <!-- Arthur Corrêa -->
+          <div class="team-card text-center transition-all duration-300">
+            <img src="./Profile-pictures/arthur.jpeg"
+              alt="Foto de perfil de Arthur Corrêa"
+              class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-purple-500">
+            <h3 class="text-lg font-bold text-white">Arthur Corrêa</h3>
+            <a href="https://www.linkedin.com/in/arthurceicorrea/" target="_blank"
+              class="text-pink-500 hover:text-pink-400 transition-colors text-sm">LinkedIn</a>
+          </div>
+          <!-- Kevin Benevides -->
+          <div class="team-card text-center transition-all duration-300">
+            <img src="./Profile-pictures/kevin.jpeg"
+              alt="Foto de perfil de Kevin Benevides"
+              class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-pink-500">
+            <h3 class="text-lg font-bold text-white">Kevin Benevides</h3>
+            <a href="https://www.linkedin.com/in/kevinbenevidesdasilva/" target="_blank"
+              class="text-pink-500 hover:text-pink-400 transition-colors text-sm">LinkedIn</a>
+          </div>
+          <!-- Roger Alencar -->
+          <div class="team-card text-center transition-all duration-300">
+            <img src="./Profile-pictures/roger.jpg"
+              alt="Foto de perfil de Roger Alencar"
+              class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-purple-500">
+            <h3 class="text-lg font-bold text-white">Roger Alencar</h3>
+            <a href="https://www.linkedin.com/in/roger-alencar-it/" target="_blank"
+              class="text-pink-500 hover:text-pink-400 transition-colors text-sm">LinkedIn</a>
+          </div>
+          <!-- Yasmin Kimura -->
+          <div class="team-card text-center transition-all duration-300">
+            <img src="./Profile-pictures/yasmin.jpeg"
+              alt="Foto de perfil de Yasmin Kimura"
+              class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-pink-500">
+            <h3 class="text-lg font-bold text-white">Yasmin Kimura</h3>
+            <a href="https://www.linkedin.com/in/yasmin-kimura-b374b72b7/" target="_blank"
+              class="text-pink-500 hover:text-pink-400 transition-colors text-sm">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 md:py-20">
+      <div class="container mx-auto px-6 text-center">
+        <div class="max-w-2xl mx-auto">
+          <h2 class="text-3xl md:text-4xl font-bold text-white">Pronto para Começar?</h2>
+          <p class="mt-4 text-base sm:text-lg text-gray-400">
+            Faça o download do SellOut EasyTrack agora mesmo e veja como ele pode revolucionar a sua gestão de vendas.
+            Comece gratuitamente.
+          </p>
+          <div class="mt-8">
+            <a href="#"
+              class="relative inline-block bg-pink-600 text-white font-bold py-3 px-8 rounded-md hover:bg-pink-700 transition-all glow-button">
+              <i class="fas fa-download mr-2"></i>Baixar Agora
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 border-t border-gray-800">
+    <div class="container mx-auto px-6 py-6 text-center text-gray-500">
+      <p>&copy; 2025 SellOut EasyTrack. Todos os direitos reservados.</p>
+      <p class="text-sm">Simplificando a gestão de vendas para negócios em crescimento.</p>
+    </div>
+  </footer>
+
+  <!-- Plan Recommendation Modal -->
+  <div id="planModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" onclick="closeModal('planModal')">&times;</span>
+      <h3 class="text-xl font-bold text-white mb-4">Recomendação de Plano Personalizada ✨</h3>
+      <p class="text-gray-400 mb-4 text-sm">Responda a esta pergunta para receber uma sugestão:</p>
+      <label for="sales-volume" class="block text-sm font-medium text-gray-400 mb-1">Quantas vendas costuma registar por
+        mês?</label>
+      <select id="sales-volume" class="ai-input w-full mb-4">
+        <option value="<100">Menos de 100</option>
+        <option value="100-500">Entre 100 e 500</option>
+        <option value=">500">Mais de 500</option>
+      </select>
+      <button id="get-recommendation-btn"
+        class="w-full bg-purple-600 text-white font-bold py-2 px-4 rounded-md hover:bg-purple-700 transition-all flex items-center justify-center">
+        Obter Recomendação
+        <span id="modal-spinner" class="spinner hidden"></span>
+      </button>
+      <div id="modal-recommendation-result"
+        class="mt-4 p-3 bg-gray-700/50 rounded-md border border-gray-600 hidden text-sm">
+        <!-- Recommendation appears here -->
+      </div>
+      <div id="modal-recommendation-error" class="mt-4 text-red-400 text-sm hidden">
+        <!-- Error message appears here -->
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // --- Mobile Menu ---
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+      const icon = menuBtn.querySelector('i');
+      if (mobileMenu.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    });
+
+    mobileMenuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        const icon = menuBtn.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      });
+    });
+
+    // --- Gemini API Call Function ---
+    const apiKey = ""; // API Key will be automatically handled
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+    async function callGemini(prompt, systemPrompt = null, maxRetries = 3) {
+      const payload = {
+        contents: [{parts: [{text: prompt}]}],
+      };
+      if (systemPrompt) {
+        payload.systemInstruction = {parts: [{text: systemPrompt}]};
+      }
+
+      let attempt = 0;
+      while (attempt < maxRetries) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const errorBody = await response.json();
+            console.error("API Error Response:", errorBody);
+            throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
+          }
+
+          const result = await response.json();
+          // console.log("API Success Response:", result); // Debugging line
+
+          const candidate = result.candidates?.[0];
+          if (candidate && candidate.content?.parts?.[0]?.text) {
+            return candidate.content.parts[0].text;
+          } else if (candidate?.finishReason === 'SAFETY') {
+            return "A resposta foi bloqueada devido a políticas de segurança.";
+          }
+          else {
+            console.warn("Estrutura de resposta inesperada:", result);
+            throw new Error("Não foi possível extrair texto da resposta da API.");
+          }
+        } catch (error) {
+          attempt++;
+          console.error(`Tentativa ${attempt} falhou: ${error.message}`);
+          if (attempt >= maxRetries) {
+            throw error; // Rethrow after max retries
+          }
+          // Exponential backoff
+          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+          // console.log(`A aguardar ${delay}ms para tentar novamente...`); // Debugging line
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+      throw new Error("Número máximo de tentativas excedido."); // Should not be reached if maxRetries > 0
+    }
+
+    // --- AI Insight Generator ---
+    const generateInsightBtn = document.getElementById('generate-insight-btn');
+    const insightResultDiv = document.getElementById('insight-result');
+    const insightErrorDiv = document.getElementById('insight-error');
+    const insightSpinner = document.getElementById('insight-spinner');
+    const aiProductInput = document.getElementById('ai-product');
+    const aiQuantityInput = document.getElementById('ai-quantity');
+    const aiPriceInput = document.getElementById('ai-price');
+
+    generateInsightBtn.addEventListener('click', async () => {
+      const product = aiProductInput.value.trim();
+      const quantity = aiQuantityInput.value.trim();
+      const price = aiPriceInput.value.trim();
+
+      if (!product || !quantity || !price) {
+        insightErrorDiv.textContent = "Por favor, preencha todos os campos da venda.";
+        insightErrorDiv.classList.remove('hidden');
+        insightResultDiv.classList.add('hidden');
+        return;
+      }
+
+      insightErrorDiv.classList.add('hidden');
+      insightResultDiv.classList.add('hidden');
+      insightSpinner.classList.remove('hidden');
+      generateInsightBtn.disabled = true;
+
+      const prompt = `Analise os seguintes dados de venda de um produto e forneça um insight curto e acionável (1-2 frases) para o dono de um pequeno negócio. Foco no Português do Brasil. Dados: Produto='${product}', Quantidade Vendida=${quantity}, Preço Médio Unitário=R$${price}.`;
+      const systemPrompt = "Aja como um consultor de negócios conciso e prático, focado em pequenos empreendedores no Brasil.";
+
+      try {
+        const insightText = await callGemini(prompt, systemPrompt);
+        insightResultDiv.textContent = insightText;
+        insightResultDiv.classList.remove('hidden');
+      } catch (error) {
+        console.error("Erro ao gerar insight:", error);
+        insightErrorDiv.textContent = `Erro ao gerar insight: ${error.message}. Tente novamente.`;
+        insightErrorDiv.classList.remove('hidden');
+      } finally {
+        insightSpinner.classList.add('hidden');
+        generateInsightBtn.disabled = false;
+      }
+    });
+
+    // --- Plan Recommendation ---
+    const recommendPlanBtn = document.getElementById('recommend-plan-btn');
+    const recommendationResultDiv = document.getElementById('recommendation-result');
+    const recommendationErrorDiv = document.getElementById('recommendation-error');
+    const recommendSpinner = document.getElementById('recommend-spinner');
+    const planModal = document.getElementById('planModal');
+    const getRecommendationBtn = document.getElementById('get-recommendation-btn');
+    const modalSpinner = document.getElementById('modal-spinner');
+    const modalRecommendationResultDiv = document.getElementById('modal-recommendation-result');
+    const modalRecommendationErrorDiv = document.getElementById('modal-recommendation-error');
+    const salesVolumeSelect = document.getElementById('sales-volume');
+
+
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+      // Clear previous results/errors in modal
+      modalRecommendationResultDiv.classList.add('hidden');
+      modalRecommendationResultDiv.textContent = '';
+      modalRecommendationErrorDiv.classList.add('hidden');
+      modalRecommendationErrorDiv.textContent = '';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Close modal if user clicks outside of it
+    window.onclick = function (event) {
+      if (event.target == planModal) {
+        closeModal('planModal');
+      }
+    }
+
+
+    recommendPlanBtn.addEventListener('click', () => {
+      openModal('planModal');
+    });
+
+    getRecommendationBtn.addEventListener('click', async () => {
+      const salesVolume = salesVolumeSelect.value;
+
+      modalRecommendationErrorDiv.classList.add('hidden');
+      modalRecommendationResultDiv.classList.add('hidden');
+      modalSpinner.classList.remove('hidden');
+      getRecommendationBtn.disabled = true;
+
+      const prompt = `Considerando os planos de preços do software SellOut EasyTrack (Essencial: até 100 vendas/mês, básico; Profissional: ilimitado, importação de dados, insights IA; Enterprise: múltiplos usuários, API, etc.), recomende o melhor plano para um pequeno negócio que regista aproximadamente ${salesVolume} vendas por mês. Explique brevemente (1-2 frases) o porquê da recomendação. Fale em Português do Brasil.`;
+      const systemPrompt = "Aja como um consultor de software conciso, ajudando pequenos empresários a escolher o plano certo.";
+
+
+      try {
+        const recommendationText = await callGemini(prompt, systemPrompt);
+        modalRecommendationResultDiv.innerHTML = `<strong class="text-purple-400">Recomendação:</strong> ${recommendationText}`;
+        modalRecommendationResultDiv.classList.remove('hidden');
+      } catch (error) {
+        console.error("Erro ao gerar recomendação:", error);
+        modalRecommendationErrorDiv.textContent = `Erro: ${error.message}. Tente novamente.`;
+        modalRecommendationErrorDiv.classList.remove('hidden');
+      } finally {
+        modalSpinner.classList.add('hidden');
+        getRecommendationBtn.disabled = false;
+      }
+
+    });
+
+
+  </script>
+
+</body>
+
+</html>
