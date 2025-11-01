@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db-sellout:
+    image: mysql:8.0
+    container_name: sellouteasytrack_db
+    # Carrega as variáveis do arquivo .env para o container
+    env_file:
+      - ./.env
+    environment:
+      # Define o nome do banco e as senhas usando as variáveis do .env
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # Use a mesma senha para root e usuário
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      # Monta o script de inicialização do banco
+      - ./init:/docker-entrypoint-initdb.d
+      # Monta um volume para persistir os dados
+      - sellout_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "${DB_USER}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sellout_db_data:

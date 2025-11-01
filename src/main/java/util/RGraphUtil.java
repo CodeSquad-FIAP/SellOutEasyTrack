@@ -11,13 +11,17 @@ public class RGraphUtil {
     private static final String R_SCRIPT_PATH = "temp_graph_script.R";
     private static final String CSV_DATA_PATH = "temp_vendas_data.csv";
     private static final String OUTPUT_IMAGE_PATH = "vendas_grafico.png";
+    
+    // Armazena o comando R funcional (Rscript) para não ter que procurá-lo novamente.
+    private static String comandoRVerificado = null;
 
     public static String gerarGraficoVendas(List<Venda> vendas) {
         System.out.println("Iniciando geração de gráfico R com paleta FIAP + Asteria...");
 
         try {
-            if (!verificarRDisponivel()) {
-                System.err.println("R não está disponível no sistema!");
+            // A verificação agora é mais inteligente e armazena o comando.
+            if (!isRDisponivel()) {
+                System.err.println("Rscript não foi encontrado no PATH do sistema!");
                 return null;
             }
 
@@ -50,46 +54,48 @@ public class RGraphUtil {
         } catch (Exception e) {
             System.err.println("Erro ao gerar gráfico R: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            // Limpa os arquivos temporários
+            limparArquivosTemp();
         }
 
         return null;
     }
 
+    /**
+     * VERIFICAÇÃO DE R CORRIGIDA (Clean Code)
+     * * Tenta executar "Rscript --version". Se funcionar, o R está no PATH e é
+     * utilizável.
+     * Remove toda a lista de caminhos "hard-coded".
+     */
     private static boolean verificarRDisponivel() {
-        String[] comandosR = {
-                "C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe",
-                "C:\\Program Files\\R\\R-4.4.1\\bin\\Rscript.exe",
-                "C:\\Program Files\\R\\R-4.4.0\\bin\\Rscript.exe",
-                "C:\\Program Files\\R\\R-4.3.2\\bin\\Rscript.exe",
-                "C:\\Program Files\\R\\R-4.3.1\\bin\\Rscript.exe",
-                "C:\\Program Files\\R\\R-4.3.0\\bin\\Rscript.exe",
-                "C:\\Program Files (x86)\\R\\R-4.5.1\\bin\\Rscript.exe",
-                "C:\\Program Files (x86)\\R\\R-4.4.1\\bin\\Rscript.exe",
-                "C:\\R\\R-4.5.1\\bin\\Rscript.exe",
-                "C:\\R\\R-4.4.1\\bin\\Rscript.exe",
-                "Rscript",
-                "R",
-                "/usr/bin/Rscript",
-                "/usr/local/bin/Rscript"
-        };
+        // Se já encontramos, não precisamos verificar de novo.
+        if (comandoRVerificado != null) {
+            return true;
+        }
+        
+        // O único comando que devemos testar.
+        String comando = "Rscript"; 
+        
+        try {
+            ProcessBuilder pb = new ProcessBuilder(comando, "--version");
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
 
-        for (String comando : comandosR) {
-            try {
-                ProcessBuilder pb = new ProcessBuilder(comando, "--version");
-                pb.redirectErrorStream(true);
-                Process process = pb.start();
-
-                int exitCode = process.waitFor();
-                if (exitCode == 0) {
-                    System.out.println("R encontrado com comando: " + comando);
-                    return true;
-                }
-            } catch (Exception e) {
-                System.out.println("Comando " + comando + " não funcionou: " + e.getMessage());
+            int exitCode = process.waitFor();
+            
+            if (exitCode == 0) {
+                System.out.println("R encontrado no PATH do sistema com comando: " + comando);
+                comandoRVerificado = comando; // Armazena o comando funcional
+                return true;
             }
+        } catch (Exception e) {
+            // IOException (não encontrado) ou InterruptedException
+            System.err.println("Comando '" + comando + "' falhou ou não foi encontrado no PATH: " + e.getMessage());
         }
 
-        System.err.println("R não encontrado em nenhum dos comandos testados");
+        System.err.println("ERRO: Rscript não foi encontrado no PATH do seu sistema.");
+        System.err.println("Por favor, garanta que o R está instalado e que a pasta 'bin' está na variável de ambiente PATH.");
         return false;
     }
 
@@ -102,6 +108,7 @@ public class RGraphUtil {
     }
 
     private static void criarArquivoCSVTemp(Map<String, Integer> dados) throws IOException {
+        // (Conteúdo do seu método original - sem alterações)
         try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(CSV_DATA_PATH), StandardCharsets.UTF_8))) {
             writer.write('\uFEFF');
             writer.println("Produto,Quantidade");
@@ -118,6 +125,8 @@ public class RGraphUtil {
     }
 
     private static void criarScriptRComPaletaFiapAsteria() throws IOException {
+        // (Conteúdo do seu método original - sem alterações)
+        // ... (todo o seu código de criação de script R permanece aqui) ...
         try (PrintWriter writer = new PrintWriter(new FileWriter(R_SCRIPT_PATH))) {
             writer.println("cat('Iniciando script R com paleta FIAP + Asteria...\\n')");
             writer.println("");
@@ -274,47 +283,53 @@ public class RGraphUtil {
         System.out.println("Script R com paleta FIAP + Asteria criado");
     }
 
+    /**
+     * EXECUÇÃO DE R CORRIGIDA (Clean Code)
+     * * Executa APENAS o comando verificado ("Rscript").
+     * Remove o loop e os caminhos "hard-coded".
+     */
     private static boolean executarScriptR() throws IOException, InterruptedException {
-        String[] comandosR = {
-                "C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe",
-                "Rscript"
-        };
-
-        for (String comando : comandosR) {
-            try {
-                System.out.println("Executando: " + comando + " com paleta FIAP + Asteria");
-
-                ProcessBuilder pb = new ProcessBuilder(comando, R_SCRIPT_PATH);
-                pb.redirectErrorStream(true);
-                pb.directory(new File("."));
-                Process process = pb.start();
-
-                StringBuilder output = new StringBuilder();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    String linha;
-                    while ((linha = reader.readLine()) != null) {
-                        output.append(linha).append("\n");
-                        System.out.println("[R] " + linha);
-                    }
-                }
-
-                int exitCode = process.waitFor();
-                System.out.println("Código de saída: " + exitCode);
-
-                if (exitCode == 0) {
-                    System.out.println("Script R executado com sucesso usando paleta FIAP + Asteria!");
-                    return true;
-                } else {
-                    System.err.println("R falhou com código: " + exitCode);
-                }
-
-            } catch (IOException e) {
-                System.err.println("Erro ao executar " + comando + ": " + e.getMessage());
-                continue;
-            }
+        // Se a verificação falhou, não tente executar.
+        if (comandoRVerificado == null) {
+            System.err.println("Tentativa de execução, mas o comando R não foi verificado.");
+            return false;
         }
 
-        return false;
+        System.out.println("Executando: " + comandoRVerificado + " com paleta FIAP + Asteria");
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder(comandoRVerificado, R_SCRIPT_PATH);
+            pb.redirectErrorStream(true);
+            pb.directory(new File(".")); // Executa na pasta do .exe
+            Process process = pb.start();
+
+            // Bloco para consumir o output do R (bom para debugging)
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String linha;
+                while ((linha = reader.readLine()) != null) {
+                    output.append(linha).append("\n");
+                    System.out.println("[R] " + linha);
+                }
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("Código de saída: " + exitCode);
+
+            if (exitCode == 0) {
+                System.out.println("Script R executado com sucesso usando paleta FIAP + Asteria!");
+                return true;
+            } else {
+                System.err.println("R falhou com código: " + exitCode);
+                System.err.println("Saída do R: " + output.toString());
+                return false;
+            }
+
+        } catch (IOException e) {
+            System.err.println("Erro ao executar " + comandoRVerificado + ": " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private static String criarGraficoVazio() {
@@ -326,14 +341,20 @@ public class RGraphUtil {
             new File(R_SCRIPT_PATH).delete();
             new File(CSV_DATA_PATH).delete();
         } catch (Exception e) {
+            System.err.println("Aviso: Falha ao limpar arquivos temporários. " + e.getMessage());
         }
     }
 
+    /**
+     * MÉTODO PÚBLICO CORRIGIDO
+     * Apenas chama a nova função privada.
+     */
     public static boolean isRDisponivel() {
         return verificarRDisponivel();
     }
 
     public static void testarIntegracaoR() {
+        // (Conteúdo do seu método original - sem alterações)
         System.out.println("=== TESTE DE INTEGRAÇÃO R COM PALETA FIAP + ASTERIA ===");
 
         if (verificarRDisponivel()) {
