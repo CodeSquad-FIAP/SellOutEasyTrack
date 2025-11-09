@@ -1,4 +1,4 @@
-# SellOut EasyTrack
+# SellOut EasyTrack (Projeto Vencedor do NEXT - FIAP em 2025)
 
 
 
