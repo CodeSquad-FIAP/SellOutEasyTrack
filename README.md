@@ -1,11 +1,11 @@
-# Asteria
+# SellOut EasyTrack
 
 
 
 
 ## 🚀 Sobre o Projeto
 
-**Asteria** (anteriormente conhecido como **SellOutEasyTrack**) é uma aplicação desktop robusta desenvolvida em Java, projetada para otimizar a gestão de vendas. Com uma interface intuitiva e moderna, construída com FlatLaf, o sistema permite o controle completo do ciclo de vida das vendas, desde o registro até a análise detalhada. Ele se integra a um banco de dados MySQL para persistência de dados e utiliza a linguagem R para gerar visualizações gráficas dinâmicas, oferecendo insights valiosos sobre o desempenho de vendas.
+**SellOut EasyTrack** é uma aplicação desktop robusta desenvolvida em Java, projetada para otimizar a gestão de vendas. Com uma interface intuitiva e moderna, construída com FlatLaf, o sistema permite o controle completo do ciclo de vida das vendas, desde o registro até a análise detalhada. Ele se integra a um banco de dados MySQL para persistência de dados e utiliza a linguagem R para gerar visualizações gráficas dinâmicas, oferecendo insights valiosos sobre o desempenho de vendas.
 
 Este projeto é ideal para pequenas e médias empresas que buscam uma solução eficiente para monitorar e analisar suas operações de vendas.
 
@@ -25,7 +25,7 @@ Este projeto é ideal para pequenas e médias empresas que buscam uma solução 
 
 ## 🛠️ Tecnologias e Ferramentas
 
-O projeto Asteria é construído com um conjunto robusto de tecnologias para garantir performance, escalabilidade e uma ótima experiência de usuário:
+O projeto SellOut EasyTrack é construído com um conjunto robusto de tecnologias para garantir performance, escalabilidade e uma ótima experiência de usuário:
 
 -   **Linguagem de Programação:** Java 11
 -   **Gerenciamento de Dependências:** Apache Maven
@@ -39,7 +39,7 @@ O projeto Asteria é construído com um conjunto robusto de tecnologias para gar
 
 ## ⚙️ Como Rodar o Projeto
 
-Para colocar o Asteria em funcionamento em sua máquina, siga os passos abaixo:
+Para colocar o SellOut EasyTrack em funcionamento em sua máquina, siga os passos abaixo:
 
 ### Pré-requisitos
 
